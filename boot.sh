@@ -1,3 +1,3 @@
 #!/bin/sh
 mkdir -p log
-python3 -u base_bot.py >> ./log/`date +%s`.txt
+python3 -u cyra.py >> ./log/`date +%s`.txt
