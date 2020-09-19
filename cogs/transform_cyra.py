@@ -45,7 +45,7 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
     invoke_without_command=True
   )
   @commands.is_owner()
-  @commands.cooldown(1, 600, commands.BucketType.default)
+  @commands.cooldown(1, 600, commands.BucketType.guild)
   async def _transform(self, context):
     was_cyra = await self.bot.transform(context.guild)
     await context.send(f"*Elara is here to reap chaos.*" if was_cyra else f"*Cyra has taken control back.*")
