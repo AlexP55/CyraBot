@@ -5,5 +5,5 @@ then
   echo "Bot is already running"
 else
   mkdir -p log
-  nohup python3 -u base_bot.py >> ./log/`date +%s`.txt &
+  nohup python3 -u cyra.py >> ./log/`date +%s`.txt &
 fi
