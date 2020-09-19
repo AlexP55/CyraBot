@@ -221,9 +221,9 @@ if __name__ == "__main__":
   #Loading the secret key.
   dotenv.load_dotenv()
   TOKEN = os.getenv("DISCORD_TOKEN")
-  APPA = os.getenv("APPA_ID")
-  SIN = os.getenv("SIN_ID")
-  SERVER = os.getenv("SERVER_ID")
+  APPA = int(os.getenv("APPA_ID"))
+  SIN = int(os.getenv("SIN_ID"))
+  SERVER = int(os.getenv("SERVER_ID"))
   cog_categories = {
     "Administration":["Database Commands", "Settings Management Commands", "Data Fetching Commands", "Administration Commands"],
     "Moderation":["Message Management Commands", "User Management Commands", "Channel Management Commands", "Moderation Commands"],
