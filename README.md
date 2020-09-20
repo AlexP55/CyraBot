@@ -1,6 +1,6 @@
-# DiscordBaseBot
-This is a basic general purpose bot for discord using discord.py api.
-It supports many features, including but not limited to a moderation suite.
+# CyraBot
+This is a bot for Realm Defense discord server using the base bot: https://github.com/Kaldzkur/DiscordBaseBot.
+It supports server moderations as well as showing various information on mobile game Realm Defense: Epic Tower Defense Strategy Game.
 
 ## Installation
 You need a few PyPI packages for this bot to work:
@@ -11,41 +11,19 @@ pip install -U python-dotenv
 pip install -U pytz
 pip install -U emoji
 pip install -U python-dateutil
-````
-## Extending the bot for your discord
-Creating your own custom bot is fairly easy.
-First you fork this project and create a new file for your bot in the root directory.
-This file should contain the class of the bot, inheriting from the BaseBot.
-
-````python
-import discord
-from base_bot import BaseBot
-
-class MyBot(BaseBot):
-  pass
-  
-if __name__ == "__main__":
-  import os
-  import dotenv
-  from base.modules.interactive_help import InteractiveHelpCommand
-  dotenv.load_dotenv()
-  TOKEN = os.getenv("DISCORD_TOKEN")
-  OWNER = os.getenv("OWNER_ID")
-  #This lookup maps all cog names to a name used in the interactive help.
-  cog_categories = {
-    "Administration":["Database Commands", "Settings Management Commands", "Administration Commands"],
-    "Moderation":["Message Management Commands", "User Management Commands", "Channel Management Commands", "Moderation Commands"],
-    "Miscellaneous":["Command Management"]
-  }
-  bot = MyBot(
-    command_prefix="?",
-    owner_ids=set([OWNER]),
-    case_insensitive = True,
-    help_command = InteractiveHelpCommand(cog_categories)
-  )
-  bot.run(TOKEN)
+pip install -U xlrd
 ````
 
+It is highly recommended to upload the pictures in 'emojis/' as emojis in the server to improve the visual effects of the information commands.
 
-## Contributing the bot
-Contributions are welcome; they will be reviewed before they are merged.
+After inviting the bot to the sever, you need to use the fetch command `?fetch all` to update the database of game. The database will be updated with the new patches in game. Using `?fetch all` after the `?upgrade` command will apply all the modifications to the bot's database.
+
+## Main Features
+###### 1. Transformation between Cyra/Elara
+A cool visual transformation in the server every 2 hours which changes the bot's role, name, and profile picture. Bot owners can use `?transform` to force a transformation.
+
+###### 2. Various Information Commands
+A large number of information commands showing game general information. Most of them are displayed in a pretty discord embed.
+
+###### 3. Interactive Stats Commands
+Hero stats, hero ability, tower, enemy, item, buff commands include stats which are data-mined from assets files and not directly shown in-game. Hero stats, hero ability and tower commands have a fancy "interactive" fashion by which the output embed will updated based on your reaction made to the message. You can easily explore the hero/ability/tower list, change the hero rank/level or even transform hero forms in a single command.
