@@ -19,11 +19,11 @@ It is highly recommended to upload the pictures in 'emojis/' as emojis in the se
 After inviting the bot to the sever, you need to use the fetch command `?fetch all` to update the database of game. The database will be updated with the new patches in game. Using `?fetch all` after the `?upgrade` command will apply all the modifications to the bot's database.
 
 ## Main Features
-###### 1. Transformation between Cyra/Elara
+##### 1. Transformation between Cyra/Elara
 A cool visual transformation in the server every 2 hours which changes the bot's role, name, and profile picture. Bot owners can use `?transform` to force a transformation.
 
-###### 2. Various Information Commands
+##### 2. Various Information Commands
 A large number of information commands showing game general information. Most of them are displayed in a pretty discord embed.
 
-###### 3. Interactive Stats Commands
+##### 3. Interactive Stats Commands
 Hero stats, hero ability, tower, enemy, item, buff commands include stats which are data-mined from assets files and not directly shown in-game. Hero stats, hero ability and tower commands have a fancy "interactive" fashion by which the output embed will updated based on your reaction made to the message. You can easily explore the hero/ability/tower list, change the hero rank/level or even transform hero forms in a single command.
