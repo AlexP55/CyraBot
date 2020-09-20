@@ -229,7 +229,7 @@ class InfoCog(commands.Cog, name="Information Commands"):
         "6th through 10th place":f"40 {gem_emoji}, 800 {elixir_emoji}, 40 {medal_emoji}",
         "11th through 15th place":f"25 {gem_emoji}, 400 {elixir_emoji}, 20 {medal_emoji}"}
       icon = discord.utils.get(guild.emojis, name="league_6_master")
-    elif league.lower() in ["legend", "legendary"]:
+    elif league.lower() in ["legend", "legendary", "grandmaster", 'gm']:
       league = "Legendary League"
       gm_emoji = discord.utils.get(guild.emojis, name="title_4_gm")
       if gm_emoji is not None:
