@@ -13,7 +13,12 @@ pip install -U emoji
 pip install -U python-dateutil
 pip install -U xlrd
 ````
-
+And you also need a .env file to specify all environment parameters:
+```text
+DISCORD_TOKEN={YOUR_BOT_TOKEN}
+OWNER_ID={YOUR_DISCORD_ID}
+SERVER_ID={YOUR_SERVER_ID}
+```
 It is highly recommended to upload the pictures in 'emojis/' as emojis in the server to improve the visual effects of the information commands.
 
 After inviting the bot to the sever, you need to use the fetch command `?fetch all` to update the database of game. The database will be updated with the new patches in game. Using `?fetch all` after the `?upgrade` command will apply all the modifications to the bot's database.
