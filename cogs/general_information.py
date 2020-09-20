@@ -231,7 +231,11 @@ class InfoCog(commands.Cog, name="Information Commands"):
       icon = discord.utils.get(guild.emojis, name="league_6_master")
     elif league.lower() in ["legend", "legendary"]:
       league = "Legendary League"
-      description = "Top 3 of 50 get Grandmaster title."
+      gm_emoji = discord.utils.get(guild.emojis, name="title_4_gm")
+      if gm_emoji is not None:
+        description = f"Top 3 of 50 get Grandmaster title {gm_emoji}."
+      else:
+        description = f"Top 3 of 50 get Grandmaster title."
       rewards = {"1st place":f"500 {gem_emoji}, 3000 {elixir_emoji}, 500 {medal_emoji}",
         "2nd place":f"400 {gem_emoji}, 2500 {elixir_emoji}, 400 {medal_emoji}",
         "3rd place":f"300 {gem_emoji}, 2000 {elixir_emoji}, 300 {medal_emoji}",
