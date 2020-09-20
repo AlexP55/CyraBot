@@ -19,6 +19,8 @@ It is highly recommended to upload the pictures in 'emojis/' as emojis in the se
 After inviting the bot to the sever, you need to use the fetch command `?fetch all` to update the database of game. The database will be updated with the new patches in game. Using `?fetch all` after the `?upgrade` command will apply all the modifications to the bot's database.
 
 ## Main Features
+In addition to the basic features inherited from base bot: https://github.com/Kaldzkur/DiscordBaseBot, the CyraBot has a few features specific for the Realm Defense game.
+
 ##### 1. Transformation between Cyra/Elara
 A cool visual transformation in the server every 2 hours which changes the bot's role, name, and profile picture. Bot owners can use `?transform` to force a transformation.
 
