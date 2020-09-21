@@ -7,6 +7,7 @@ from pathlib import Path
 from discord.ext import commands, tasks
 from base.modules.access_checks import has_mod_role, has_admin_role, is_server_owner
 from base.modules.message_helper import wait_user_confirmation
+from base.modules.basic_converters import MemberOrUser
 
 class UserManagementCog(commands.Cog, name="User Management Commands"):
   def __init__(self, bot):
@@ -581,7 +582,7 @@ class UserManagementCog(commands.Cog, name="User Management Commands"):
   @commands.has_permissions(ban_members=True)
   @commands.bot_has_permissions(ban_members=True)
   @has_mod_role()
-  async def _ban(self, context, users: commands.Greedy[discord.User], days: typing.Optional[int] = 1, *, reason="not specified"):
+  async def _ban(self, context, users: commands.Greedy[MemberOrUser], days: typing.Optional[int] = 1, *, reason="not specified"):
     if len(users) == 0:
       await context.send(f"Sorry {context.author.mention}, but I could not find the specified user(s).")
       return
