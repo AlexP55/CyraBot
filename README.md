@@ -12,6 +12,11 @@ pip install -U pytz
 pip install -U emoji
 pip install -U python-dateutil
 ````
+And you also need a .env file to specify all environment parameters:
+```text
+DISCORD_TOKEN={YOUR_BOT_TOKEN}
+OWNER_ID={YOUR_DISCORD_ID}
+```
 ## Extending the bot for your discord
 Creating your own custom bot is fairly easy.
 First you fork this project and create a new file for your bot in the root directory.
@@ -46,6 +51,35 @@ if __name__ == "__main__":
   bot.run(TOKEN)
 ````
 
+## Main Features
+### Administration
+#### Set the activity of the bot
+#### Shutdown, reboot, upgrade
+#### ID lookup, invite link
+#### Logging of all admin/mod/error activities
+### Database Management
+#### Create/delete table, insert/delete row, select, general query
+#### Database backup
+### Settings
+#### Default settings
+#### Add/edit/remove/reset settings
+### Custom Commands
+#### Add/edit/remove custom commands (groups)
+#### Lock/globalize custom commands
+### Channel Management
+#### Channel mute/unmute/open/close
+#### Channel monitor
+### Secrete Channels
+#### Create/close secrete channels
+#### Auto-delete, keep-alive
+### Message Management
+#### Bulk delete, bulk move, announce, edit, react
+#### Schedule messages, commands
+#### Storage in database
+### User Management
+#### Welcome message
+#### Warn, kick, ban, mute, prune
+#### Statisctics tracking
 
 ## Contributing the bot
 Contributions are welcome; they will be reviewed before they are merged.
