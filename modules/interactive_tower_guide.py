@@ -11,7 +11,7 @@ class TowerRootMessage(InteractiveMessage):
   def __init__(self, parent=None, **attributes):
     super().__init__(parent, **attributes)
     db = self.context.bot.db[self.context.guild.id]
-    result = db.query("SELECT tower, world FROM tower ORDER BY world")
+    result = db.query('SELECT tower, world FROM tower ORDER BY world')
     self.towers = {}
     for tower, world in result:
       if world not in self.towers:
@@ -39,7 +39,7 @@ class TowerWorldMessage(InteractiveMessage):
     if self.parent is None:
       self.parent = TowerRootMessage(**attributes)
     db = self.context.bot.db[self.context.guild.id]
-    self.towers = db.query(f"SELECT tower, description1, description2 FROM tower WHERE world='{world}'")
+    self.towers = db.query(f'SELECT tower, description1, description2 FROM tower WHERE world="{world}"')
     self.world = world
     self.child_emojis = num_emojis[1:len(self.towers)+1]
     
@@ -76,8 +76,8 @@ class TowerIndividualMessage(InteractiveMessage):
     if self.towerInfo is None: # no result passed in attributes, then go for a new db query
       db = self.context.bot.db[self.context.guild.id]
       result = db.query(
-        f"SELECT basic, starUpgrade, lvUpgrade, leftBranchName, leftBranch, rightBranchName, rightBranch, reinforcement, buff, url "
-        f"FROM tower JOIN buff ON tower.type=buff.unit AND tower.world=buff.world WHERE tower.tower='{tower}' and tower.world={world}"
+        f'SELECT basic, starUpgrade, lvUpgrade, leftBranchName, leftBranch, rightBranchName, rightBranch, reinforcement, buff, url '
+        f'FROM tower JOIN buff ON tower.type=buff.unit AND tower.world=buff.world WHERE tower.tower="{tower}" and tower.world={world}'
       )
       if len(result) == 0:
         raise custom_exceptions.DataNotFound(f"W{world} Tower", string.capwords(tower))
