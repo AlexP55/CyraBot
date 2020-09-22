@@ -197,14 +197,14 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       enemy = "flying"
     if world is None:
       if enemy in ["boss", "flying"]:
-        where_clause = f"remark='{enemy}'"
+        where_clause = f'remark="{enemy}"'
       else:
-        where_clause = f"enemy LIKE '%{enemy}%'"
+        where_clause = f'enemy LIKE "%{enemy}%"'
     else:
       if enemy in ["boss", "flying"]:
-        where_clause = f"remark='{enemy}' AND enemy.world={world}"
+        where_clause = f'remark="{enemy}" AND enemy.world={world}'
       else:
-        where_clause = f"enemy LIKE '%{enemy}%' AND enemy.world={world}"
+        where_clause = f'enemy LIKE "%{enemy}%" AND enemy.world={world}'
     result = self.bot.db[context.guild.id].query(
       f"SELECT enemy, enemy.world, type, hp, physicalArmor, magicalArmor, moveSpeed, castSpeed, normalDamage, specialDamage, dodge, abilities, remark, buff, url "
       f"FROM enemy JOIN buff ON buff.unit='enemy' AND enemy.world=buff.world WHERE {where_clause} LIMIT {searchLimit}"
@@ -291,14 +291,14 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     searchLimit = self.get_search_limit(context.guild)
     if world is None:
       if tower in ["barrack"]:
-        where_clause = f"type='{tower}'"
+        where_clause = f'type="{tower}"'
       else:
-        where_clause = f"tower LIKE '%{tower}%'"
+        where_clause = f'tower LIKE "%{tower}%"'
     else:
       if tower in ["barrack"]:
-        where_clause = f"type='{tower}' AND tower.world={world}"
+        where_clause = f'type="{tower}" AND tower.world={world}'
       else:
-        where_clause = f"tower LIKE '%{tower}%' AND tower.world={world}"
+        where_clause = f'tower LIKE "%{tower}%" AND tower.world={world}'
     result = self.bot.db[context.guild.id].query(
       f"SELECT tower.tower, tower.world, basic, starUpgrade, lvUpgrade, leftBranchName, leftBranch, rightBranchName, rightBranch, reinforcement, buff, url "
       f"FROM tower JOIN buff ON tower.type=buff.unit AND tower.world=buff.world WHERE {where_clause} LIMIT {searchLimit}"
