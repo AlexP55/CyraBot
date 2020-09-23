@@ -100,6 +100,55 @@ class UserManagementCog(commands.Cog, name="User Management Commands"):
     return self.bot.get_setting(guild, "MUTE_DURATION")
 
   @commands.Cog.listener()
+  async def on_member_update(self, before, after):
+    if before.id == self.bot.user.id:
+      return
+    if before.nick != after.nick:
+      title = f"{before.display_name} changed nickname"
+      fields = {
+        "Old nickname":before.nick,
+        "New nickname":after.nick
+      }
+      await self.bot.log_audit(before.guild, title=title, description=f"{before}\nID: {before.id}", fields=fields)
+    roles_before = set(before.roles)
+    roles_after = set(after.roles)
+    if roles_before != roles_after:
+      title = f"{before.display_name} updated roles"
+      fields = {
+        "New role":", ".join(role.name for role in (roles_after-roles_before)),
+        "Removed role":", ".join(role.name for role in (roles_before-roles_after))
+      }
+      await self.bot.log_audit(before.guild, title=title, description=f"{before}\nID: {before.id}", fields=fields)
+
+  @commands.Cog.listener()
+  async def on_user_update(self, before, after):
+    if before.id == self.bot.user.id:
+      return
+    fields = {}
+    change = False
+    if before.name != after.name:
+      fields.update({
+        "Old username":before.name,
+        "New username":after.name
+      })
+      change = True
+    if before.discriminator != after.discriminator:
+      fields.update({
+        "Old discriminator":before.discriminator,
+        "New discriminator":after.discriminator
+      })
+      change = True
+    if change:
+      for guild in self.bot.guilds:       
+        if guild.get_member(before.id) is not None:
+          await self.bot.log_audit(
+            guild,
+            title=f"{before.display_name} changed profile",
+            description=f"{before}\n{after}\nID: {before.id}",
+            fields=fields
+          )
+
+  @commands.Cog.listener()
   async def on_member_remove(self, member):
     if member.id == self.bot.user.id:
       return
@@ -113,6 +162,12 @@ class UserManagementCog(commands.Cog, name="User Management Commands"):
       channel = discord.utils.get(member.guild.text_channels, name="general-chat")
     if channel is not None:
       await channel.send(f"{member} just left the server. :sob:")
+    title = f"{member.display_name} just left the server"
+    fields = {
+      "Account created on":member.created_at,
+      "Joined on":member.joined_at
+    }
+    await self.bot.log_audit(member.guild, title=title, description=f"{member}\nID: {member.id}", fields=fields)
     if False:
       try:
         await member.create_dm()
@@ -128,35 +183,53 @@ class UserManagementCog(commands.Cog, name="User Management Commands"):
 
   @commands.Cog.listener()
   async def on_member_join(self, member):
-    await member.create_dm()
-    await member.dm_channel.send(
-      f"Hi __{member.name}__, welcome to the {member.guild.name} discord server!"
-      f"Please read the following sections:\n\n"
-      f"__***Rules***__\n"
-      f"Be *polite*, *respectful*, and avoid political discussions.  "
-      f"You heard us -- *civil* and *friendly*.\n\n"
-      f"This discord is a place to kick back, have a mug of Elixir, and chat about the good ol’ days of tossin’ meteors. "
-      f"You know, typical stuff.\n\n"
-      f"All text should be in English, please. "
-      f"If you feel there is a need for a language specific channel, please PM one of the mods and we will arrange one.\n\n"
-      f"Questions are always welcome. The developers are around, but let's avoid tagging them too much. "
-      f"We don't want to be a pain in the butt.\n\n"
-      f"Alternatively feel free to talk about other neat stuff (How neat is that?), "
-      f"that you find around the web, worldwide or localwide, we don’t discriminate the regionality of your finds.\n\n"
-      f"__Please respect all of Discord's global rules: https://discordapp.com/guidelines__\n\n"
-    )
-    max_warnings = self.get_max_warnings(member.guild)
-    warn_duration = self.get_warn_duration(member.guild)
-    await member.dm_channel.send(
-      f"__**Warnings**__\n"
-      f"When you receive a warning it will expire after {warn_duration} days. If you receive another warning during that time, "
-      f"it will expire after {2*warn_duration} days from the time you got the last warning. "
-      f"If you get no additional warnings during the expiry time, then all your warnings will be reset."
-      f"If you receive more than {max_warnings} warnings without them expiring first, then you will be removed from the server. "
-      f"If you want to check the current status of your warnings, use the `?warn info` or `?slap info` command.\n\n"
-      f"If you have something to discuss with the mods, then use the `?modmail` command. You can specify the reason for opening the channel using `?modmail your reason`. "
-      f"To dispute any warnings, use the `?modmail` command."
-    )
+    if member.id == self.bot.user.id:
+      return
+    title = f"{member.display_name} just joined the server"
+    fields = {
+      "Account created on":member.created_at,
+      "Joined on":member.joined_at
+    }
+    await self.bot.log_audit(member.guild, title=title, description=f"{member}\nID: {member.id}", fields=fields)
+    try:
+      await member.create_dm()
+      await member.dm_channel.send(
+        f"Hi __{member.name}__, welcome to the {member.guild.name} discord server!"
+        f"Please read the following sections:\n\n"
+        f"__***Rules***__\n"
+        f"Be *polite*, *respectful*, and avoid political discussions.  "
+        f"You heard us -- *civil* and *friendly*.\n\n"
+        f"This discord is a place to kick back, have a mug of Elixir, and chat about the good ol’ days of tossin’ meteors. "
+        f"You know, typical stuff.\n\n"
+        f"All text should be in English, please. "
+        f"If you feel there is a need for a language specific channel, please PM one of the mods and we will arrange one.\n\n"
+        f"Questions are always welcome. The developers are around, but let's avoid tagging them too much. "
+        f"We don't want to be a pain in the butt.\n\n"
+        f"Alternatively feel free to talk about other neat stuff (How neat is that?), "
+        f"that you find around the web, worldwide or localwide, we don’t discriminate the regionality of your finds.\n\n"
+        f"__Please respect all of Discord's global rules: https://discordapp.com/guidelines__\n\n"
+      )
+    except: #could not send dm
+      pass
+    try:
+      max_warnings = self.get_max_warnings(member.guild)
+      warn_duration = self.get_warn_duration(member.guild)
+      await member.dm_channel.send(
+        f"__**Warnings**__\n"
+        f"When you receive a warning it will expire after {warn_duration} days. If you receive another warning during that time, "
+        f"it will expire after {2*warn_duration} days from the time you got the last warning. "
+        f"If you get no additional warnings during the expiry time, then all your warnings will be reset."
+        f"If you receive more than {max_warnings} warnings without them expiring first, then you will be removed from the server. "
+        f"If you want to check the current status of your warnings, use the `?warn info` or `?slap info` command.\n\n"
+        f"If you have something to discuss with the mods, then use the `?modmail` command. You can specify the reason for opening the channel using `?modmail your reason`. "
+        f"To dispute any warnings, use the `?modmail` command."
+      )
+    except: #could not send dm
+      pass
+
+  #@commands.Cog.listener()
+  #async def on_member_ban(self, guild, user):
+  #async def on_member_unban(self, guild, user):
 
   @commands.command(
     name="statistic",
@@ -247,7 +320,7 @@ class UserManagementCog(commands.Cog, name="User Management Commands"):
       if hasattr(user, "joined_at"): #member specific attribute
         embed.add_field(name=f"Joined {context.guild.name} on:", value=f"{user.joined_at}", inline=False)
       await context.send(content=None, embed=embed)
-    users = "\n".join([f"{user.mention}({user})" for user in members])
+    users = "\n".join([f"{user} ({user.id})" for user in members])
     title = "User fetched user information"
     fields = {"User":f"{context.author.mention}\n{context.author}",
               "Target User(s)":users}
@@ -281,8 +354,8 @@ class UserManagementCog(commands.Cog, name="User Management Commands"):
       self.bot.db[context.guild.id].insert_or_update("users_muted", member.id, expiry)
       await member.add_roles(mute_role)
       await context.send(f"{member.mention} muted.")
-      title = "User has been muted"
-      fields = {"User":f"{member.mention}\n{member}",
+      title = f"{member.display_name} has been muted"
+      fields = {"User":f"{member}\nID: {member.id}",
                 "Reason":reason,
                 "Expires":f"{expire_time} UTC"}
       await self.bot.log_mod(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
@@ -326,8 +399,8 @@ class UserManagementCog(commands.Cog, name="User Management Commands"):
       self.bot.db[context.guild.id].delete_row("users_muted", member.id)
       await member.remove_roles(mute_role)
       await context.send(f"{member.mention} unmuted.")
-      title = "User has been unmuted"
-      fields = {"User":f"{member.mention}\n{member}"}
+      title = f"{member.display_name} has been unmuted"
+      fields = {"User":f"{member}\nID: {member.id}"}
       await self.bot.log_mod(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
 
   @commands.command(
@@ -408,8 +481,8 @@ class UserManagementCog(commands.Cog, name="User Management Commands"):
         except:
           pass #DM could not be sent
         await context.send(f"{self.bot.user.name} \*slaps* {member.mention}.\nSlapcount: {warn_count+1}")
-        title = "User has been warned"
-        fields = {"User":f"{member.mention}\n{member}",
+        title = f"{member.display_name} has been warned"
+        fields = {"User":f"{member}\nID: {member.id}",
                   "Reason":reason,
                   "Number of warnings":warn_count+1,
                   "Expires":f"{expire_time} UTC"}
@@ -427,8 +500,8 @@ class UserManagementCog(commands.Cog, name="User Management Commands"):
           pass
         await member.kick(reason="Exceeded number of allowed warnings.")
         await context.send(f"```{member} was forced to leave the server.\nReason: excessive slapcount```")
-        title = "User has been kicked because of reaching the max warnings"
-        fields = {"User":f"{member.mention}\n{member}",
+        title = f"{member.display_name} has been kicked (reached max warnings)"
+        fields = {"User":f"{member}\nID: {member.id}",
                   "Reason":reason,
                   "Number of warnings":warn_count+1,
                   "Expires":f"{expire_time} UTC"}
@@ -520,10 +593,10 @@ class UserManagementCog(commands.Cog, name="User Management Commands"):
         await context.send(
           f"{self.bot.user.name} removed {number} slap(s) from  {member.mention}.\nSlapcount: {new_warn_count}"
         )
-        title = "User removed warnings"
+        title = f"{context.author.display_name} removed warnings"
         fields = {"User":f"{context.author.mention}\n{context.author}",
                   "Removed warnings":number,
-                  "From":f"{member.mention}\n{member}",
+                  "From":f"{member}\nID: {member.id}",
                   "Expires":f"{expire_time} UTC"}
         await self.bot.log_mod(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
       else:
@@ -555,15 +628,16 @@ class UserManagementCog(commands.Cog, name="User Management Commands"):
         continue
       await member.kick(reason=reason)
       await context.send(f"```{member} has been kicked from the server.```")
-      title = "User was kicked from server"
-      fields = {"User":f"{member.mention}\n{member}",
+      title = f"{member.display_name} was kicked from server"
+      fields = {"User":f"{member}\nID: {member.id}",
                 "Reason":reason}
       await self.bot.log_mod(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
 
   @commands.group(
     name="ban",
     brief="Bans user(s)",
-    help="A command that bans one or more users.",
+    description="Will ban all users specified in the `users` parameter.",
+    help="The `users` can be either mentions (using @), names (with 4-digit number), or user ids. If the user is currently not in the server, then you have to use the user id.\nThe `days` parameter is optional and can be between 1 and 7. For example, 7 means all of the users' messages of the past 7 days will be deleted.",
     invoke_without_command=True
   )
   @commands.has_permissions(ban_members=True)
@@ -574,7 +648,7 @@ class UserManagementCog(commands.Cog, name="User Management Commands"):
       await context.send(f"Sorry {context.author.mention}, but I could not find the specified user(s).")
       return
     if not(0 <= days <= 7):
-      await context.send(f"Sorry {context.author.mention}, `days` needs to be between 0 and 7. Refer to `?help ban id` for more information.")
+      await context.send(f"Sorry {context.author.mention}, `days` needs to be between 0 and 7. Refer to `?help ban` for more information.")
       return
     for user in users:
       if user.id == self.bot.user.id:
@@ -588,8 +662,8 @@ class UserManagementCog(commands.Cog, name="User Management Commands"):
         continue
       await context.guild.ban(user, reason=reason, delete_message_days=days)
       await context.send(f"```{user} has been banned from the server.```")
-      title = "User was banned from server"
-      fields = {"User":f"{user.mention}\n{user}",
+      title = f"{user.display_name} was banned from server"
+      fields = {"User":f"{user}\nID: {user.id}",
                 "Reason":reason}
       await self.bot.log_mod(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
 
@@ -610,7 +684,7 @@ class UserManagementCog(commands.Cog, name="User Management Commands"):
     name="rm",
     brief="Unbans a user",
     help="A command to unban (only) one user from the server. The user should be either the full username or the user id.",
-    usage="<user> [reason]",
+    usage="user [reason]",
     aliases=["remove"]
   )
   @commands.has_permissions(ban_members=True)
@@ -627,7 +701,7 @@ class UserManagementCog(commands.Cog, name="User Management Commands"):
         if (ban.user.name, ban.user.discriminator) == (member_name, member_discriminator):
           await context.guild.unban(ban.user)
           await context.send(f"{ban.user} has been unbanned from the server.")
-          title = "User was unbanned from server"
+          title = f"{ban.user.display_name} was unbanned from server"
           fields = {"User":f"{ban.user.name}\n{ban.user}",
                     "Reason":reason}
           await self.bot.log_mod(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
@@ -642,9 +716,9 @@ class UserManagementCog(commands.Cog, name="User Management Commands"):
       for ban in banned_users:
         if ban.user.id == user_id:
           await context.guild.unban(ban.user)
-          await context.send(f"{ban.user} has been unbanned from the server.")
-          title = "User was unbanned from server"
-          fields = {"User":f"{ban.user.name}\n{ban.user}",
+          await context.send(f"```{ban.user} has been unbanned from the server.```")
+          title = f"{ban.user.display_name} was unbanned from server"
+          fields = {"User":f"{ban.user}\nID: {ban.user.id}",
                     "Reason":reason}
           await self.bot.log_mod(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
           break
