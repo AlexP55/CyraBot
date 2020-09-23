@@ -26,6 +26,11 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
         await self.bot.log_admin(guild, title=title, fields=fields)
       except Exception as error:
         await self.bot.on_task_error("Cyra/Elara auto transformation", error, guild)
+  @auto_transform.error
+  async def auto_transform_error(self, error):
+    guild = self.bot.main_server
+    if guild:
+      await self.bot.on_task_error("Cyra/Elara auto transformation", error, guild)
 
   @auto_transform.before_loop
   async def before_auto_transform(self):

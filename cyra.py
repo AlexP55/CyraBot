@@ -111,7 +111,7 @@ class CyraBot(BaseBot):
     mod_role = self.get_mod_role(guild)
     bot_role = self.get_bot_role(guild)
     if is_cyra:
-      if guild.id == self.main_server:
+      if guild == self.main_server:
         with open("avatar/Elara.png", "rb") as avatar:
           await self.user.edit(avatar=avatar.read())
       await guild.me.edit(nick="Elara")
@@ -124,7 +124,7 @@ class CyraBot(BaseBot):
         await self.set_setting(guild, "BOT_ROLE_NAME", bot_role_name)
         await bot_role.edit(name=bot_role_name, color=discord.Colour.dark_purple())
     else:
-      if guild.id == self.main_server:
+      if guild == self.main_server:
         with open("avatar/Cyra.png", "rb") as avatar:
           await self.user.edit(avatar=avatar.read())
       await guild.me.edit(nick="Cyra")
@@ -209,9 +209,6 @@ class CyraBot(BaseBot):
   
   async def close(self):
     await super().close()
-    
-  def set_main_server(self, id):
-    self.main_server = id
 
     
 if __name__ == "__main__":
