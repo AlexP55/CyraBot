@@ -465,12 +465,20 @@ class BaseBot(commands.Bot):
       )
       #Restrict access to channels
       for channel in guild.channels:
+        everyone_permissions = channel.overwrites_for(guild.default_role)
+        if everyone_permissions is None or everyone_permissions.pair()[1].view_channel is True:   #Deny-Pair
+          #Skip private channels, we do not want Muted people to suddenly have access to the channel
+          continue
         try:
           await channel.set_permissions(mute_role, overwrite=mute_channel_permissions)
         except:
           pass
 
   async def on_guild_channel_create(self, channel):
+    everyone_permissions = channel.overwrites_for(channel.guild.default_role)
+    if everyone_permissions is None or everyone_permissions.pair()[1].view_channel is True:
+      #Skip private channels, we do not want Muted people to suddenly have access to the channel
+      return
     mute_permissions = discord.PermissionOverwrite(
       create_instant_invite=False, manage_channels=False, manage_roles=False, manage_webhooks=False, view_channel=True,
       send_messages=False, send_tts_messages=False, manage_messages=False, embed_links=False, 
@@ -743,7 +751,7 @@ if __name__ == "__main__":
   TOKEN = os.getenv("DISCORD_TOKEN")
   APPA = int(os.getenv("APPA_ID"))
   SIN = int(os.getenv("SIN_ID"))
-  SERVER = int(os.getenv("SERVER_ID"))
+  #SERVER = int(os.getenv("SERVER_ID"))
   cog_categories = {
     "Administration":["Database Commands", "Settings Management Commands", "Administration Commands"],
     "Moderation":["Message Management Commands", "User Management Commands", "Channel Management Commands", "Moderation Commands"],
@@ -762,5 +770,5 @@ if __name__ == "__main__":
     case_insensitive = True,
     help_command = InteractiveHelpCommand(cog_categories)
   )
-  bot.set_main_server(SERVER)
+  #bot.set_main_server(SERVER)
   bot.run(TOKEN)
