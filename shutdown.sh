@@ -1,6 +1,5 @@
 #!/bin/sh
 if [ -z "$1" ] ; then
-  echo "No Args"
   #No input argument passed -> kill all base_bot instances
   sudo pkill -9 -f cyra.py
   #wait for all processes to end
