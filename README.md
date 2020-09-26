@@ -1,4 +1,6 @@
 # CyraBot
+[![Discord Server](https://img.shields.io/badge/Discord-Realm%20Defense-green)](https://discord.gg/3WyY7Vb)
+
 This is a bot for Realm Defense discord server using the base bot: https://github.com/Kaldzkur/DiscordBaseBot.
 
 It supports server moderations as well as displays various information on mobile game Realm Defense: Epic Tower Defense Strategy Game.
