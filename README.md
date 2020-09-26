@@ -5,27 +5,6 @@ This is a bot for Realm Defense discord server using the base bot: https://githu
 
 It supports server moderations as well as displays various information on mobile game Realm Defense: Epic Tower Defense Strategy Game.
 
-## Installation
-You need a few PyPI packages for this bot to work:
-
-````bash
-pip install -U discord.py
-pip install -U python-dotenv
-pip install -U pytz
-pip install -U emoji
-pip install -U python-dateutil
-pip install -U xlrd
-````
-And you also need a .env file to specify all environment parameters:
-```text
-DISCORD_TOKEN={YOUR_BOT_TOKEN}
-OWNER_ID={YOUR_DISCORD_ID}
-SERVER_ID={YOUR_SERVER_ID}
-```
-It is highly recommended to upload the pictures in 'emojis/' as emojis in the server to improve the visual effects of the information commands.
-
-After inviting the bot to the sever, you need to use the fetch command `?fetch all` to update the database of game. The database will be updated with the new patches in game. Using `?fetch all` after the `?upgrade` command will apply all the modifications to the bot's database.
-
 ## Main Features
 In addition to the basic features inherited from the base bot: https://github.com/Kaldzkur/DiscordBaseBot, the CyraBot has a few specific features for the Realm Defense game.
 
