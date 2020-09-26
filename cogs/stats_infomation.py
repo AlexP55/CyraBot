@@ -89,7 +89,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
 
     
   @commands.command(
-    help='Shows information about an ability. Vague searches on abilities such as "melee" "ranged" "rank1" "active" "passive2" are supported. To check the exact name of an ability, use:\n?hero [heroName]\nSpecial thanks to NFdragon#7195 for collecting the data.',
+    help='Shows information about an ability. Vague searches on abilities such as "melee" "ranged" "rank1" "active" "passive2" are supported. To check the exact name of an ability, use `hero` command\nSpecial thanks to NFdragon#7195 for collecting the data.',
     brief="Shows ability details",
     usage="<hero> <ability>",
     aliases=["spell", "skill"]
@@ -114,11 +114,11 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     elif len(result) == searchLimit: # too many results
       await context.send(
         f'There are more than {searchLimit-1} abilities that match your input name, '
-        f'please input a more accurate name to narrow down the search: `?ability "{heroName.replace(" ","")}" <ability>`'
+        f'please input a more accurate name to narrow down the search: `{context.prefix}ability "{heroName.replace(" ","")}" <ability>`'
       )
       return
     elif len(result) > 1:
-      abilities = [f"{num_emojis[i+1]} `?ability {heroName.replace(' ', '')} {result[i][0]}`" for i in range(len(result))]
+      abilities = [f"{num_emojis[i+1]} `{context.prefix}ability {heroName.replace(' ', '')} {result[i][0]}`" for i in range(len(result))]
       content = f"There are {len(result)} results that match your keyword, please make a choice by reacting:\n" + '\n'.join(abilities)
       response, msg = await multiple_choice(context, content, num=len(result))
       if response is None:
@@ -134,7 +134,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       
 
   @commands.command(
-    help="Displays or compares the stats of a hero at different levels and ranks, [rank] [level] must have the format [num] or [num]->[num], for example, to display Fee at rank 5 lv30, use:\n?stats fee 5 30\nTo compare Fee at rank 5 lv 30 with she at rank 5 lv 35, use:\n?statscmp fee 5 30->35",
+    help="Displays or compares the stats of a hero at different levels and ranks, [rank] [level] must have the format [num] or [num]->[num], for example, to display Fee at rank 5 lv30, use:\n`?stats fee 5 30`\nTo compare Fee at rank 5 lv 30 with she at rank 5 lv 35, use:\n`?statscmp fee 5 30->35`",
     brief="Shows or compares stats",
     aliases=["stat", "statscmp", "statcmp"]
   )
@@ -214,10 +214,10 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     elif len(result) == searchLimit: # too many results
       await context.send(
         f"There are more than {searchLimit-1} enemies that match your input name, "
-        f"please input a more accurate name to narrow down the search: `?enemy <name>`"
+        f"please input a more accurate name to narrow down the search: `{context.prefix}enemy <name>`"
       )
     elif len(result) > 1:
-      enemies = [f"{num_emojis[i+1]} `?enemy w{result[i][1]} {result[i][0]}`" for i in range(len(result))]
+      enemies = [f"{num_emojis[i+1]} `{context.prefix}enemy w{result[i][1]} {result[i][0]}`" for i in range(len(result))]
       content = f"There are {len(result)} results that match your keyword, please make a choice by reacting:\n" + '\n'.join(enemies)
       response, msg = await multiple_choice(context, content, num=len(result))
       if response is None:
@@ -308,11 +308,11 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     elif len(result) == searchLimit: # too many results
       await context.send(
         f"There are more than {searchLimit-1} towers that match your input name, "
-        f"please input a more accurate name to narrow down the search: `?tower <name>`"
+        f"please input a more accurate name to narrow down the search: `{context.prefix}tower <name>`"
       )
       return
     elif len(result) > 1:
-      towers = [f"{num_emojis[i+1]} `?tower w{result[i][1]} {result[i][0]}`" for i in range(len(result))]
+      towers = [f"{num_emojis[i+1]} `{context.prefix}tower w{result[i][1]} {result[i][0]}`" for i in range(len(result))]
       content = f"There are {len(result)} results that match your keyword, please make a choice by reacting:\n" + '\n'.join(towers)
       response, msg = await multiple_choice(context, content, num=len(result))
       if response is None:
