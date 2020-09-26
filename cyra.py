@@ -5,10 +5,15 @@ import time
 import string
 from base.modules.settings_manager import DefaultSetting
 import modules.custom_exceptions as custom_exceptions
-from base_bot import BaseBot
+from base_bot import BaseBot, dynamic_prefix
 from modules.cyra_constants import emoji_keys
 
 class CyraBot(BaseBot):
+
+  def __init__(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    self.energy = {}
+    self.last_transform = {}
 
   def get_emoji(self, guild, key):
     return discord.utils.get(guild.emojis, name=emoji_keys[key])
@@ -182,8 +187,6 @@ class CyraBot(BaseBot):
     await super().on_guild_join(guild)
     
   async def on_ready(self):
-    self.energy = {}
-    self.last_transform = {}
     await super().on_ready()
     
   def load_all_cogs(self):
@@ -227,18 +230,11 @@ if __name__ == "__main__":
     "Information":["Stats Commands", "Information Commands"],
     "Miscellaneous":["Transformation Commands", "Command Management", "General Commands"]
   }
-  async def dynamic_prefix(bot, message):
-    if message.type != discord.MessageType.default:
-      return
-    if hasattr(message, "guild"):
-      return "?"
-    else: #in DMs the bot can respond to prefix-less messages
-      return "?", ""
   bot = CyraBot(
-    command_prefix="?",
+    command_prefix=dynamic_prefix,
     owner_ids=set([APPA, SIN]),
     case_insensitive = True,
-    help_command = InteractiveHelpCommand(cog_categories)
+    help_command = InteractiveHelpCommand(cog_categories),
+    server_id = SERVER
   )
-  bot.set_main_server(SERVER)
   bot.run(TOKEN)
