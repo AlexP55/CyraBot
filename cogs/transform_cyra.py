@@ -21,16 +21,17 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
         continue
       try:
         was_cyra = await self.bot.transform(guild)
-        title = "Cyra/Elara Auto-Transformed"
-        fields = {"Direction":"Cyra transforms to Elara" if was_cyra else "Elara transforms to Cyra"}
-        await self.bot.log_admin(guild, title=title, fields=fields)
+        before, after = ("Cyra", "Elara") if was_cyra else ("Elara", "Cyra")
+        await self.bot.log_message(guild, "ADMIN_LOG",
+          user=self.bot.user, action="auto transformed",
+          description=f"Direction: {before} -> {after}"
+        )
       except Exception as error:
         await self.bot.on_task_error("Cyra/Elara auto transformation", error, guild)
-  @auto_transform.error
-  async def auto_transform_error(self, error):
-    guild = self.bot.main_server
-    if guild:
-      await self.bot.on_task_error("Cyra/Elara auto transformation", error, guild)
+
+  #@auto_transform.error
+  #async def auto_transform_error(self, error):
+    #TODO: Add logging via logging module
 
   @auto_transform.before_loop
   async def before_auto_transform(self):
@@ -54,10 +55,12 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
   async def _transform(self, context):
     was_cyra = await self.bot.transform(context.guild)
     await context.send(f"*Elara is here to reap chaos.*" if was_cyra else f"*Cyra has taken control back.*")
-    title = "User Transformed Cyra/Elara"
-    fields = {"User":f"{context.author.mention}\n{context.author}",
-              "Direction":"Cyra transforms to Elara" if was_cyra else "Elara transforms to Cyra"}
-    await self.bot.log_admin(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
+    before, after = ("Cyra", "Elara") if was_cyra else ("Elara", "Cyra")
+    await self.bot.log_message(context.guild, "ADMIN_LOG",
+      user=context.author, action="was transformed", target=self.bot.user,
+      description=f"Direction: {before} -> {after}",
+      timestamp=context.message.created_at
+    )
   @_transform.error
   async def _transform_error(self, context, error):
     if isinstance(error, commands.CommandOnCooldown):

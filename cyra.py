@@ -116,9 +116,8 @@ class CyraBot(BaseBot):
     mod_role = self.get_mod_role(guild)
     bot_role = self.get_bot_role(guild)
     if is_cyra:
-      if guild == self.main_server:
-        with open("avatar/Elara.png", "rb") as avatar:
-          await self.user.edit(avatar=avatar.read())
+      with open("avatar/Elara.png", "rb") as avatar:
+        await self.user.edit(avatar=avatar.read())
       await guild.me.edit(nick="Elara")
       if mod_role is not None:
         mod_role_name = f"{guild.me.nick}'s Ravager"
@@ -129,9 +128,8 @@ class CyraBot(BaseBot):
         await self.set_setting(guild, "BOT_ROLE_NAME", bot_role_name)
         await bot_role.edit(name=bot_role_name, color=discord.Colour.dark_purple())
     else:
-      if guild == self.main_server:
-        with open("avatar/Cyra.png", "rb") as avatar:
-          await self.user.edit(avatar=avatar.read())
+      with open("avatar/Cyra.png", "rb") as avatar:
+        await self.user.edit(avatar=avatar.read())
       await guild.me.edit(nick="Cyra")
       if mod_role is not None:
         mod_role_name = f"{guild.me.nick}'s Enforcer"
@@ -223,7 +221,7 @@ if __name__ == "__main__":
   TOKEN = os.getenv("DISCORD_TOKEN")
   APPA = int(os.getenv("APPA_ID"))
   SIN = int(os.getenv("SIN_ID"))
-  SERVER = int(os.getenv("SERVER_ID"))
+  #SERVER = int(os.getenv("SERVER_ID"))
   cog_categories = {
     "Administration":["Database Commands", "Settings Management Commands", "Data Fetching Commands", "Administration Commands"],
     "Moderation":["Message Management Commands", "User Management Commands", "Channel Management Commands", "Moderation Commands"],
@@ -235,6 +233,6 @@ if __name__ == "__main__":
     owner_ids=set([APPA, SIN]),
     case_insensitive = True,
     help_command = InteractiveHelpCommand(cog_categories),
-    server_id = SERVER
+    #server_id = SERVER
   )
   bot.run(TOKEN)

@@ -18,7 +18,6 @@ from base.modules.constants import games, animes
 class BaseBot(commands.Bot):
 
   def __init__(self, *arg, **kwargs):
-    self.main_server_id = kwargs.pop("server_id", None)
     super().__init__(*arg, **kwargs)
     self.intialized = {}
     self.db = {}
@@ -28,14 +27,14 @@ class BaseBot(commands.Bot):
     @self.check # add a global check to the bot
     def check_initialized(context):
       if context.guild.id not in context.bot.intialized or not context.bot.intialized[context.guild.id]:
-        raise commands.CheckFailure("Guild {context.guild.name} is not initialized")
+        raise commands.CheckFailure(f"Guild {context.guild.name} is not initialized")
       return True
 
   async def find_prefix(self, message):
     prefix = await self.get_prefix(message)
-    if type(prefix) == list:
+    if isinstance(prefix, (list, tuple)):
       for pre in prefix:
-        if message.startswith(pre):
+        if message.content.startswith(pre):
           return pre
       else:
         return None
@@ -48,7 +47,72 @@ class BaseBot(commands.Bot):
     if guild.me.nick is None:
       return guild.me.name
     return guild.me.nick
-    
+
+  async def log_message(self, guild, log_type, **content):
+    if log_type.upper() not in ["MOD_LOG", "ADMIN_LOG", "ERROR_LOG", "AUDIT_LOG"]:
+      await self.log_message(
+        guild, "ERROR_LOG",
+        title="Invalid Log Type",
+        description=f"The log {log_type} does not exist.",
+      )
+      return
+    if self.get_setting(guild, log_type) != "ON":
+      return
+    if "title" not in content:
+      content["title"] = None
+    if "description" not in content:
+      content["description"] = None
+    if "colour" not in content:
+      if log_type == "MOD_LOG":
+        content["colour"] = discord.Colour.green()
+      elif log_type == "ADMIN_LOG":
+        content["colour"] = discord.Colour.blue()
+      elif log_type == "ERROR_LOG":
+        content["colour"] = discord.Colour.red()
+      elif log_type == "AUDIT_LOG":
+        content["colour"] = discord.Colour.gold()
+      else:
+        content["colour"] = discord.Colour.from_rgb(54,57,63)
+    if "timestamp" not in content:
+      content["timestamp"] = datetime.utcnow()
+    embed = discord.Embed(
+      title=content["title"],
+      description=content["description"],
+      colour=content["colour"],
+      timestamp=content["timestamp"]
+    )
+    fields = {}
+    if "user" in content:
+      if "target" in content:
+        embed.set_author(
+          name=f"{content['target'].display_name} {content['action']}",
+          icon_url=content["target"].avatar_url
+        )
+        embed.set_thumbnail(url=content["user"].avatar_url)
+        fields["User"] = f"{content['target'].mention}\n{content['target']}\nUID: {content['target'].id}"
+        fields["Action by"] = f"{content['user'].mention}\n{content['user']}\nUID: {content['user'].id}"
+      else:
+        embed.set_author(
+          name=f"{content['user'].display_name} {content['action']}",
+          icon_url=content["user"].avatar_url
+        )
+        embed.set_thumbnail(url=content["user"].avatar_url)
+        fields["User"] = f"{content['user'].mention}\n{content['user']}\nUID: {content['user'].id}"
+    if "fields" in content:
+      fields.update(content["fields"])
+    for key, value in fields.items():
+      if key and value:
+        embed.add_field(name=f"{key}:", value=f"{value}", inline=False)
+    embed.set_footer(text=log_type.replace("_", " "))
+    if log_type == "MOD_LOG":
+      await self.get_log(guild, "mod-log").send(embed=embed)
+    elif log_type == "ADMIN_LOG":
+      await self.get_log(guild, "admin-log").send(embed=embed)
+    elif log_type == "ERROR_LOG":
+      await self.get_log(guild, "error-log").send(embed=embed)
+    elif log_type == "AUDIT_LOG":
+      await self.get_log(guild, "audit-log").send(embed=embed)
+
   async def log_error(self, guild, *, title, description=None, timestamp=None, fields:dict=None):
     if not self.get_setting(guild, "ERROR_LOG") == "ON":
       return
@@ -134,15 +198,14 @@ class BaseBot(commands.Bot):
     await self.create_roles(guild)
     await self.create_logs(guild)
     self.create_tables(guild)
-    time = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     for cog in self.cogs.values():
       # you can initialze your cog during a guild join if you have init_guild() function for guild
       if callable(getattr(cog, "init_guild", None)):
         cog.init_guild(guild)
     self.intialized[guild.id] = True
-    print(f"({time}) {self.user} has connected to: {guild.name} ({guild.id})")
+    print(f"({datetime.now().strftime('%Y-%m-%d %H:%M:%S')}) {self.user} has connected to: {guild.name} ({guild.id})")
     try:
-      await self.log_admin(guild, title="Bot connected")
+      await self.log_message(guild, "ADMIN_LOG", user=self.user, action="connected")
     except:
       pass
     
@@ -219,55 +282,31 @@ class BaseBot(commands.Bot):
   #This global command error handler just adds the embed to the error log.
   #Any additional stuff should be done before calling this handler from the subclass.
   async def on_command_error(self, context, error):
-    title = f"A {error.__class__.__name__} occured"
     if hasattr(error, "original"):
       error = error.original
-    fields = {"User":f"{context.author.mention}\n{context.author}",
-              "Channel":f"{context.message.channel.mention}",
-              "Command":f"{context.message.content}",
-             f"{error.__class__.__name__}":f"{error}"}
-    await self.log_error(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
-  
+    fields = {
+      "User":f"{context.author.mention}\n{context.author}\nUID:{context.author.id}",
+      "Channel":f"{context.message.channel.mention}\nCID:{context.message.channel.id}",
+      "Command":f"{context.message.content}",
+     f"{error.__class__.__name__}":f"{error}"
+    }
+    await self.log_message(context.guild, "ERROR_LOG",
+      title=f"A {error.__class__.__name__} occured",
+      fields=fields, timestamp=context.message.created_at,
+    )
+
   # the error handler for task, need to be called in try except block in each task
   async def on_task_error(self, task, error, guild):
-    title = f"A {error.__class__.__name__} occured"
     if hasattr(error, "original"):
       error = error.original
-    fields = {"Task":task,
-             f"{error.__class__.__name__}":f"{error}"}
-    await self.log_error(guild, title=title, fields=fields)
-    
-  async def on_error(self, event, *args, **kwargs):
-    error = sys.exc_info()[1]
-    if len(args) > 0:
-      if isinstance(args[0], list):
-        first_arg = args[0][0]
-      else:
-        first_arg = args[0]
-      if isinstance(first_arg, discord.Guild):
-        guild = first_arg
-      else:
-        if isinstance(first_arg, discord.Reaction):
-          first_arg = first_arg.message
-        if hasattr(first_arg, "guild"):
-          guild = first_arg.guild
-        elif hasattr(fist_arg, "guild_id"):
-          guild = self.get_guild(fist_arg.guild_id)
-        else:
-          guild = None
-    else:
-      guild = None
-    if guild is None:
-      guild = self.main_server
-    if guild is not None:
-      title = f"A {error.__class__.__name__} occured"
-      if hasattr(error, "original"):
-        error = error.original
-      fields = {"Event":event,
-               f"{error.__class__.__name__}":f"{error}"}
-      await self.log_error(guild, title=title, fields=fields)
-    else:
-      await super().on_error(event, *args, **kwargs)
+    fields = {
+      "Task":task,
+      f"{error.__class__.__name__}":f"{error}"
+    }
+    await self.log_message(guild, "ERROR_LOG",
+      title=f"A {error.__class__.__name__} occured",
+      fields=fields,
+    )
 
   def create_tables(self, guild):
     if "user_warnings" not in self.db[guild.id]:
@@ -719,19 +758,19 @@ class BaseBot(commands.Bot):
       db.close()
     print("The bot client is completely closed")
     
-  @property
-  def main_server(self):
-    if not hasattr(self, "main_server_id"):
-      return None
-    return self.get_guild(self.main_server_id)
-    
 def dynamic_prefix(bot, message):
-  if message.type != discord.MessageType.default:
-    return
-  if hasattr(message, "guild") and message.guild:
-    return bot.get_guild_prefix(message.guild)
+  if hasattr(message, "guild"):
+    prefix_list = []
+    if message.guild.id in bot.intialized and bot.intialized[message.guild.id]:
+      prefix_list.append(bot.get_guild_prefix(message.guild))
+      role = bot.get_bot_role(message.guild)
+      if role:
+        prefix_list.append(f"{role.mention} ")
+    prefix_list += [f"{bot.user.mention} ", f"<@!{bot.user.id}> "]
   else: #in DMs the bot can respond to prefix-less messages
-    return "?", ""
+    prefix_list = ["?", ""]
+  return prefix_list
+  
 
 if __name__ == "__main__":
   import os
@@ -742,7 +781,6 @@ if __name__ == "__main__":
   TOKEN = os.getenv("DISCORD_TOKEN")
   APPA = int(os.getenv("APPA_ID"))
   SIN = int(os.getenv("SIN_ID"))
-  SERVER = int(os.getenv("SERVER_ID"))
   cog_categories = {
     "Administration":["Database Commands", "Settings Management Commands", "Administration Commands"],
     "Moderation":["Message Management Commands", "User Management Commands", "Channel Management Commands", "Moderation Commands"],
@@ -753,6 +791,5 @@ if __name__ == "__main__":
     owner_ids=set([APPA, SIN]),
     case_insensitive = True,
     help_command = InteractiveHelpCommand(cog_categories),
-    server_id = SERVER
   )
   bot.run(TOKEN)

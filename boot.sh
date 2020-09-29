@@ -1,3 +1,4 @@
 #!/bin/sh
 mkdir -p log
-python3 -u cyra.py >> ./log/`date +%s`.txt
+output=./log/`date +%s`.txt
+python3 -u cyra.py > $output 2>&1

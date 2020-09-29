@@ -284,11 +284,11 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
     await self.send_fetch_log(context, "buff")
       
   async def send_fetch_log(self, context, sheetname):
-    title = "User updated a table"
-    fields = {"User":f"{context.author.mention}\n{context.author}",
-              "Table name":sheetname}
-    await self.bot.log_admin(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
-      
+    await self.bot.log_message(context.guild, "ADMIN_LOG", 
+      user=context.author, action="updated a table",
+      description=f"**Table:** {sheetname}", timestamp=context.message.created_at
+    )
+
 #This function is needed for the load_extension routine.
 def setup(bot):
   bot.add_cog(FetchCog(bot))
