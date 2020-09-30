@@ -138,7 +138,7 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
     if isinstance(error, commands.CheckFailure):
       await context.send(f"Sorry {context.author.mention}, but you do not have permission to fetch data.")
     elif isinstance(error, commands.MaxConcurrencyReached):
-      await context.send(f"Sorry {context.author.mention}, but only {error.number} user(s) per guild can execute `{context.prefix}{context.command.qualified_name}` at the same time!")
+      await context.send(f"Sorry {context.author.mention}, but only {error.number} user(s) per guild can execute `{context.command.qualified_name}` at the same time!")
     else:
       await context.send(f"Sorry {context.author.mention}, something unexpected happened while fetching data.")
 

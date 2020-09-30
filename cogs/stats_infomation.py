@@ -112,13 +112,15 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     if len(result) == 0:
       raise custom_exceptions.AbilityNotFound(string.capwords(heroName), string.capwords(abilityName))
     elif len(result) == searchLimit: # too many results
+      prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
       await context.send(
         f'There are more than {searchLimit-1} abilities that match your input name, '
-        f'please input a more accurate name to narrow down the search: `{context.prefix}ability "{heroName.replace(" ","")}" <ability>`'
+        f'please input a more accurate name to narrow down the search: `{prefix}ability "{heroName.replace(" ","")}" <ability>`'
       )
       return
     elif len(result) > 1:
-      abilities = [f"{num_emojis[i+1]} `{context.prefix}ability {heroName.replace(' ', '')} {result[i][0]}`" for i in range(len(result))]
+      prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
+      abilities = [f"{num_emojis[i+1]} `{prefix}ability {heroName.replace(' ', '')} {result[i][0]}`" for i in range(len(result))]
       content = f"There are {len(result)} results that match your keyword, please make a choice by reacting:\n" + '\n'.join(abilities)
       response, msg = await multiple_choice(context, content, num=len(result))
       if response is None:
@@ -212,12 +214,14 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     if len(result) == 0:
       raise custom_exceptions.DataNotFound(f"W{world} Enemy" if world is not None else "Enemy", string.capwords(enemy))
     elif len(result) == searchLimit: # too many results
+      prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
       await context.send(
         f"There are more than {searchLimit-1} enemies that match your input name, "
-        f"please input a more accurate name to narrow down the search: `{context.prefix}enemy <name>`"
+        f"please input a more accurate name to narrow down the search: `{prefix}enemy <name>`"
       )
     elif len(result) > 1:
-      enemies = [f"{num_emojis[i+1]} `{context.prefix}enemy w{result[i][1]} {result[i][0]}`" for i in range(len(result))]
+      prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
+      enemies = [f"{num_emojis[i+1]} `{prefix}enemy w{result[i][1]} {result[i][0]}`" for i in range(len(result))]
       content = f"There are {len(result)} results that match your keyword, please make a choice by reacting:\n" + '\n'.join(enemies)
       response, msg = await multiple_choice(context, content, num=len(result))
       if response is None:
@@ -306,13 +310,15 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     if len(result) == 0:
       raise custom_exceptions.DataNotFound(f"W{world} Tower" if world is not None else "Tower", string.capwords(tower))
     elif len(result) == searchLimit: # too many results
+      prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
       await context.send(
         f"There are more than {searchLimit-1} towers that match your input name, "
-        f"please input a more accurate name to narrow down the search: `{context.prefix}tower <name>`"
+        f"please input a more accurate name to narrow down the search: `{prefix}tower <name>`"
       )
       return
     elif len(result) > 1:
-      towers = [f"{num_emojis[i+1]} `{context.prefix}tower w{result[i][1]} {result[i][0]}`" for i in range(len(result))]
+      prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
+      towers = [f"{num_emojis[i+1]} `{prefix}tower w{result[i][1]} {result[i][0]}`" for i in range(len(result))]
       content = f"There are {len(result)} results that match your keyword, please make a choice by reacting:\n" + '\n'.join(towers)
       response, msg = await multiple_choice(context, content, num=len(result))
       if response is None:

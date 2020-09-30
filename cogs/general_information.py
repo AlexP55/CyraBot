@@ -29,12 +29,13 @@ class InfoCog(commands.Cog, name="Information Commands"):
   )
   async def elixir(self, context, hero:find_hero=None, lvStart=1, lvEnd=-1):
     if hero is None:
+      prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
       await context.send(
         f"Elixir {self.bot.get_emoji(context.guild, 'elixir')} is a resource in Realm Defense.\n"
         f"It's main purpose is to level up your heroes.\n"
         f"It can be obtained from the Elixir Mine and as rewards from Mabyn's Wheel, Tournaments and Shattered Realms.\n"
-        f"For info on the Elixir Mine, use the `{context.prefix}elixir mine` command.\n"
-        f"To show the elixir cost for upgrading a hero, use `{context.prefix}elixir <hero> <lvStart> <lvEnd>`"
+        f"For info on the Elixir Mine, use the `{prefix}elixir mine` command.\n"
+        f"To show the elixir cost for upgrading a hero, use `{prefix}elixir <hero> <lvStart> <lvEnd>`"
       )
       return
     if hero not in elixir_cost_hero:
@@ -142,7 +143,8 @@ class InfoCog(commands.Cog, name="Information Commands"):
     embed.add_field(name="Diamond League:",  value="Top 5/30 promote to Master League.",   inline=False)
     embed.add_field(name="Master League:",   value="Top 5/30 promote to Legend League.",   inline=False)
     embed.add_field(name="Legend League:",   value="Top 3/50 earn a grandmaster title.",   inline=False)
-    embed.add_field(name="For rewards:",   value=f"`{context.prefix}league reward <league>`",   inline=False)
+    prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
+    embed.add_field(name="For rewards:",   value=f"`{prefix}league reward <league>`",   inline=False)
     embed.set_footer(text="LEAGUES CARD")
     await context.send(content=None, embed=embed)
 #    await context.send(
