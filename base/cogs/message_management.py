@@ -65,6 +65,59 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
     else:
       await context.send(f"Sorry {context.author.mention}, but something unexpected happened...")
 
+  #@commands.Cog.listener() -> will be triggered by the on_raw_message_delete event
+  async def on_message_delete(self, message):
+    if message.guild:
+      fields ={
+        "Author":f"{message.author.mention}\n{message.author}\nUID: {message.author.id}",
+        "Channel":f"{message.channel.mention}\nCID: {message.channel.id}",
+        "Message":f"MID: {message.id}",
+        "Sent at":message.created_at,
+      }
+      if message.edited_at:
+        fields["Last edit"] = message.edited_at
+      attachments = {}
+      if len(message.attachments) > 0:
+        fields["Attachments"] = len(message.attachments)
+        attachments = { attachment.filename: await attachment.save(attachment.filename, use_cached=True) for attachment in message.attachments}
+      if len(message.embeds) > 0:
+        fields["Embeds"] = len(message.embeds)
+      await self.bot.log_message(message.guild, "AUDIT_LOG",
+        title="A message was deleted", description="The message is visible below this entry",
+        fields=fields,
+      )
+      if len(message.embeds) > 0:
+        await self.bot.get_log(message.guild, "audit-log").send(content=message.content, embed=message.embeds[0])
+        for embed in message.embeds[1:]:
+          await self.bot.get_log(message.guild, "audit-log").send(content=None, embed=embed)
+      elif message.content:
+        await self.bot.get_log(message.guild, "audit-log").send(content=message.content)
+      if attachments:
+        for name in attachments:
+          with open(name, "rb") as f:
+            await self.bot.get_log(message.guild, "audit-log").send(content=None, file=discord.File(f, filename=name))
+          os.remove(name) #delete file
+
+    else:
+      print(f"MID: {message.id} deleted")
+
+  @commands.Cog.listener()
+  async def on_raw_message_delete(self, payload):
+    if payload.cached_message:
+      #on_delete will handle this case
+      await self.on_message_delete(payload.cached_message)
+      return
+    if payload.guild_id:
+      guild = discord.utils.get(self.bot.guilds, id=payload.guild_id)
+      channel = discord.utils.get(guild.text_channels, id=payload.channel_id)
+      fields = {
+        "Channel":f"{channel.mention}\nCID: {channel.id}",
+        "Message":f"MID: {payload.message_id}",
+      }
+      await self.bot.log_message(guild, "AUDIT_LOG",
+        title="A message was deleted", fields=fields
+      )
+
   @commands.group(
     name="delete",
     brief="Deletes messages",
@@ -98,12 +151,14 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
           await self.cache_message(message, max_cache)
           msg_list.append(message)
     await self.smart_delete_messages(channel, msg_list)
-    title = f"Messages have been deleted"
-    fields = {"User":f"{context.author.mention}\n{context.author}",
-              "Author(s)":"\n".join([f"{member.mention} {member}" for member in members]) if members else None,
-              "Channel":channel.mention,
-              "Deleted":f"{len(msg_list)} message(s)"}
-    await self.bot.log_mod(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
+    fields = {
+      "Author(s)":"\n".join([f"{member.mention}\n{member}\nUID: {member.id}" for member in members]) if members else None,
+      "Channel":f"{channel.mention}\nCID: {channel.id}",
+    }
+    await self.bot.log_message(context.guild, "MOD_LOG",
+      user=context.author, action=f"deleted {len(msg_list)} message(s)",
+      fields=fields, timestamp=context.message.created_at
+    )
     if len(msg_list) == 0:
       await send_temp_message(context, "Could not delete message(s).", 10)
     await context.message.delete()
@@ -129,8 +184,7 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
       if (len(self.delete_cache[key]) > max_cache):
         # remove the oldest message if it exceeds the max cache
         self.delete_cache[key].pop().del_files()
-    
-        
+
   @_delete.command(
     name="restore",
     brief="Restores deleted messages",
@@ -165,13 +219,15 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
         restored += 1
       except:
         pass
-    title = f"Messages have been restored"
-    fields = {"User":f"{context.author.mention}\n{context.author}",
-              "Author(s)":"\n".join([f"{member.mention} {member}" for member in members]) if members else None,
-              "From Channel(s)":"\n".join([channel.mention for channel in channels]) if channels else None,
-              "To Channel":context.channel.mention,
-              "Restored":f"{restored} message(s)"}
-    await self.bot.log_mod(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
+    fields = {
+      "Author(s)":"\n".join([f"{member.mention}\n{member}\nUID: {member.id}" for member in members]) if members else None,
+      "From Channel(s)":"\n".join([f"{channel.mention}\nCID: {channel.id}" for channel in channels]) if channels else None,
+      "To Channel":f"{context.channel.mention}\nCID: {channel.id}",
+    }
+    await self.bot.log_message(context.guild, "MOD_LOG",
+      user=context.author, action=f"restored {restored} message(s)",
+      title=title, fields=fields, timestamp=context.message.created_at
+    )
     if restored == 0:
       await send_temp_message(context, "Could not restore message(s).", 10)
     await context.message.delete()
@@ -234,13 +290,16 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
       await context.send_help("announce")
       return
     await channel.send(content=announcement, embed=embed_post, files=files)
-    title = f"An announcement has been made"
-    fields = {"User":f"{context.author.mention}\n{context.author}",
-              "Channel":channel.mention,
-              "Content":(announcement[:1021] + '...') if announcement and len(announcement) > 1021 else announcement,
-              "Embed size":len(embed_post) if embed_post else None,
-              "Files":f"{len(files)} file(s)" if files else None}
-    await self.bot.log_mod(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
+    fields = {
+      "Channel":f"{channel.mention}\nCID: {channel.id}",
+      "Content":(announcement[:1021] + '...') if announcement and len(announcement) > 1021 else announcement,
+      "Embed size":len(embed_post) if embed_post else None,
+      "Files":f"{len(files)} file(s)" if files else None
+    }
+    await self.bot.log_message(context.guild, "MOD_LOG",
+      user=context.author, action="made an announcement",
+      fields=fields, timestamp=context.message.created_at
+    )
     await context.message.delete()
 
   @commands.command(
@@ -271,13 +330,15 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
     for msg in reversed(queue):
       await self.copy_message(channel, msg)
     await self.smart_delete_messages(context.message.channel, queue)
-    title = f"Messages have been moved"
-    fields = {"User":f"{context.author.mention}\n{context.author}",
-              "Author(s)":"\n".join([f"{member.mention} {member}" for member in members]) if members else None,
-              "From Channel":context.channel.mention,
-              "To Channel":channel.mention,
-              "Moved":f"{len(queue)} message(s)"}
-    await self.bot.log_mod(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
+    fields = {
+      "Author(s)":"\n".join([f"{member.mention}\n{member}\nUID: {member.id}" for member in members]) if members else None,
+      "From Channel":f"{context.channel.mention}\nCID: {context.channel.id}",
+      "To Channel":f"{channel.mention}\nCID: {channel.id}",
+    }
+    await self.bot.log_message(context.guild, "MOD_LOG",
+      user=context.author, action=f"moved {len(queue)} mesages",
+      fields=fields, timestamp=context.message.created_at
+    )
     if len(queue) == 0:
       await send_temp_message(context, "Could not move message(s).", 10)
     await context.message.delete()
@@ -371,22 +432,22 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
           await self.edit_message(context, message, text, edit_method)
           break
     else:
-      title = f"Could not edit a message"
-      description=f"No message number {num} found from bot"
-      await self.bot.log_mod(context.guild, title=title, description=description, timestamp=context.message.created_at)
-      await send_temp_message(context, "Could not edit a message.", 10)
+      await send_temp_message(context, f"Could not edit a message: message number {num} from bot not found", 10)
     await context.message.delete()
     
   async def edit_message(self, context, message, text, edit_method):
     old_content = message.content
     new_content = edit_method(old_content, text)
     await message.edit(content=new_content)
-    title = f"A bot message has been edited"
-    fields = {"User":f"{context.author.mention}\n{context.author}",
-              "Channel":message.channel.mention,
-              "Old Content":'...' + (old_content[-1021:]) if len(old_content) > 1021 else old_content,
-              "New Content:":'...' + (new_content[-1021:]) if len(new_content) > 1021 else new_content}
-    await self.bot.log_mod(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
+    fields = {
+      "Channel":f"{message.channel.mention}\nCID: {message.channel.id}",
+      "Old Content":'...' + (old_content[-1021:]) if len(old_content) > 1021 else old_content,
+      "New Content:":'...' + (new_content[-1021:]) if len(new_content) > 1021 else new_content
+    }
+    await self.bot.log_message(context.guild, "MOD_LOG",
+      user=context.author, action="edited a bot message",
+      fields=fields, timestamp=context.message.created_at
+    )
     
   @commands.command(
     name="react",
@@ -417,21 +478,27 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
           await self.add_reaction(context, message, emojis)
           break
     else:
-      title = f"Could not add reaction(s)"
-      description=f"No message number {num} found{' from '+member.mention if member is not None else ''} in {channel.mention}"
-      await self.bot.log_mod(context.guild, title=title, description=description, timestamp=context.message.created_at)
-      await send_temp_message(context, "Could not add reaction(s).", 10)
+      if member:
+        tmp_str = f" from {member.mention}"
+      else:
+        tmp_str = ""
+      await send_temp_message(context,
+        f"Could not add reaction(s): message number {num} not found{tmp_str} in {channel.mention}",
+        10
+      )
     await context.message.delete()
     
   async def add_reaction(self, context, message, emojis):
     for emoji in emojis:
       await message.add_reaction(emoji)
-    title = f"Reaction(s) have been added"
-    fields = {"User":f"{context.author.mention}\n{context.author}",
-              "Author":f"{message.author.mention}\n{message.author}",
-              "Channel":message.channel.mention,
-              "Reaction(s)":''.join([str(emoji) for emoji in emojis])}
-    await self.bot.log_mod(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
+    fields = {
+      "Author":f"{message.author.mention}\n{message.author}\nUID: {message.author.id}",
+      "Channel":f"{message.channel.mention}\nCID: {message.channel.id}",
+      "Reaction(s)":''.join([str(emoji) for emoji in emojis])}
+    await self.bot.log_message(context.guild, "MOD_LOG",
+      user=context.author, action="added reaction(s)",
+      fields=fields, timestamp=context.message.created_at
+    )
     
   @commands.group(
     name="schedule",
@@ -455,14 +522,17 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
     message_schedule = await MessageSchedule.from_message(context.message, channel, schedule, text)
     self.scheduler[context.guild.id].append(message_schedule)
     message_schedule.set_timer(context.guild, self.bot, self.scheduler[context.guild.id])
-    title = f"A message has been scheduled"
-    fields = {"User":f"{context.author.mention}\n{context.author}",
-              "Channel":channel.mention,
-              "Content":(text[:1021] + '...') if text and len(text) > 1021 else text,
-              "Embed size":len(discord.Embed.from_dict(message_schedule['embed'])) if message_schedule['embed'] else None,
-              "Files":f"{len(message_schedule['files'])} file(s)" if message_schedule["files"] else None,
-              "Time":schedule.strftime('%Y-%m-%d %H:%M:%S %z')}
-    await self.bot.log_mod(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
+    fields = {
+      "Channel":f"{channel.mention}\nCID: {channel.id}",
+      "Content":(text[:1021] + '...') if text and len(text) > 1021 else text,
+      "Embed size":len(discord.Embed.from_dict(message_schedule['embed'])) if message_schedule['embed'] else None,
+      "Files":f"{len(message_schedule['files'])} file(s)" if message_schedule["files"] else None,
+      "Time":schedule.strftime('%Y-%m-%d %H:%M:%S %z')
+    }
+    await self.bot.log_message(context.guild, "MOD_LOG",
+      user=context.author, action="scheduled a message",
+      fields=fields, timestamp=context.message.created_at
+    )
     await send_temp_message(context, f"{context.author.mention} You have scheduled a message at {schedule.strftime('%Y-%m-%d %H:%M:%S %z')}.", 10)
     await context.message.delete()
     
@@ -520,7 +590,7 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
       return
     msg_count = 0
     for message_schedule in self.scheduler[context.guild.id]:
-      if (member is None or message_schedule["author"] == member.id) and (channel is None or message_schedule["channel"] == channels.id):
+      if (member is None or message_schedule["author"] == member.id) and (channel is None or message_schedule["channel"] == channel.id):
         msg_count += 1
         if msg_count == num:
           message_schedule.cancel()
@@ -530,20 +600,39 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
             member = context.guild.get_member(message_schedule["author"])
           if channel is None:
             channel = context.guild.get_channel(message_schedule['channel'])
-          title = f"A scheduled message have been cancelled"
-          fields = {"Cancelled by":f"{context.author.mention}\n{context.author}",
-                    "Author":member.mention if member else 'Unknown Member',
-                    "Channel":channel.mention if channel else 'Unknown Channel',
-                    "Content":(message_schedule['content'][:1021] + '...') if message_schedule['content'] and len(message_schedule['content']) > 1021 else message_schedule['content'],
-                    "Embed size":len(discord.Embed.from_dict(message_schedule['embed'])) if message_schedule['embed'] else None,
-                    "Files":f"{file_num} file(s)" if file_num else None}
-          await self.bot.log_mod(context.guild, title=title, fields=fields, timestamp=context.message.created_at)
+          fields = {}
+          if member:
+            fields["Author"] = f"{member.mention}\n{member}\nUID: {member.id}"
+          if channel:
+            fields["Channel"] = f"{channel.mention}\nCID: {channel.id}"
+          if message_schedule['content'] and len(message_schedule['content']) > 1021:
+            fields["Content"] = message_schedule['content'][:1021] + '...'
+          else:
+            fields["Content"] = message_schedule['content']
+          if message_schedule['embed']:
+            fields["Embed size"] = len(discord.Embed.from_dict(message_schedule['embed']))
+          if file_num:
+            fields["Files"] = f"{file_num} file(s)"
+          await self.bot.log_message(context.guild, "MOD_LOG",
+            user=context.author, action="cancelled a scheduled message",
+            fields=fields, timestamp=context.message.created_at
+          )
           await send_temp_message(context, "A scheduled message has been cancelled.", 10)
           break
     else:
-      title = f"Could not cancel a scheduled message"
-      description=f"No scheduled message number {num} found{' from '+member.mention if member is not None else ''}{' to be sent in '+channel.mention if channel is not None else ''}"
-      await self.bot.log_mod(context.guild, title=title, description=description, timestamp=context.message.created_at)
+      if member:
+        tmp_member = f" from {member.mention}"
+      else:
+        tmp_member = ""
+      if channel:
+        tmp_channel = f" to be sent in {channel.mention}"
+      else:
+        tmp_channel = ""
+      description=f"Scheduled message number {num} not found{tmp_member}{tmp_channel}"
+      await self.bot.log_message(context.guild, "ERROR_LOG", 
+        user=context.author, action="failed to cancel a message",
+        description=description, timestamp=context.message.created_at
+      )
       await send_temp_message(context, "Could not cancel a scheduled message.", 10)
     await context.message.delete()
     
