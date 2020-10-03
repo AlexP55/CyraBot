@@ -3,6 +3,7 @@ import discord
 import json
 import os
 import typing
+from queue import Queue
 from discord.ext import commands
 from base.modules.access_checks import has_mod_role, check_channel_permissions
 from datetime import datetime, timezone
@@ -12,6 +13,9 @@ from base.modules.constants import CACHE_PATH as path
 from base.modules.message_helper import get_message_attachments, send_temp_message, wait_user_confirmation,\
                                         save_message, get_message_brief, get_full_message, clean_message_files
 from base.modules.special_bot_methods import special_process_command, command_check
+import logging
+
+logger = logging.getLogger(__name__)
 
 class MessageManagementCog(commands.Cog, name="Message Management Commands"):
   def __init__(self, bot):
@@ -20,6 +24,7 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
       os.mkdir(path)
     self.delete_cache = MessageCache.from_json(f'{path}/delete_cache.json')
     self.scheduler = MessageSchedule.from_json(f'{path}/scheduler.json')
+    self.delete_queue = Queue(maxsize=100)
     for guild in self.bot.guilds:
       self.init_guild(guild)
     
@@ -70,6 +75,10 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
     if message.guild:
       if self.bot.get_setting(message.guild, "MESSAGE_LOG") == "OFF":
         return
+      if await self.bot.is_command(message) or message.author == self.bot.user: # ignore command message
+        return
+      if message.id in self.delete_queue.queue: # ignore the messsage deleted by delete or move commands
+        return
       fields ={
         "Author":f"{message.author.mention}\n{message.author}\nUID: {message.author.id}",
         "Channel":f"{message.channel.mention}\nCID: {message.channel.id}",
@@ -97,8 +106,6 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
             await message_log.send(content=None, embed=embed)
         else:
           await message_log.send(content=message.content, files=files)
-    else:
-      print(f"MID: {message.id} deleted")
 
   @commands.Cog.listener()
   async def on_raw_message_delete(self, payload):
@@ -169,6 +176,7 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
     minimum_time = int((time.time() - 14 * 24 * 60 * 60) * 1000.0 - 1420070400000) << 22
     bulk_msg = []
     for msg in msg_list:
+      self.delete_queue.put(msg.id)
       if msg.id < minimum_time: # older than 14 days
         await msg.delete()
       else:
@@ -911,4 +919,4 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
 
 def setup(bot):
   bot.add_cog(MessageManagementCog(bot))
-  print("Added message management.")
+  logger.info("Added message management.")
