@@ -10,6 +10,9 @@ from base.modules.message_helper import num_emojis, multiple_choice
 import asyncio
 import string
 import typing
+import logging
+
+logger = logging.getLogger(__name__)
 
 vague_search_tag_rank = ['r1', 'r2', 'r3', 'r4', 'r5', 'r6', 'r7']
 vague_search_tag_game = ['active', 'passive1', 'passive2', 'passive3']
@@ -25,9 +28,6 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     
   async def cog_before_invoke(self, context):
     self.bot.is_willing_to_answer(context)
-    
-  async def cog_after_invoke(self, context):
-    await self.bot.finish_info_command(context)
 
   #Default error handler for this cog, can be overwritten with a local error handler.
   async def cog_command_error(self, context, error):
@@ -571,5 +571,5 @@ class StatsCog(commands.Cog, name="Stats Commands"):
 #This function is needed for the load_extension routine.
 def setup(bot):
   bot.add_cog(StatsCog(bot))
-  print("Added stats cog.")
+  logging.info("Added stats cog.")
 

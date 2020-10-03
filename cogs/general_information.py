@@ -5,6 +5,9 @@ import modules.custom_exceptions as custom_exceptions
 from modules.cyra_converter import find_hero
 from modules.cyra_constants import facts, elixir_cost_hero
 import string
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class InfoCog(commands.Cog, name="Information Commands"):
@@ -13,9 +16,6 @@ class InfoCog(commands.Cog, name="Information Commands"):
     
   async def cog_before_invoke(self, context):
     self.bot.is_willing_to_answer(context)
-    
-  async def cog_after_invoke(self, context):
-    await self.bot.finish_info_command(context)
 
   #Default error handler for this cog, can be overwritten with a local error handler.
   async def cog_command_error(self, context, error):
@@ -292,4 +292,4 @@ class InfoCog(commands.Cog, name="Information Commands"):
     
 def setup(bot):
   bot.add_cog(InfoCog(bot))
-  print("Added information cog.")
+  logging.info("Added information cog.")

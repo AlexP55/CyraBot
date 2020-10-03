@@ -12,8 +12,6 @@ class CyraBot(BaseBot):
 
   def __init__(self, *args, **kwargs):
     super().__init__(*args, **kwargs)
-    self.energy = {}
-    self.last_transform = {}
 
   def get_emoji(self, guild, key):
     return discord.utils.get(guild.emojis, name=emoji_keys[key])
@@ -35,10 +33,7 @@ class CyraBot(BaseBot):
         return True
       if context.author.id in self.owner_ids:
         return False #Bot owners are immune to Elaras chaos
-      try:
-        chance = float(self.get_setting(context.guild, "ELARA_REFUSE_CHANCE"))/100.0
-      except:
-        chance = self.default_settings["ELARA_REFUSE_CHANCE"].default
+      chance = self.get_setting(context.guild, "ELARA_REFUSE_CHANCE")/100.0
       if random.random() < chance:
         responses = [
           "I do not need to answer you!", "I'm busy sowing the seeds of chaos. Don't disturb me.", 
@@ -56,9 +51,6 @@ class CyraBot(BaseBot):
         return True
     else:
       return True
-      
-  async def finish_info_command(self, context):
-    self.energy[context.guild.id][0] = self.energy[context.guild.id][0] + 1
       
   async def respond_to_error(self, context, error):
     # general error handler, used in hero/infomation cog
@@ -107,7 +99,6 @@ class CyraBot(BaseBot):
       msg = "I cannot process your command, please refer to `?help [command]` for more information"
     #Send response
     await context.send(msg)
-    self.energy[context.guild.id][1] = self.energy[context.guild.id][1] + 1
 
   async def transform(self, guild: discord.Guild):
     is_cyra = await self.is_cyra(guild)
@@ -147,9 +138,6 @@ class CyraBot(BaseBot):
       bot_category_name = f"{guild.me.nick}s-bot-corner"
       await self.set_setting(guild, "BOT_CATEGORY_NAME", bot_category_name)
       await bot_category.edit(name=bot_category_name)
-    self.energy[guild.id][0] = 0
-    self.energy[guild.id][1] = 0
-    self.last_transform[guild.id] = time.time()
     return is_cyra
     
   async def init_bot(self, guild):
@@ -157,8 +145,6 @@ class CyraBot(BaseBot):
     await super().init_bot(guild)
     if guild.me.nick not in ["Cyra", "Elara"]:
       await guild.me.edit(nick="Cyra")
-    self.energy[guild.id] = [0,0]
-    self.last_transform[guild.id] = time.time()
 
   async def on_command_error(self, context, error):
     ignored = (commands.CommandOnCooldown, )
@@ -216,6 +202,8 @@ if __name__ == "__main__":
   import os
   import dotenv
   from base.modules.interactive_help import InteractiveHelpCommand
+  import logging.config
+  logging.config.fileConfig("logging.conf")
   #Loading the secret key.
   dotenv.load_dotenv()
   TOKEN = os.getenv("DISCORD_TOKEN")

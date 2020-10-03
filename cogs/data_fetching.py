@@ -3,6 +3,9 @@ from discord.ext import commands
 from base.modules.access_checks import has_admin_role
 import xlrd
 from base.modules.constants import DB_PATH as path
+import logging
+
+logger = logging.getLogger(__name__)
 
 class SheetReader:
   def __init__(self, db, file_name="db.xlsx"):
@@ -12,7 +15,7 @@ class SheetReader:
   def fetchHero(self):
     sheet = self.book.sheet_by_name("hero")
     if sheet is None:
-      print("Warning, no hero sheet found")
+      logging.warning("Warning, no hero sheet found")
       return
     if not sheet.ncols == 24:
       raise Exception("Hero sheet columns do not match")
@@ -26,7 +29,7 @@ class SheetReader:
   def fetchAbility(self):
     sheet = self.book.sheet_by_name("ability")
     if sheet is None:
-      print("Warning, no ability sheet found")
+      logging.warning("Warning, no ability sheet found")
       return
     if not sheet.ncols == 9:
       raise Exception("Ability sheet columns do not match")
@@ -38,7 +41,7 @@ class SheetReader:
   def fetchAbilityDetail(self):
     sheet = self.book.sheet_by_name("abilityDetail")
     if sheet is None:
-      print("Warning, no abilityDetail sheet found")
+      logging.warning("Warning, no abilityDetail sheet found")
       return
     if not sheet.ncols == 4:
       raise Exception("AbilityDetail sheet columns do not match")
@@ -50,7 +53,7 @@ class SheetReader:
   def fetchLevels(self):
     sheet = self.book.sheet_by_name("levels")
     if sheet is None:
-      print("Warning, no levels sheet found")
+      logging.warning("Warning, no levels sheet found")
       return
     if not sheet.ncols == 5:
       raise Exception("Levels sheet columns do not match")
@@ -61,7 +64,7 @@ class SheetReader:
   def fetchQuotes(self):
     sheet = self.book.sheet_by_name("quotes")
     if sheet is None:
-      print("Warning, no quotes sheet found")
+      logging.warning("Warning, no quotes sheet found")
       return
     if not sheet.ncols == 3:
       raise Exception("Quotes sheet columns do not match")
@@ -72,7 +75,7 @@ class SheetReader:
   def fetchEnemy(self):
     sheet = self.book.sheet_by_name("enemy")
     if sheet is None:
-      print("Warning, no enemy sheet found")
+      logging.warning("Warning, no enemy sheet found")
       return
     if not sheet.ncols == 14:
       raise Exception("Enemy sheet columns do not match")
@@ -83,7 +86,7 @@ class SheetReader:
   def fetchTower(self):
     sheet = self.book.sheet_by_name("tower")
     if sheet is None:
-      print("Warning, no tower sheet found")
+      logging.warning("Warning, no tower sheet found")
       return
     if not sheet.ncols == 14:
       raise Exception("Tower sheet columns do not match")
@@ -94,7 +97,7 @@ class SheetReader:
   def fetchBuff(self):
     sheet = self.book.sheet_by_name("buff")
     if sheet is None:
-      print("Warning, no buff sheet found")
+      logging.warning("Warning, no buff sheet found")
       return
     if not sheet.ncols == 3:
       raise Exception("Buff sheet columns do not match")
@@ -292,4 +295,4 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
 #This function is needed for the load_extension routine.
 def setup(bot):
   bot.add_cog(FetchCog(bot))
-  print("Added data fetching cog.")
+  logging.info("Added data fetching cog.")

@@ -2,6 +2,9 @@ from datetime import datetime
 import discord
 from discord.ext import commands, tasks
 import time
+import logging
+
+logger = logging.getLogger(__name__)
 
 class TransformationCog(commands.Cog, name="Transformation Commands"):
   def __init__(self, bot):
@@ -20,12 +23,14 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
       if not self.get_auto_transform(guild):
         continue
       try:
+        logger.debug(f"Transforming in {guild.name} ({guild.id}).")
         was_cyra = await self.bot.transform(guild)
         before, after = ("Cyra", "Elara") if was_cyra else ("Elara", "Cyra")
         await self.bot.log_message(guild, "ADMIN_LOG",
           user=self.bot.user, action="auto transformed",
           description=f"Direction: {before} -> {after}"
         )
+        logger.debug(f"Finished Transforming in {guild.name} ({guild.id}).")
       except Exception as error:
         await self.bot.on_task_error("Cyra/Elara auto transformation", error, guild)
 
@@ -44,11 +49,9 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
     else:
       return False
 
-  @commands.group(
+  @commands.command(
     name="transform",
     brief="Transforms to Cyra/Elara",
-    case_insensitive = True,
-    invoke_without_command=True
   )
   @commands.is_owner()
   @commands.cooldown(1, 600, commands.BucketType.guild)
@@ -69,31 +72,8 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
       await context.send(f"Sorry {context.author.mention}, but you do not have permission to transform Cyra/Elara.")
     else:
       await context.send(f"Sorry {context.author.mention}, something unexpected happened during my transformation.")
-      
-  @_transform.command(
-    name="energy",
-    brief="Shows the energy stored",
-  )
-  @commands.is_owner()
-  async def _energy(self, context):
-    await context.send(f"```Energy points stored: {self.bot.energy[context.guild.id]}```")
-  @_energy.error
-  async def _energy_error(self, context, error):
-    await context.send(f"Sorry {context.author.mention}, something unexpected happened when looking for energy points.")
-    
-  @_transform.command(
-    name="time",
-    brief="Shows the last transform time",
-  )
-  @commands.is_owner()
-  async def _trans_time(self, context):
-    last_time = self.bot.last_transform[context.guild.id]
-    await context.send(f"```Last transform/reboot time: {time.strftime('%Y-%m-%d %H:%M:%S', time.gmtime(self.bot.last_transform[context.guild.id]))} UTC```")
-  @_trans_time.error
-  async def _trans_time_error(self, context, error):
-    await context.send(f"Sorry {context.author.mention}, something unexpected happened when looking for the last transform time.")
 
 def setup(bot):
   bot.add_cog(TransformationCog(bot))
-  print("Added transformation.")
+  logging.info("Added transformation.")
 
