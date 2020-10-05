@@ -25,7 +25,7 @@ class InfoCog(commands.Cog, name="Information Commands"):
     brief="Shows info on elixir",
     case_insensitive = True,
     invoke_without_command=True,
-    usage="[hero] [lvStart] [lvEnd]"
+    usage="[hero] [lvStart=1] [lvEnd]"
   )
   async def elixir(self, context, hero:find_hero=None, lvStart=1, lvEnd=-1):
     if hero is None:
@@ -50,6 +50,29 @@ class InfoCog(commands.Cog, name="Information Commands"):
       f"Upgrading {string.capwords(hero)} from level {lvStart} to {lvEnd} costs:\n"
       f"{elixir_cost} {self.bot.get_emoji(context.guild, 'elixir')}"
     )
+    
+  @elixir.command(
+    name="upgrade",
+    brief="Shows which level can be upgraded to",
+    help="Shows which level can be upgraded to given the amount of elixirs.",
+    aliases=["up"]
+  )
+  async def _elixir_up(self, context, hero:find_hero, numElixir:int, lvStart:int=1):
+    if hero not in elixir_cost_hero:
+      raise custom_exceptions.HeroNotFound(string.capwords(hero))
+    if lvStart <= 0 or lvStart >= 35:
+      await context.send(f"Start level of {string.capwords(hero)} must be between 1 and 34.")
+      return
+    cost_list = elixir_cost_hero[hero]
+    cost = 0
+    for lv in range(lvStart, len(cost_list)+1):
+      if cost + cost_list[lv-1] > numElixir:
+        break
+      cost += cost_list[lv-1]
+    else:
+      lv += 1
+    await context.send(f"You are able to upgrade {string.capwords(hero)} from lv{lvStart} to lv{lv}, "
+                       f"with {numElixir-cost} {self.bot.get_emoji(context.guild, 'elixir')} remained.")
     
   @elixir.command(
     brief="Shows info on elixir mine",
