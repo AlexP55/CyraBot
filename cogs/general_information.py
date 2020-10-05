@@ -239,20 +239,20 @@ class InfoCog(commands.Cog, name="Information Commands"):
     elif league.lower() in ["diamond", "dia"]:
       league = "Diamond League"
       description = "Top 5 of 30 get promoted."
-      rewards = {"1st place":f"300 {gem_emoji}, 1200 {elixir_emoji}, 75 {medal_emoji}",
-        "2nd and 3rd place":f"250 {gem_emoji}, 1000 {elixir_emoji}, 60 {medal_emoji}",
-        "4th and 5th place":f"200 {gem_emoji}, 800 {elixir_emoji}, 50 {medal_emoji}",
-        "6th through 10th place":f"40 {gem_emoji}, 800 {elixir_emoji}, 25 {medal_emoji}",
-        "11th through 15th place":f"25 {gem_emoji}, 400 {elixir_emoji}, 15 {medal_emoji}"}
+      rewards = {"1st place":f"300 {gem_emoji}, 1500 {elixir_emoji}, 75 {medal_emoji}",
+        "2nd and 3rd place":f"250 {gem_emoji}, 1200 {elixir_emoji}, 60 {medal_emoji}",
+        "4th and 5th place":f"200 {gem_emoji}, 1000 {elixir_emoji}, 50 {medal_emoji}",
+        "6th through 10th place":f"40 {gem_emoji}, 1000 {elixir_emoji}, 25 {medal_emoji}",
+        "11th through 15th place":f"25 {gem_emoji}, 500 {elixir_emoji}, 15 {medal_emoji}"}
       icon = discord.utils.get(guild.emojis, name="league_5_diamond")
     elif league.lower() in ["master"]:
       league = "Master League"
       description = "Top 5 of 30 get promoted."
-      rewards = {"1st place":f"300 {gem_emoji}, 1200 {elixir_emoji}, 100 {medal_emoji}",
-        "2nd and 3rd place":f"250 {gem_emoji}, 1000 {elixir_emoji}, 90 {medal_emoji}",
-        "4th and 5th place":f"200 {gem_emoji}, 800 {elixir_emoji}, 80 {medal_emoji}",
-        "6th through 10th place":f"40 {gem_emoji}, 800 {elixir_emoji}, 40 {medal_emoji}",
-        "11th through 15th place":f"25 {gem_emoji}, 400 {elixir_emoji}, 20 {medal_emoji}"}
+      rewards = {"1st place":f"300 {gem_emoji}, 1500 {elixir_emoji}, 100 {medal_emoji}",
+        "2nd and 3rd place":f"250 {gem_emoji}, 1200 {elixir_emoji}, 90 {medal_emoji}",
+        "4th and 5th place":f"200 {gem_emoji}, 1000 {elixir_emoji}, 80 {medal_emoji}",
+        "6th through 10th place":f"40 {gem_emoji}, 1000 {elixir_emoji}, 40 {medal_emoji}",
+        "11th through 15th place":f"25 {gem_emoji}, 500 {elixir_emoji}, 20 {medal_emoji}"}
       icon = discord.utils.get(guild.emojis, name="league_6_master")
     elif league.lower() in ["legend", "legendary", "grandmaster", 'gm']:
       league = "Legendary League"
