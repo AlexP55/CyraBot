@@ -30,8 +30,10 @@ class InfoCog(commands.Cog, name="Information Commands"):
   async def elixir(self, context, hero:find_hero=None, lvStart=1, lvEnd=-1):
     if hero is None:
       prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
+      elixir_str = self.bot.get_emoji(context.guild, 'elixir')
+      elixir_str = elixir_str if elixir_str else ""
       await context.send(
-        f"Elixir {self.bot.get_emoji(context.guild, 'elixir')} is a resource in Realm Defense.\n"
+        f"Elixir {elixir_str} is a resource in Realm Defense.\n"
         f"It's main purpose is to level up your heroes.\n"
         f"It can be obtained from the Elixir Mine and as rewards from Mabyn's Wheel, Tournaments and Shattered Realms.\n"
         f"For info on the Elixir Mine, use the `{prefix}elixir mine` command.\n"
@@ -46,9 +48,13 @@ class InfoCog(commands.Cog, name="Information Commands"):
       await context.send(f"Level of {string.capwords(hero)} must be between 1 and 35.")
       return
     elixir_cost = sum(elixir_cost_hero[hero][lvStart-1:lvEnd-1])
+    hero_str = self.bot.get_emoji(context.guild, hero)
+    hero_str = hero_str if hero_str else string.capwords(hero)
+    elixir_str = self.bot.get_emoji(context.guild, 'elixir')
+    elixir_str = elixir_str if elixir_str else "elixirs"
     await context.send(
-      f"Upgrading {string.capwords(hero)} from level {lvStart} to {lvEnd} costs:\n"
-      f"{elixir_cost} {self.bot.get_emoji(context.guild, 'elixir')}"
+      f"Upgrading {hero_str} from level {lvStart} to {lvEnd} costs:\n"
+      f"{elixir_cost} {elixir_str}"
     )
     
   @elixir.command(
@@ -71,26 +77,34 @@ class InfoCog(commands.Cog, name="Information Commands"):
       cost += cost_list[lv-1]
     else:
       lv += 1
-    await context.send(f"You are able to upgrade {string.capwords(hero)} from lv{lvStart} to lv{lv}, "
-                       f"with {numElixir-cost} {self.bot.get_emoji(context.guild, 'elixir')} remained.")
+    hero_str = self.bot.get_emoji(context.guild, hero)
+    hero_str = hero_str if hero_str else string.capwords(hero)
+    elixir_str = self.bot.get_emoji(context.guild, 'elixir')
+    elixir_str = elixir_str if elixir_str else "elixirs"
+    await context.send(f"You are able to upgrade {hero_str} from lv{lvStart} to lv{lv}, "
+                       f"with {numElixir-cost} {elixir_str} remained.")
     
   @elixir.command(
     brief="Shows info on elixir mine",
   )
   async def mine(self, context):
+    gem_str = self.bot.get_emoji(context.guild, 'gem')
+    gem_str = gem_str if gem_str else "gems"
+    elixir_str = self.bot.get_emoji(context.guild, 'elixir')
+    elixir_str = elixir_str if elixir_str else "elixirs"
     await context.send(
       f"Elixir Mine can be unlocked in World 1.\n"
       f"It has a total of 10 levels.\n"
-      f"Level  1:    0 {self.bot.get_emoji(context.guild, 'gem')} (  5{self.bot.get_emoji(context.guild, 'elixir')}/hour, Capacity:   40{self.bot.get_emoji(context.guild, 'elixir')})\n"
-      f"Level  2:   50 {self.bot.get_emoji(context.guild, 'gem')} ( 15{self.bot.get_emoji(context.guild, 'elixir')}/hour, Capacity:  120{self.bot.get_emoji(context.guild, 'elixir')})\n"
-      f"Level  3:  300 {self.bot.get_emoji(context.guild, 'gem')} ( 30{self.bot.get_emoji(context.guild, 'elixir')}/hour, Capacity:  240{self.bot.get_emoji(context.guild, 'elixir')})\n"
-      f"Level  4:  600 {self.bot.get_emoji(context.guild, 'gem')} ( 45{self.bot.get_emoji(context.guild, 'elixir')}/hour, Capacity:  360{self.bot.get_emoji(context.guild, 'elixir')})\n"
-      f"Level  5: 1000 {self.bot.get_emoji(context.guild, 'gem')} ( 75{self.bot.get_emoji(context.guild, 'elixir')}/hour, Capacity:  600{self.bot.get_emoji(context.guild, 'elixir')})\n"
-      f"Level  6: 1500 {self.bot.get_emoji(context.guild, 'gem')} (105{self.bot.get_emoji(context.guild, 'elixir')}/hour, Capacity:  840{self.bot.get_emoji(context.guild, 'elixir')})\n"
-      f"Level  7: 2000 {self.bot.get_emoji(context.guild, 'gem')} (140{self.bot.get_emoji(context.guild, 'elixir')}/hour, Capacity: 1260{self.bot.get_emoji(context.guild, 'elixir')})\n"
-      f"Level  8: 2500 {self.bot.get_emoji(context.guild, 'gem')} (180{self.bot.get_emoji(context.guild, 'elixir')}/hour, Capacity: 1620{self.bot.get_emoji(context.guild, 'elixir')})\n"
-      f"Level  9: 4000 {self.bot.get_emoji(context.guild, 'gem')} (220{self.bot.get_emoji(context.guild, 'elixir')}/hour, Capacity: 3520{self.bot.get_emoji(context.guild, 'elixir')})\n"
-      f"Level 10: 6000 {self.bot.get_emoji(context.guild, 'gem')} (260{self.bot.get_emoji(context.guild, 'elixir')}/hour, Capacity: 6240{self.bot.get_emoji(context.guild, 'elixir')})"
+      f"Level  1:    0 {gem_str} (  5{elixir_str}/hour, Capacity:   40{elixir_str})\n"
+      f"Level  2:   50 {gem_str} ( 15{elixir_str}/hour, Capacity:  120{elixir_str})\n"
+      f"Level  3:  300 {gem_str} ( 30{elixir_str}/hour, Capacity:  240{elixir_str})\n"
+      f"Level  4:  600 {gem_str} ( 45{elixir_str}/hour, Capacity:  360{elixir_str})\n"
+      f"Level  5: 1000 {gem_str} ( 75{elixir_str}/hour, Capacity:  600{elixir_str})\n"
+      f"Level  6: 1500 {gem_str} (105{elixir_str}/hour, Capacity:  840{elixir_str})\n"
+      f"Level  7: 2000 {gem_str} (140{elixir_str}/hour, Capacity: 1260{elixir_str})\n"
+      f"Level  8: 2500 {gem_str} (180{elixir_str}/hour, Capacity: 1620{elixir_str})\n"
+      f"Level  9: 4000 {gem_str} (220{elixir_str}/hour, Capacity: 3520{elixir_str})\n"
+      f"Level 10: 6000 {gem_str} (260{elixir_str}/hour, Capacity: 6240{elixir_str})"
     )
 
   @commands.command(
@@ -193,13 +207,13 @@ class InfoCog(commands.Cog, name="Information Commands"):
     guild = context.guild
     gem_emoji = self.bot.get_emoji(guild, "gem")
     if gem_emoji is None:
-      gem_emoji = "__Gem__"
+      gem_emoji = "__Gems__"
     elixir_emoji = self.bot.get_emoji(guild, "elixir")
     if elixir_emoji is None:
-      elixir_emoji = "__Elixir__"
+      elixir_emoji = "__Elixirs__"
     medal_emoji = self.bot.get_emoji(guild, "medal")
     if medal_emoji is None:
-      medal_emoji = "__Medal__"
+      medal_emoji = "__Medals__"
     if league.lower() in ["bronze"]:
       league = "Bronze League"
       description = "Top 3 of 15 get promoted."
