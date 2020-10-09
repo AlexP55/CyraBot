@@ -219,6 +219,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
         f"There are more than {searchLimit-1} enemies that match your input name, "
         f"please input a more accurate name to narrow down the search: `{prefix}enemy <name>`"
       )
+      return
     elif len(result) > 1:
       prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
       enemies = [f"{num_emojis[i+1]} `{prefix}enemy w{result[i][1]} {result[i][0]}`" for i in range(len(result))]
