@@ -189,7 +189,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     where_clause = []
     if enemy:
       enemy = enemy.lower()
-      if enemy in ["bird", "fly", "air", "flying"]: # aliases for "flying"
+      if enemy in ["bird", "birds", "fly", "air", "flying"]: # aliases for "flying"
         where_clause.append(f'remark="flying"')
       elif enemy in ["boss"]:
         where_clause.append(f'remark="boss"')
