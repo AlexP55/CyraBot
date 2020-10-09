@@ -157,10 +157,6 @@ class StatsCog(commands.Cog, name="Stats Commands"):
         level1, level2 = int(level), int(level)
     except ValueError:
       raise commands.BadArgument("passed hero level has an invalid format.")
-    #if rank1 > rank2:
-    #  rank1, rank2 = rank2, rank1
-    #if level1 > level2:
-    #  level1, level2 = level2, level1
     if (not 0 < level1 <= 35) or (not 0 < level2 <= 35):
       await context.send(f"Level of {string.capwords(unit)} must be between 1 and 35.")
       return
@@ -174,13 +170,9 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     timeout = self.get_active_time(context.guild) * 60
     if rank1 == rank2 and level1 == level2:
       # display the stats
-      #await context.send(f"{stats.HeroStats(unit, rank1, level1, result)}")
       guide = stats_guide.StatsMessage(unit, rank1, level1, result, context=context, timeout=timeout)
     else:
       # compare the stats
-      #stats_low = stats.HeroStats(unit, rank1, level1, result)
-      #stats_high = stats.HeroStats(unit, rank2, level2, result)
-      #await context.send(f"{stats_low.cmp(stats_high)}")
       guide = stats_guide.StatsCmpMessage(unit, rank1, level1, rank2, level2, result, context=context, timeout=timeout)
     await guide.start()
       
@@ -189,24 +181,23 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     brief="Shows enemy details",
     usage="[world] <name>"
   )
-  async def enemy(self, context, world:typing.Optional[toWorld], *, enemy):
+  async def enemy(self, context, world:typing.Optional[toWorld], *, enemy=None):
     # check world argument
     if world is not None and (world <= 0 or world >= 8):
       raise custom_exceptions.DataNotFound("World", num)
-    enemy = enemy.lower()
     searchLimit = self.get_search_limit(context.guild)
-    if enemy in ["bird", "fly", "air"]: # aliases for "flying"
-      enemy = "flying"
-    if world is None:
-      if enemy in ["boss", "flying"]:
-        where_clause = f'remark="{enemy}"'
+    where_clause = []
+    if enemy:
+      enemy = enemy.lower()
+      if enemy in ["bird", "fly", "air", "flying"]: # aliases for "flying"
+        where_clause.append(f'remark="flying"')
+      elif enemy in ["boss"]:
+        where_clause.append(f'remark="boss"')
       else:
-        where_clause = f'enemy LIKE "%{enemy}%"'
-    else:
-      if enemy in ["boss", "flying"]:
-        where_clause = f'remark="{enemy}" AND enemy.world={world}'
-      else:
-        where_clause = f'enemy LIKE "%{enemy}%" AND enemy.world={world}'
+        where_clause.append(f'enemy LIKE "%{enemy}%"')
+    if world:
+      where_clause.append(f'enemy.world={world}')
+    where_clause = " AND ".join(where_clause) if where_clause else True
     result = self.bot.db[context.guild.id].query(
       f"SELECT enemy, enemy.world, type, hp, physicalArmor, magicalArmor, moveSpeed, castSpeed, normalDamage, specialDamage, dodge, abilities, remark, buff, url "
       f"FROM enemy JOIN buff ON buff.unit='enemy' AND enemy.world=buff.world WHERE {where_clause} LIMIT {searchLimit}"
