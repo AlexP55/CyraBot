@@ -3,7 +3,7 @@ from discord.ext import commands
 import random
 import modules.custom_exceptions as custom_exceptions
 from modules.cyra_converter import find_hero
-from modules.cyra_constants import facts, elixir_cost_hero
+from modules.cyra_constants import facts, elixir_cost_hero, max_level
 import string
 import logging
 
@@ -44,8 +44,8 @@ class InfoCog(commands.Cog, name="Information Commands"):
       raise custom_exceptions.HeroNotFound(string.capwords(hero))
     if lvEnd <= lvStart:
       lvEnd = lvStart + 1
-    if lvStart <= 0 or lvEnd > 35:
-      await context.send(f"Level of {string.capwords(hero)} must be between 1 and 35.")
+    if lvStart <= 0 or lvEnd > max_level:
+      await context.send(f"Level of {string.capwords(hero)} must be between 1 and {max_level}.")
       return
     elixir_cost = sum(elixir_cost_hero[hero][lvStart-1:lvEnd-1])
     hero_str = self.bot.get_emoji(context.guild, hero)
@@ -66,8 +66,8 @@ class InfoCog(commands.Cog, name="Information Commands"):
   async def _elixir_up(self, context, hero:find_hero, numElixir:int, lvStart:int=1):
     if hero not in elixir_cost_hero:
       raise custom_exceptions.HeroNotFound(string.capwords(hero))
-    if lvStart <= 0 or lvStart >= 35:
-      await context.send(f"Start level of {string.capwords(hero)} must be between 1 and 34.")
+    if lvStart <= 0 or lvStart >= max_level:
+      await context.send(f"Starting level of {string.capwords(hero)} must be between 1 and {max_level-1}.")
       return
     cost_list = elixir_cost_hero[hero]
     cost = 0

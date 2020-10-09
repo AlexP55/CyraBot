@@ -6,6 +6,7 @@ import modules.interactive_hero_guide as hero_guide
 import modules.interactive_tower_guide as tower_guide
 import modules.interactive_stats_guide as stats_guide
 from modules.cyra_converter import find_hero, find_ability, toWorld
+from modules.cyra_constants import max_level
 from base.modules.message_helper import num_emojis, multiple_choice
 import asyncio
 import string
@@ -157,8 +158,8 @@ class StatsCog(commands.Cog, name="Stats Commands"):
         level1, level2 = int(level), int(level)
     except ValueError:
       raise commands.BadArgument("passed hero level has an invalid format.")
-    if (not 0 < level1 <= 35) or (not 0 < level2 <= 35):
-      await context.send(f"Level of {string.capwords(unit)} must be between 1 and 35.")
+    if (not 0 < level1 <= max_level) or (not 0 < level2 <= max_level):
+      await context.send(f"Level of {string.capwords(unit)} must be between 1 and {max_level}.")
       return
     result = self.bot.db[context.guild.id].select("hero", unit)
     if result is None:
