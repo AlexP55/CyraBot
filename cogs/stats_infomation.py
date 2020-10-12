@@ -116,7 +116,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
       await context.send(
         f'There are more than {searchLimit-1} abilities that match your input name, '
-        f'please input a more accurate name to narrow down the search: `{prefix}ability "{heroName.replace(" ","")}" <ability>`'
+        f'please input a more accurate name to narrow down the search: `{prefix}ability {heroName.replace(" ","")} <ability>`'
       )
       return
     elif len(result) > 1:
@@ -209,7 +209,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
       await context.send(
         f"There are more than {searchLimit-1} enemies that match your input name, "
-        f"please input a more accurate name to narrow down the search: `{prefix}enemy <name>`"
+        f"please input a more accurate name to narrow down the search: `{prefix}{context.command.qualified_name} {context.command.signature}`"
       )
       return
     elif len(result) > 1:
@@ -306,7 +306,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
       await context.send(
         f"There are more than {searchLimit-1} towers that match your input name, "
-        f"please input a more accurate name to narrow down the search: `{prefix}tower <name>`"
+        f"please input a more accurate name to narrow down the search: `{prefix}{context.command.qualified_name} {context.command.signature}`"
       )
       return
     elif len(result) > 1:

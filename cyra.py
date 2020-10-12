@@ -44,8 +44,8 @@ class CyraBot(BaseBot):
           "Did you honestly believe you'd get the results you were looking for? How naive.",
           "How about you do the work once in a while?",
           "Command invalid. Just kidding. I'm not in the mood for work.",
+          f"Input:{context.message.content}\nOutput: Chaos."
         ]
-        responses.append(f"Input:{context.message.content}\nOutput: Chaos")
         raise custom_exceptions.ElaraRefuseToAnswer(random.choice(responses))
       else:
         return True
@@ -77,7 +77,7 @@ class CyraBot(BaseBot):
         msg = f"Elara stopped me from executing that command. Maybe try something else?\nPlease refer to `?help {context.command.qualified_name}` for information on my commands."
     elif context.guild.me.nick == "Elara":
       if isinstance(error, commands.CommandOnCooldown):
-        msg = f"Do not rush me mortal! I cannot use this skill so often. ({round(error.retry_after)}s remains)"
+        msg = f"Do not rush me mortal! I cannot use this skill so often ({round(error.retry_after)}s remains)."
       elif isinstance(error, custom_exceptions.HeroNotFound):
         msg = f"Who is **{error.item}**? Is that a new nickname?"
       elif isinstance(error, custom_exceptions.AbilityNotFound):
@@ -96,7 +96,7 @@ class CyraBot(BaseBot):
       else:
         msg = f"Cyra stopped me from executing that command. It's too dangerous, even for myself.\nRefer to `?help {context.command.qualified_name}` for information on my commands."
     else:
-      msg = "I cannot process your command, please refer to `?help [command]` for more information"
+      msg = "I cannot process your command, please refer to `?help [command]` for more information."
     #Send response
     await context.send(msg)
 
