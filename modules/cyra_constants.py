@@ -1,3 +1,5 @@
+max_level = 35
+
 emoji_keys = {
   "elixir":"item_Elixir",
   "gem":"item_Gem",
