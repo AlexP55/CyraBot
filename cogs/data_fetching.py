@@ -17,8 +17,9 @@ class SheetReader:
     if sheet is None:
       logging.warning("Warning, no hero sheet found")
       return
-    if not sheet.ncols == 24:
-      raise Exception("Hero sheet columns do not match")
+    expected = 24
+    if not sheet.ncols == expected:
+      raise Exception(f"Levels sheet columns do not match, expected {expected} but found {sheet.ncols}")
     self.db.delete_table("hero")
     self.db.create_table("hero", "name", name="txt", world="int", baseHP="int", drankHP="int", dlvHP="int", dranklvHP="int",
                     baseND="int", drankND="int", dlvND="int", dranklvND="int", baseSD="int", drankSD="int", dlvSD="int", dranklvSD="int",
@@ -31,8 +32,9 @@ class SheetReader:
     if sheet is None:
       logging.warning("Warning, no ability sheet found")
       return
-    if not sheet.ncols == 9:
-      raise Exception("Ability sheet columns do not match")
+    expected = 9
+    if not sheet.ncols == expected:
+      raise Exception(f"Levels sheet columns do not match, expected {expected} but found {sheet.ncols}")
     self.db.delete_table("ability")
     self.db.create_table("ability", ["ability", "hero"], ability="txt_not_null", hero="txt_not_null", type="txt_not_null", unlock="txt_not_null",
                     shortDescription="txt_not_null", addition="txt_not_null", tag="int_not_null", keyword="txt_not_null", url="txt_not_null")
@@ -43,8 +45,9 @@ class SheetReader:
     if sheet is None:
       logging.warning("Warning, no abilityDetail sheet found")
       return
-    if not sheet.ncols == 4:
-      raise Exception("AbilityDetail sheet columns do not match")
+    expected = 4
+    if not sheet.ncols == expected:
+      raise Exception(f"Levels sheet columns do not match, expected {expected} but found {sheet.ncols}")
     self.db.delete_table("abilityDetail")
     self.db.create_table("abilityDetail", ["ability", "hero", "upgrade"],  ability="txt_not_null", hero="txt_not_null",
                     upgrade="txt_not_null", info="txt_not_null")
@@ -55,10 +58,11 @@ class SheetReader:
     if sheet is None:
       logging.warning("Warning, no levels sheet found")
       return
-    if not sheet.ncols == 5:
-      raise Exception("Levels sheet columns do not match")
+    expected = 7
+    if not sheet.ncols == expected:
+      raise Exception(f"Levels sheet columns do not match, expected {expected} but found {sheet.ncols}")
     self.db.delete_table("levels")
-    self.db.create_table("levels", "level", level="txt", name="txt", handicap="txt", tappable="txt", link="txt")
+    self.db.create_table("levels", "level", level="txt", world="int", name="txt", handicap="txt", tappable="txt", link="txt", remark="txt")
     self.insertSheet(sheet, "levels")
 
   def fetchQuotes(self):
@@ -66,8 +70,9 @@ class SheetReader:
     if sheet is None:
       logging.warning("Warning, no quotes sheet found")
       return
-    if not sheet.ncols == 3:
-      raise Exception("Quotes sheet columns do not match")
+    expected = 3
+    if not sheet.ncols == expected:
+      raise Exception(f"Levels sheet columns do not match, expected {expected} but found {sheet.ncols}")
     self.db.delete_table("quotes")
     self.db.create_table("quotes", "id", id="int", hero="txt", quote="txt")
     self.insertSheet(sheet, "quotes")
@@ -77,8 +82,9 @@ class SheetReader:
     if sheet is None:
       logging.warning("Warning, no enemy sheet found")
       return
-    if not sheet.ncols == 14:
-      raise Exception("Enemy sheet columns do not match")
+    expected = 14
+    if not sheet.ncols == expected:
+      raise Exception(f"Levels sheet columns do not match, expected {expected} but found {sheet.ncols}")
     self.db.delete_table("enemy")
     self.db.create_table("enemy", ["enemy", "world"], enemy="txt", world="int", type="txt", hp="int", physicalArmor="real", magicalArmor="real", moveSpeed="real", castSpeed="real", normalDamage="int", specialDamage="int", dodge="int", abilities="txt", remark="txt", url="txt")
     self.insertSheet(sheet, "enemy")
@@ -88,8 +94,9 @@ class SheetReader:
     if sheet is None:
       logging.warning("Warning, no tower sheet found")
       return
-    if not sheet.ncols == 14:
-      raise Exception("Tower sheet columns do not match")
+    expected = 14
+    if not sheet.ncols == expected:
+      raise Exception(f"Levels sheet columns do not match, expected {expected} but found {sheet.ncols}")
     self.db.delete_table("tower")
     self.db.create_table("tower", ["tower", "world"], tower="txt", world="int", type="txt", description1="txt", description2="txt", basic="txt", starUpgrade="txt", lvUpgrade="txt", leftBranchName="txt", leftBranch="txt", rightBranchName="txt", rightBranch="txt", reinforcement="txt", url="txt")
     self.insertSheet(sheet, "tower")
@@ -99,8 +106,9 @@ class SheetReader:
     if sheet is None:
       logging.warning("Warning, no buff sheet found")
       return
-    if not sheet.ncols == 3:
-      raise Exception("Buff sheet columns do not match")
+    expected = 3
+    if not sheet.ncols == expected:
+      raise Exception(f"Levels sheet columns do not match, expected {expected} but found {sheet.ncols}")
     self.db.delete_table("buff")
     self.db.create_table("buff", ["world", "unit"], world="int", unit="txt", buff="txt")
     self.insertSheet(sheet, "buff")

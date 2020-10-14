@@ -113,32 +113,16 @@ class InfoCog(commands.Cog, name="Information Commands"):
     aliases=["lvl","lv"]
   )
   async def _level(self, context, level):
+    level = level.upper()
     result = self.bot.db[context.guild.id].select("levels", level)
     if result is None:
       raise custom_exceptions.DataNotFound("Level", level)
-    if level[0] in ["s", "S"]:
+    if level[0] == "S":
       world = "Shattered Realms"
+    elif level[0] == "A":
+      world = "Arcade"
     else:
-      try:
-        level = int(level)
-      except ValueError as err:
-        raise commands.BadArgument(f"Could not find level {level}.")
-      if 1 <= level <= 20:
-        world = "World 1"
-      elif 21 <= level <= 40:
-        world = "World 2"
-      elif 41 <= level <= 80:
-        world = "World 3"
-      elif 81 <= level <= 120:
-        world = "World 4"
-      elif 121 <= level <= 160:
-        world = "World 5"
-      elif 161 <= level <= 200:
-        world = "World 6"
-      #elif 201 <= level <= 240:
-      #  world = "World 7
-      else:
-        raise commands.BadArgument("Invalid level for level command.")
+      world = result["world"]
     embed = discord.Embed(title=f"{level}. {result['name']}", colour=discord.Colour.green(), timestamp=context.message.created_at)
     if result["handicap"] != "NONE":
       embed.add_field(name="Legendary Handicap:", value=result["handicap"], inline=False)
