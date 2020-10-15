@@ -255,7 +255,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       _stats["Dodge"] = f"{dg}%"
     statsMsg = "\n".join([f"`{key:<13} = {value:<6}`" for key, value in _stats.items()])
     embed = discord.Embed(
-      title=f"**{string.capwords(enemy)}**", 
+      title=f"**{enemy}**", 
       timestamp=context.message.created_at, 
       description=f"World {world} {etype} Enemy"
     )

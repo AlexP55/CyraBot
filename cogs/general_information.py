@@ -4,6 +4,7 @@ import random
 import modules.custom_exceptions as custom_exceptions
 from modules.cyra_converter import find_hero
 from modules.cyra_constants import facts, elixir_cost_hero, max_level
+import modules.interactive_level_guide as level_guide 
 import string
 import logging
 
@@ -113,6 +114,10 @@ class InfoCog(commands.Cog, name="Information Commands"):
     aliases=["lvl","lv"]
   )
   async def _level(self, context, level):
+    timeout = self.bot.get_setting(context.guild, "ACTIVE_TIME") * 60
+    guild = level_guide.LevelRootMessage(context=context, timeout=timeout)
+    await guild.start()
+    return
     level = level.title()
     result = self.bot.db[context.guild.id].select("levels", level)
     if result is None:
