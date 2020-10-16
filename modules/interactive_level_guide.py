@@ -419,7 +419,7 @@ class LevelAchievementMessage(InteractiveMessage):
       summary = ["`" + " ".join(f"{row[i]:<{max_len[i]}}" for i in range(len(row))) + "`" for row in table]
       embed = discord.Embed(title=f"Search Results", colour=discord.Colour.green(), 
                             timestamp=datetime.utcnow(), description=description+"\n".join(summary))
-      instruction = f"{text_emojis['info']} Summary {self.child_emojis[2]}-{self.child_emojis[-1]} Results"
+      instruction = f"{text_emojis['info']} Summary {num_emojis[1]}-{num_emojis[len(self.result)]} Results"
       embed.add_field(name="For Level Details:", value=instruction, inline=False)
     else: # return the level info
       if self.achievement == "fast":
@@ -445,7 +445,7 @@ class LevelAchievementMessage(InteractiveMessage):
         description.append(f"👽 {self.achievement.title()} Enemies Num: {kills}")
       embed = discord.Embed(title=f"{level}. {name} {mode.title()}", colour=discord.Colour.green(), 
                             timestamp=datetime.utcnow(), description="\n".join(description))
-      instruction = (f"{text_emojis['info']} Summary {num_emojis[1]}-{num_emojis[len(self.results)]} Results\n"
+      instruction = (f"{text_emojis['info']} Summary {num_emojis[1]}-{num_emojis[len(self.result)]} Results\n"
                      f"👽 Details of Enemy Waves")
       embed.add_field(name="For Other Details:", value=instruction, inline=False)
       if link and link != "NONE":
