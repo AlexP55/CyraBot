@@ -361,14 +361,14 @@ class LevelAchievementMessage(InteractiveMessage):
       ind = achievements.index(achievement) + 7 # index of achievement in results
       where_clause.append(f"{achievement}>0")
       if num:
-        self.goal = f"Levels that quickly farms **{num} {achievement.title()}** Enemies"
+        self.goal = f"Levels that quickly farm **{num} {achievement.title()}** Enemies"
         self.info = ["KILL","TIME","RUN","SUM_T"]
         self.info_fun = lambda row: [row[ind], f"{row[4] + self.extra_t:.0f}", 
                         int(-(-num // row[ind])), f"{(row[4] + self.extra_t) * (-(-num // row[ind])):.0f}"]
         num = float(num)
         sort_method = f"(time+{self.extra_t})*(CAST (({num}/{achievement}) AS INT) + (({num}/{achievement}) > CAST (({num}/{achievement}) AS INT)))"
       else:
-        self.goal = f"Levels that quickly farms **{achievement.title()}** Enemies"
+        self.goal = f"Levels that quickly farm **{achievement.title()}** Enemies"
         self.info = ["KILL","TIME","KPS"]
         self.info_fun = lambda row: [row[ind], f"{row[4] + self.extra_t:.0f}", f"{float(row[ind]) / (row[4] + self.extra_t):.2f}"]
         sort_method = f"CAST((time+{self.extra_t}) AS FLOAT)/{achievement}"
