@@ -302,7 +302,8 @@ class LevelWaveMessage(InteractiveMessage):
       else:
         total_bonus = wave["bonus"]
       category = f"Wave {self.state} Information"
-    description=f"{gold_emoji} Initial Gold: {self.level_info['initial_gold']}\n❤️ Life: {self.level_info['max_life']}"
+    description=(f"{gold_emoji} Initial Gold: {self.level_info['initial_gold']}\n❤️ Life: {self.level_info['max_life']}\n"
+                 f"🌊 Wave Num: {len(self.level_info['enemy_waves'])}")
     if total_bonus == 0:
       text = f"⏳ Time: {total_time:.1f}s\n{gold_emoji} Reward: {total_reward}"
     else:
@@ -321,7 +322,8 @@ class LevelWaveMessage(InteractiveMessage):
     embed.add_field(name="Enemies:" if not self.achieve else "Achievements:", value=text, inline=False)
     if len(self.level_info["enemy_waves"]) > 1:
       wave_emojis = " ".join(num_emojis[1:len(self.level_info["enemy_waves"])+1])
-      instruction = f"{text_emojis['info']} Overview {wave_emojis} Wave Info\n🏆 Switch to {'Achievements' if not self.achieve else 'Enemies'}"
+      instruction = (f"{text_emojis['info']} Overview {num_emojis[1]}-{num_emojis[len(self.level_info['enemy_waves'])]} Wave Info\n"
+                     f"🏆 Switch to {'Achievements' if not self.achieve else 'Enemies'}")
     else:
       instruction = f"🏆 Switch to {'Achievements' if not self.achieve else 'Enemies'}"
     embed.add_field(name="For information:", value=instruction, inline=False)
@@ -443,7 +445,7 @@ class LevelAchievementMessage(InteractiveMessage):
         description.append(f"👽 {self.achievement.title()} Enemies Num: {kills}")
       embed = discord.Embed(title=f"{level}. {name} {mode.title()}", colour=discord.Colour.green(), 
                             timestamp=datetime.utcnow(), description="\n".join(description))
-      instruction = (f"{text_emojis['info']} Summary {self.child_emojis[2]}-{self.child_emojis[-1]} Results\n"
+      instruction = (f"{text_emojis['info']} Summary {num_emojis[1]}-{num_emojis[len(self.results)]} Results\n"
                      f"👽 Details of Enemy Waves")
       embed.add_field(name="For Other Details:", value=instruction, inline=False)
       if link and link != "NONE":
