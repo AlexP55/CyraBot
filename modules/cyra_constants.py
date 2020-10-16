@@ -157,17 +157,23 @@ elixir_cost_hero = {
 achievemets_dict = {
 "Slime":["slime"],"Skeleton":["skeleton"],"Crow":["flying"],"Skeleton Archer":["skeleton"],"Spider":["spider"],"Poison Spider":["spider"],
 "Skeleton Mage":["skeleton"],"Bucket Slime":["slime"],"Giant Slime":["slime"],"Slime Queen":["slime"],"Slime Blob":["slime"],"Goblin Grunt":["goblin"],
-"Crow Rider":["flying"],"Goblin Archer":["goblin"],"Goblin Shaman":["goblin"],"Maniac":["goblin"],"Shield Goblin":["goblin"],"Goblin Tallman":["goblin"],
-"Heretic":["goblin"],"Witch":["goblin"],"Orc":["goblin"],"Goblin Chieftain":["goblin"],"Hordemonger":["goblin"],"Flying Scarab":["flying"],
-"Anubian":["anubian"],"Vulture Rider":["flying"],"Mega Anubian":["anubian"],"Cactus Golem":["golem"],"Magic Book":["flying"],"Fire Elemental":["elemental"],
+"Crow Rider":["flying"],"Goblin Archer":["goblin"],"Goblin Shaman":["goblin"],"Maniac":["goblin"],"Goblin Tallman":["goblin"],
+"Heretic":["goblin"],"Orc":["goblin"],"Goblin Chieftain":["goblin"],"Hordemonger":["goblin"],"Flying Scarab":["flying"],
+"Anubian":["anubian"],"Vulture Rider":["flying"],"Mega Anubian":["anubian"],"Cactus Golem":["golem"],"Fire Elemental":["elemental"],
 "Ice Elemental":["elemental"],"Whelp":["flying"],"Time Construct":["golem"],"Wizard Initiate":["wizard"],"Void Elemental":["elemental"],"Gravity Wizard":["wizard"],
-"Earth Elemental":["elemental"],"Cloud Sunfish":["flying"],"Ivory Golem":["golem"],"Duskvine Sproutling":["duskvine"],"Aqua Slime":["slime"],
+"Earth Elemental":["elemental"],"Ivory Golem":["golem"],"Duskvine Sproutling":["duskvine"],"Aqua Slime":["slime"],
 "Cave Bat":["flying"],"Lava Slime":["slime","lava"],"Lava Bat":["flying","lava"],"Lava Snail":["lava"],"Duskvine Sporophyte":["duskvine"],"Giant Cave Bat":["flying"],
 "Myrk Archer":["myrk"],"Small Ent":["ent"],"Duskvine Lasher":["duskvine"],"Myrk Assassin":["myrk"],"Duskvine Crusher":["duskvine"],"Myrk Warlock":["myrk"],
 "Lava Pango":["lava"],"Lava Smasher":["lava"],"Large Ent":["ent"],"Strange Monk":["w6"],"Big Crane":["w6","flying"],"Origami Crane":["w6","flying"],
-"Oni-tekidanhei":["w6"],"Daruma":["w6","flying"],"Small Ghostfire":["w6"],"Chibi-Mahou":["w6"],"Harpi":["w6","flying"],"Skeleton Samurai":["w6","skeleton"],
-"Mizu-no-Sei":["w6","flying"],"Oni-baba":["w6"],"Koi-jin":["w6"],"Kakutouka":["w6"],"Oni-ken":["w6"],"Kagami-no-Yuurei":["w6"],"Namazu-jin":["w6"],
-"Oni Mask":["w6","flying"],"Aoi Mask":["w6","flying"],"Kami-no-Mahoutsukai":["w6"],"Kaeru-hei":["w6"],"Big Ghostfire":["w6"],"Shunmin-shi":["w6"],
-"Oni-kanadzuchi":["w6"]
+"Oni-tekidanhei":["w6"],"Daruma":["w6","flying"],"Small Ghostfire":["w6","spirit"],"Chibi-Mahou":["w6"],"Harpi":["w6","flying"],"Skeleton Samurai":["w6","skeleton"],
+"Mizu-no-Sei":["w6","flying"],"Oni-baba":["w6"],"Koi-jin":["w6"],"Kakutouka":["w6"],"Oni-ken":["w6"],"Kagami-no-Yuurei":["w6","spirit"],"Namazu-jin":["w6"],
+"Oni Mask":["w6","flying","spirit"],"Aoi Mask":["w6","flying","spirit"],"Kami-no-Mahoutsukai":["w6"],"Kaeru-hei":["w6"],"Big Ghostfire":["w6","spirit"],
+"Shunmin-shi":["w6"],"Oni-kanadzuchi":["w6"]
 }
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))
+achievement_synonyms = {
+"w6enemy":"w6",
+"world6":"w6",
+"bird":"flying",
+"air":"flying"
+}

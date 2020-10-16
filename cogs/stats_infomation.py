@@ -185,7 +185,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
   async def enemy(self, context, world:typing.Optional[toWorld], *, enemy=None):
     # check world argument
     if world is not None and (world <= 0 or world >= 8):
-      raise custom_exceptions.DataNotFound("World", num)
+      raise custom_exceptions.DataNotFound("World", world)
     searchLimit = self.get_search_limit(context.guild)
     where_clause = []
     if enemy:
@@ -280,7 +280,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
   async def tower(self, context, world:typing.Optional[toWorld], *, tower=None):
     # check world argument
     if world is not None and (world <= 0 or world >= 8):
-      raise custom_exceptions.DataNotFound("World", num) 
+      raise custom_exceptions.DataNotFound("World", world) 
     if tower is None:
       await context.invoke(self.bot.get_command("guide tower"), world)
       return

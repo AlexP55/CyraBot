@@ -191,6 +191,8 @@ class CyraBot(BaseBot):
       transFun=lambda x: float(x), checkFun=lambda x: x>=0, checkDescription="a non-negative number")
     self.default_settings["SEARCH_LIMIT"] = DefaultSetting(name="SEARCH_LIMIT", default=11, description="max num of entries by a query", 
       transFun=lambda x: int(x), checkFun=lambda x: 0<x<=11, checkDescription="an integer between 1 and 11")
+    self.default_settings["LEVEL_EXTRA_TIME"] = DefaultSetting(name="LEVEL_EXTRA_TIME", default=30, description="time to enter/exit a level", 
+      transFun=lambda x: float(x), checkFun=lambda x: x>=0, checkDescription="a non-negative number")
     self.default_settings["AUTO_TRANSFORM"] = DefaultSetting(name="AUTO_TRANSFORM", default="ON", description="on/off auto transform", 
       transFun=lambda x: x.upper(), checkFun=lambda x: x in ["ON", "OFF"], checkDescription="either ON or OFF")
   

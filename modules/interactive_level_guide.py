@@ -1,9 +1,11 @@
 import discord
 from datetime import datetime
-import modules.custom_exceptions
+import json
+import modules.custom_exceptions as custom_exceptions
 from base.modules.interactive_message import InteractiveMessage
 from modules.cyra_constants import world_url, tower_menu_url
-from base.modules.constants import num_emojis, text_emojis, letter_emojis, item_emojis
+from base.modules.constants import num_emojis, text_emojis, letter_emojis
+from modules.level_parser import parse_wave_achievements, sum_dict
 
 class LevelRootMessage(InteractiveMessage):
   def __init__(self, parent=None, **attributes):
@@ -155,12 +157,10 @@ class LevelIndividualMessage(InteractiveMessage):
     
   def __init__(self, level, parent=None, **attributes):
     super().__init__(parent, **attributes)
-    if self.parent is None:
-      self.parent = LevelRootMessage(None, **attributes)
     self.level = level
     self.dbrow = attributes.pop("dbrow", None)
+    db = self.context.bot.db[self.context.guild.id]
     if not self.dbrow:
-      db = self.context.bot.db[self.context.guild.id]
       self.dbrow = db.select("levels", level)
       if not self.dbrow:
         raise custom_exceptions.DataNotFound("Level", level)
@@ -187,21 +187,266 @@ class LevelIndividualMessage(InteractiveMessage):
       w = world
     if self.parent is None:
       self.parent = LevelWorldMessage(w, **attributes)
+    # check the level's wave data to decide its child emojis
+    wave_info = db.query(f'SELECT * FROM wave WHERE level="{level}"')
+    self.wave_info = None
+    self.legendary_info = None
+    if wave_info:
+      for row in wave_info:
+        if row[1].lower() == "legendary":
+          self.legendary_info = row
+        elif row[1] in ["", "campaign"]:
+          self.wave_info = row
+    if self.wave_info:
+      self.child_emojis.append("👽")
+    if self.legendary_info:
+      self.child_emojis.append("🏆")
     
   async def transfer_to_child(self, emoji):
-    return
+    if emoji == "👽":
+      return LevelWaveMessage(self.level, self.wave_info[1], self, dbrow=self.wave_info, link=self.dbrow[5])
+    elif emoji == "🏆":
+      return LevelWaveMessage(self.level, self.legendary_info[1], self, dbrow=self.legendary_info, link=self.dbrow[5])
     
   async def get_embed(self):
     level, world, name, handicap, tappable, link, remark = self.dbrow
     embed = discord.Embed(title=f"{level}. {name}", colour=discord.Colour.green(), timestamp=datetime.utcnow())
-    if handicap != "NONE":
+    if handicap and handicap != "NONE":
       embed.add_field(name="Legendary Handicap:", value=handicap, inline=False)
-    if tappable != "NONE":
+    if tappable and tappable != "NONE":
       coin_emoji = self.context.bot.get_emoji(self.context.guild, "coin")
       if coin_emoji is not None:
         tappable = tappable.replace(":moneybag:", f"{coin_emoji}")
       embed.add_field(name="Tappable(s):", value=tappable, inline=False)
-    if link != "NONE":
+    if self.wave_info or self.legendary_info:
+      instructions = []
+      if self.wave_info:
+        instructions.append("👽 Enemy waves")
+      if self.legendary_info:
+        instructions.append("🏆 Legendary waves")
+      embed.add_field(name="To check enemy waves:", value=" ".join(instructions), inline=False)
+    if link and link != "NONE":
       embed.set_image(url=link)
     embed.set_footer(text=self.footer)
+    return embed
+    
+class LevelWaveMessage(InteractiveMessage):
+    
+  def __init__(self, level, mode, parent=None, **attributes):
+    super().__init__(parent, **attributes)
+    self.level = level
+    self.mode = mode
+    self.state = 0
+    self.achieve = False
+    dbrow = attributes.pop("dbrow", None)
+    self.link = attributes.pop("link", None)
+    if not dbrow:
+      db = self.context.bot.db[self.context.guild.id]
+      dbrow = db.select("wave", [level, mode])
+      if not dbrow:
+        raise custom_exceptions.DataNotFound("Level Waves", f"{level} {mode}" if mode else level)
+      else:
+        dbrow = list(dbrow.values())
+    if self.parent is None:
+      self.parent = LevelIndividualMessage(level, **attributes)
+    # check the level's wave data to decide its child emojis
+    self.level_info = {"level":dbrow[0], "mode":dbrow[1], "initial_gold":dbrow[2], "max_life":dbrow[3], "enemy_waves":json.loads(dbrow[4])}
+    for wave in self.level_info["enemy_waves"]:
+      wave["achievements"] = parse_wave_achievements(wave["enemies"])
+    if len(self.level_info["enemy_waves"]) > 1: # only need to show more info when there are more than 1 waves
+      self.child_emojis += [text_emojis["info"], "🏆"] + num_emojis[1:len(self.level_info["enemy_waves"])+1]
+    else:
+      self.child_emojis = ["🏆"]
+    
+  async def transfer_to_child(self, emoji):
+    if emoji == "🏆":
+      self.achieve = not self.achieve
+      return self
+    if emoji == text_emojis["info"]:
+      state = 0
+    else:
+      state = num_emojis.index(emoji)
+    if state == self.state:
+      return None
+    else:
+      self.state = state
+      return self
+    
+  async def get_embed(self):
+    gold_emoji = self.context.bot.get_emoji(self.context.guild, "coin")
+    if not gold_emoji:
+      gold_emoji = "💰"
+    if self.state == 0:
+      # show sum information
+      enemies = {}
+      total_time = 0
+      total_reward = 0
+      total_bonus = 0
+      i = 0
+      for wave in self.level_info["enemy_waves"]:
+        i += 1
+        sum_dict(enemies, wave["enemies"] if not self.achieve else wave["achievements"])
+        total_time += wave["time"]
+        total_reward += wave["reward"]
+        if i > 1:
+          total_bonus += wave["bonus"]
+      category = "Level Information"
+    else:
+      # show a specific wave info
+      wave = self.level_info["enemy_waves"][self.state-1]
+      enemies = wave["enemies"] if not self.achieve else wave["achievements"]
+      total_time = wave["time"]
+      total_reward = wave["reward"]
+      if self.state == 1:
+        total_bonus = 0
+      else:
+        total_bonus = wave["bonus"]
+      category = f"Wave {self.state} Information"
+    description=f"{gold_emoji} Initial Gold: {self.level_info['initial_gold']}\n❤️ Life: {self.level_info['max_life']}"
+    if total_bonus == 0:
+      text = f"⏳ Time: {total_time:.1f}s\n{gold_emoji} Reward: {total_reward}"
+    else:
+      text = f"⏳ Time: {total_time:.1f}s\n{gold_emoji} Reward: {total_reward}\n{gold_emoji} Early wave bonus: {total_bonus}"
+    embed = discord.Embed(title=f"Level {self.level}. {self.mode.title()} Enemies", colour=discord.Colour.green(), 
+                          timestamp=datetime.utcnow(), description=description)
+    embed.add_field(name=f"{category}:", value=text, inline=False)
+    if enemies:
+      max_num_len = max(len(str(num)) for num in enemies.values())
+      if self.achieve:
+        text = "\n".join([f"`{num:<{max_num_len}}` {enemy.title()} Enemies" for enemy, num in enemies.items()])
+      else:
+        text = "\n".join([f"`{num:<{max_num_len}}` {enemy}" for enemy, num in enemies.items()])
+    else:
+      text = "None"
+    embed.add_field(name="Enemies:" if not self.achieve else "Achievements:", value=text, inline=False)
+    if len(self.level_info["enemy_waves"]) > 1:
+      wave_emojis = " ".join(num_emojis[1:len(self.level_info["enemy_waves"])+1])
+      instruction = f"{text_emojis['info']} Overview {wave_emojis} Wave Info\n🏆 Switch to {'Achievements' if not self.achieve else 'Enemies'}"
+    else:
+      instruction = f"🏆 Switch to {'Achievements' if not self.achieve else 'Enemies'}"
+    embed.add_field(name="For information:", value=instruction, inline=False)
+    embed.set_footer(text="Enemy Waves")
+    if self.link and self.link != "NONE":
+      embed.set_thumbnail(url=self.link)
+    return embed
+    
+class LevelAchievementMessage(InteractiveMessage):
+    
+  def __init__(self, achievement, num, parent=None, **attributes):
+    super().__init__(parent, **attributes)
+    self.achievement = achievement
+    self.num = num
+    self.state = 0
+    world = attributes.pop("world", None)
+    mode = attributes.pop("mode", None)
+    # use the world and mode arguments to limit the search
+    where_clause = []
+    select_clause = ["level","name","mode","strategy","time","link","remark"]
+    # the time required for entering exiting the level and
+    self.extra_t = self.context.bot.get_setting(self.context.guild, "LEVEL_EXTRA_TIME")
+    limit = self.context.bot.get_setting(self.context.guild, "SEARCH_LIMIT")-1
+    if world:
+      where_clause.append(f"world={world}")
+    if mode:
+      where_clause.append(f'mode="{mode}"')
+    # check the achievemnt argument to get the sorting method
+    if achievement == "fast":
+      self.goal = "Levels with the shortest completion time"
+      self.info = ["TIME"]
+      self.info_fun = lambda row: [f"{row[4] + self.extra_t:.0f}"]
+      sort_method = "time"
+    else:
+      select_clause.append(achievement)
+      where_clause.append(f"{achievement}>0")
+      if num:
+        self.goal = f"Levels that quickly farms **{num} {achievement.title()}** Enemies"
+        self.info = ["KILL","TIME","RUN","SUM_T"]
+        self.info_fun = lambda row: [row[7], f"{row[4] + self.extra_t:.0f}", 
+                        int(-(-num // row[7])), f"{(row[4] + self.extra_t) * (-(-num // row[7])):.0f}"]
+        num = float(num)
+        sort_method = f"(time+{self.extra_t})*(CAST (({num}/{achievement}) AS INT) + (({num}/{achievement}) > CAST (({num}/{achievement}) AS INT)))"
+      else:
+        self.goal = f"Levels that quickly farms **{achievement.title()}** Enemies"
+        self.info = ["KILL","TIME","KPS"]
+        self.info_fun = lambda row: [row[7], f"{row[4] + self.extra_t:.0f}", f"{float(row[7]) / (row[4] + self.extra_t):.2f}"]
+        sort_method = f"CAST((time+{self.extra_t}) AS FLOAT)/{achievement}"
+    where_clause = " AND ".join(where_clause) if where_clause else "TRUE"
+    select_clause = ", ".join(select_clause)
+    self.result = self.context.bot.db[self.context.guild.id].query(
+      f"SELECT {select_clause} FROM achievement NATURAL JOIN levels WHERE ({where_clause}) ORDER BY {sort_method} ASC LIMIT {limit}")
+    if not self.result:
+      raise custom_exceptions.DataNotFound("Level Achievement", achievement)
+    
+    # check the level's wave data to decide its child emojis
+    self.child_emojis = [text_emojis["info"], "👽"]
+    self.child_emojis += num_emojis[1:len(self.result)+1]
+      
+  @property
+  def current_row(self):
+    if self.state > 0:
+      return self.result[self.state-1]
+    
+  async def transfer_to_child(self, emoji):
+    if emoji == "👽":
+      if self.state > 0:
+        return LevelWaveMessage(self.current_row[0], self.current_row[2], self, link=self.current_row[5])
+      else:
+        return None
+    if emoji == text_emojis["info"]:
+      state = 0
+    else:
+      state = num_emojis.index(emoji)
+    if state == self.state:
+      return None
+    else:
+      self.state = state
+      return self
+    
+  async def get_embed(self):
+    if self.state <= 0: # return the summary
+      description = (f"🎯 Goal: Find {self.goal}\n📖 Assume: {self.extra_t} seconds to enter and exit the level\n"
+                     f"Candidate levels with their attributes are shown below:\n")
+      table = [["NO","LEVEL"]+self.info]
+      max_len = [len(str(item)) for item in table[0]]
+      i = 0
+      for row in self.result:
+        i += 1
+        new_row = [str(i), f"{row[0]} {row[2][:3].title()}"]+self.info_fun(row)
+        table.append(new_row)
+        max_len = [max(column) for column in zip(max_len, [len(str(item)) for item in new_row])]
+      summary = ["`" + " ".join(f"{row[i]:<{max_len[i]}}" for i in range(len(row))) + "`" for row in table]
+      embed = discord.Embed(title=f"Search Results", colour=discord.Colour.green(), 
+                            timestamp=datetime.utcnow(), description=description+"\n".join(summary))
+      instruction = f"{text_emojis['info']} Summary {self.child_emojis[2]}-{self.child_emojis[-1]} Results"
+      embed.add_field(name="For Level Details:", value=instruction, inline=False)
+    else: # return the level info
+      if self.achievement == "fast":
+        level, name, mode, strategy, time, link, remark = self.current_row
+        kills = 0
+      else:
+        level, name, mode, strategy, time, link, remark, kills = self.current_row
+      description = []
+      if strategy == "long":
+        if remark == "boss":
+          description.append("⚔️ Strategy: Play as long as you can without killing the boss")
+        else:
+          description.append("⚔️ Strategy: Play as long as you can")
+      elif strategy == "short":
+        if remark == "boss":
+          description.append("⚔️ Strategy: Kill the boss as fast as you can")
+        else:
+          description.append("⚔️ Strategy: Compelete the mission as fast as you can")
+      else:
+        description.append("⚔️ Strategy: Kill all enemies as fast as you can")
+      description.append(f"⏳ Completion Time: {time}s")
+      if kills > 0:
+        description.append(f"👽 {self.achievement.title()} Enemies Num: {kills}")
+      embed = discord.Embed(title=f"{level}. {name} {mode.title()}", colour=discord.Colour.green(), 
+                            timestamp=datetime.utcnow(), description="\n".join(description))
+      instruction = (f"{text_emojis['info']} Summary {self.child_emojis[2]}-{self.child_emojis[-1]} Results\n"
+                     f"👽 Details of Enemy Waves")
+      embed.add_field(name="For Other Details:", value=instruction, inline=False)
+      if link and link != "NONE":
+        embed.set_image(url=link)
+    embed.set_footer(text="Achievements")
     return embed

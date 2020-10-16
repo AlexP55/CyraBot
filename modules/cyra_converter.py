@@ -1,5 +1,5 @@
 import difflib
-from modules.cyra_constants import hero_synonyms, ability_synonyms, hero_list
+from modules.cyra_constants import hero_synonyms, ability_synonyms, hero_list, achievements, achievement_synonyms
 
 def find_hero(word):
   word = word.lower()
@@ -19,10 +19,49 @@ def find_ability(word):
     return ability_synonyms[word]
   return word
   
+def find_achievement(name):
+  name = name.lower()
+  if name in ["shortest", "fastest", "short", "fast", "quick", "quickest"]:
+    return "fast"
+  elif name in achievement_synonyms:
+    return achievement_synonyms[name]
+  else:
+    close_word = difflib.get_close_matches(name, achievements, n=1)
+    if not len(close_word) == 0:
+      return close_word[0]
+  raise custom_exceptions.ItemNotFound("Achievement", string.capwords(name))
+  
+def toMode(argument):
+  if argument in ["legend", "legendary"]:
+    return "legendary"
+  elif argument in ["campaign"]:
+    return "campaign"
+  raise
+
 def toWorld(argument):
   world = argument.lower()
   if world.startswith("world"):
     world = world.replace("world", "", 1)
   elif world.startswith("w"):
     world = world.replace("w", "", 1)
+  world = world.strip()
   return int(world)
+  
+def toLevelWorld(argument):
+  world = argument.lower()
+  if world.startswith("world"):
+    return int(world[5:].strip())
+  elif world.startswith("w"):
+    return int(world[1:].strip())
+  elif world in ["s", "sr", "shattered realms", "shatteredrealms"]:
+    return "S"
+  elif world in ["a", "arcade", "arcades"]:
+    return "A"
+  elif world in ["e", "endless"]:
+    return "E"
+  elif world in ["c", "challenge", "challenges"]:
+    return "C"
+  elif world in ["connie", "connie story", "conniestrory"]:
+    return "Connie"
+  raise custom_exceptions.DataNotFound("World", argument)
+  

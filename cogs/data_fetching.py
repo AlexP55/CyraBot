@@ -4,6 +4,7 @@ from base.modules.access_checks import has_admin_role
 import xlrd
 from base.modules.constants import DB_PATH as path
 from modules.cyra_constants import achievements, achievemets_dict
+from modules.level_parser import parse_achievements, parse_wave
 import os
 import json
 import logging
@@ -320,10 +321,10 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
   def update_wave_achievement(self, context):
     db = self.bot.db[context.guild.id]
     db.delete_table("wave")
-    db.create_table("wave", ["level", "mode"], level="txt", mode="txt", initial_gold="txt", max_life="txt", enemy_waves="txt")
+    db.create_table("wave", ["level", "mode"], level="txt", mode="txt", initial_gold="int", max_life="int", enemy_waves="txt")
     db.delete_table("achievement")
     achievement_columns = {achievement:"int" for achievement in achievements}
-    db.create_table("achievement", ["level", "mode", "strategy"], level="txt", mode="txt", strategy="txt", time="real", enemies="txt", **achievement_columns)
+    db.create_table("achievement", ["level", "mode", "strategy"], level="txt", mode="txt", strategy="txt", time="real", **achievement_columns)
     directory = os.path.join(path, 'levels/')
     data = sorted(os.listdir(directory))
     for name in data:
@@ -342,27 +343,27 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
           parsed_level = {"initial_gold":entry["initial_gold"], "max_life":entry["max_life"], "enemy_waves":[]}
           waves = entry["enemy_waves"]
           for wave in waves:
-            wave_data = parse_wave(wave)
-            parsed_level["enemy_waves"].append(wave_data)
+            parsed_level["enemy_waves"].append(parse_wave(wave))
           # parse achievements info
           if (mode != "legendary" and level in 
              ["10","20","30","40","50","60","70","80","90","100","110","130","140","150",
              "160","170","180","190","200","C1-5","C2-10","C3-9","C3-10","C6-3","C6-6","C6-10"]):
             # boss level, can skip the last wave by instantly killing the boss
             strategy = "long"
-            time, enemy_count, achievement_count = parse_achievements(parsed_level["enemy_waves"])
-            db.insert_or_update("achievement", level, mode, strategy, time, json.dumps(enemy_count), *achievement_count.values())
-            strategy = "short"
-            time, enemy_count, achievement_count = parse_achievements(parsed_level["enemy_waves"][:-1])
-            db.insert_or_update("achievement", level, mode, strategy, time, json.dumps(enemy_count), *achievement_count.values())
+            time, achievement_count = parse_achievements(parsed_level["enemy_waves"])
+            db.insert_or_update("achievement", level, mode, strategy, time, *achievement_count.values())
+            if len(parsed_level["enemy_waves"]) > 1:
+              strategy = "short"
+              time, achievement_count = parse_achievements(parsed_level["enemy_waves"][:-1])
+              db.insert_or_update("achievement", level, mode, strategy, time, *achievement_count.values())
           else:
             if level in ["S1","S5","S6","S9","S10","S36","S38","A5-1","A5-2","A5-3"]:
               # these levels can be run as long as possible
               strategy = "long"
             else:
               strategy = ""
-            time, enemy_count, achievement_count = parse_achievements(parsed_level["enemy_waves"])
-            db.insert_or_update("achievement", level, mode, strategy, time, json.dumps(enemy_count), *achievement_count.values())
+            time, achievement_count = parse_achievements(parsed_level["enemy_waves"])
+            db.insert_or_update("achievement", level, mode, strategy, time, *achievement_count.values())
           
           parsed_level["enemy_waves"] = json.dumps(parsed_level["enemy_waves"])
           db.insert_or_update("wave", level, mode, *parsed_level.values())
@@ -370,47 +371,7 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
         logging.error(f"Error while reading wave data in file {name}.")
         raise e
         
-def parse_achievements(waves):
-  time = 0
-  enemy_count = {}
-  achievement_count = {achievement:0 for achievement in achievements}
-  for wave in waves:
-    time += wave["time"]
-    sum_dict(enemy_count, wave["enemies"])
-    for enemy in wave["enemies"]:
-      if enemy in achievemets_dict:
-        for name in achievemets_dict[enemy]:
-          achievement_count[name] += wave["enemies"][enemy]
-  return time, enemy_count, achievement_count
-    
-def parse_wave_group(group, units):
-  time = group["delay"] + (group["count"] - 1) * group["cadence"]
-  if group["unit"] in units:
-    units[group["unit"]] += group["count"]
-  else:
-    units[group["unit"]] = group["count"]
-  return time
-  
-def parse_subwave(subwave, units):
-  max_time = 0
-  for group in subwave["groups"]:
-    max_time = max(max_time, parse_wave_group(group, units))
-  return max_time + subwave["delay"]
-  
-def parse_wave(wave):
-  units = {}
-  max_time = 0
-  for subwave in wave["subwaves"]:
-    max_time = max(max_time, parse_subwave(subwave, units))
-  wave_data = {"reward":wave["total_reward"], "bonus":wave["max_early_bonus"], "time":max_time, "enemies":units}
-  return wave_data
-  
-def sum_dict(dict1, dict2):
-  for key in dict2:
-    if key in dict1:
-      dict1[key] += dict2[key]
-    else:
-      dict1[key] = dict2[key]
+
 
 #This function is needed for the load_extension routine.
 def setup(bot):

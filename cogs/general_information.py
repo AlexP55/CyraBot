@@ -2,7 +2,8 @@ import discord
 from discord.ext import commands
 import random
 import modules.custom_exceptions as custom_exceptions
-from modules.cyra_converter import find_hero
+import typing
+from modules.cyra_converter import find_hero, toLevelWorld, toWorld, toMode, find_achievement
 from modules.cyra_constants import facts, elixir_cost_hero, max_level
 import modules.interactive_level_guide as level_guide 
 import string
@@ -113,39 +114,29 @@ class InfoCog(commands.Cog, name="Information Commands"):
     brief="Shows a selected level",
     aliases=["lvl","lv"]
   )
-  async def _level(self, context, level):
+  async def _level(self, context, world:typing.Optional[toLevelWorld], level=None):
     timeout = self.bot.get_setting(context.guild, "ACTIVE_TIME") * 60
-    guild = level_guide.LevelRootMessage(context=context, timeout=timeout)
-    await guild.start()
-    return
-    level = level.title()
-    result = self.bot.db[context.guild.id].select("levels", level)
-    if result is None:
-      raise custom_exceptions.DataNotFound("Level", level)
-    if level.startswith("S"):
-      world = "Shattered Realms"
-    elif level.startswith("A"):
-      world = "Arcade"
-    elif level.startswith("Connie"):
-      world = "Connie Story"
-    elif level.startswith("C"):
-      world = f"World {result['world']} Challenge"
+    if not world and not level:
+      guild = level_guide.LevelRootMessage(context=context, timeout=timeout)
+    elif not level:
+      guild = level_guide.LevelWorldMessage(world, context=context, timeout=timeout)
     else:
-      world = f"World {result['world']}"
-    embed = discord.Embed(title=f"{level}. {result['name']}", colour=discord.Colour.green(), timestamp=context.message.created_at)
-    if result["handicap"] != "NONE":
-      embed.add_field(name="Legendary Handicap:", value=result["handicap"], inline=False)
-    if result["tappable"] != "NONE":
-      coin_emoji = self.bot.get_emoji(context.guild, "coin")
-      if coin_emoji is not None:
-        tappable = result["tappable"].replace(":moneybag:", f"{coin_emoji}")
-      else:
-        tappable = result["tappable"]
-      embed.add_field(name="Tappable(s):", value=tappable, inline=False)
-    if result["link"] != "NONE":
-      embed.set_image(url=result["link"])
-    embed.set_footer(text=world)
-    await context.send(content=None, embed=embed)
+      level = level.title()
+      guild = level_guide.LevelIndividualMessage(level, context=context, timeout=timeout)
+    await guild.start()
+    
+  @commands.command(
+    name="achieve",
+    brief="Farms achievements",
+    aliases=["achievement"]
+  )
+  async def _achieve(self, context, world:typing.Optional[toWorld], mode:typing.Optional[toMode], achievement:find_achievement, num:int=None):
+    # check world argument
+    if world is not None and (world <= 0 or world >= 8):
+      raise custom_exceptions.DataNotFound("World", world)
+    timeout = self.bot.get_setting(context.guild, "ACTIVE_TIME") * 60
+    guide = level_guide.LevelAchievementMessage(achievement, num, context=context, timeout=timeout, world=world, mode=mode)
+    await guide.start()
 
   @commands.command(
     brief="Displays link to wiki",
