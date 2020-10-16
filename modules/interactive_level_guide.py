@@ -32,7 +32,7 @@ class LevelRootMessage(InteractiveMessage):
     return LevelWorldMessage(world, self)
     
   async def get_embed(self):
-    embed = discord.Embed(title=f"Level Main Menu", timestamp=datetime.utcnow(), colour=discord.Colour.blue(), description="Choose a world (by reacting):")
+    embed = discord.Embed(title=f"Level Main Menu", timestamp=datetime.utcnow(), colour=discord.Colour.green(), description="Choose a world (by reacting):")
     embed.set_thumbnail(url=tower_menu_url)
     embed.add_field(name=f"World 1:", value="Level 1-20")
     embed.add_field(name=f"World 2:", value="Level 21-40")
@@ -112,7 +112,7 @@ class LevelWorldMessage(InteractiveMessage):
     
   async def get_embed(self):
     instructions = "\n".join([f"{emoji} `{category}`" for emoji, category in zip(self.child_emojis, self.categories)])
-    embed = discord.Embed(title=f"{self.world_text} Level Menu", timestamp=datetime.utcnow(), colour=discord.Colour.blue(),
+    embed = discord.Embed(title=f"{self.world_text} Level Menu", timestamp=datetime.utcnow(), colour=discord.Colour.green(),
       description=f"Choose a category (by reacting):\n{instructions}")
     if isinstance(self.world, int):
       embed.set_thumbnail(url=world_url[self.world])
@@ -148,7 +148,7 @@ class LevelCategoryMessage(InteractiveMessage):
   async def get_embed(self):
     max_level_len = max(len(level[0]) for level in self.level_info)
     instructions = "\n".join([f"{emoji} `{level[0]:<{max_level_len}} {level[2]}`" for emoji, level in zip(self.child_emojis, self.level_info)])
-    embed = discord.Embed(title=f"{self.name} Levels", colour=discord.Colour.blue(), timestamp=datetime.utcnow(), 
+    embed = discord.Embed(title=f"{self.name} Levels", colour=discord.Colour.green(), timestamp=datetime.utcnow(), 
                           description=f"Choose a level (by reacting):\n{instructions}")
     embed.set_footer(text=f"{self.name}")
     return embed
