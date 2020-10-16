@@ -166,8 +166,8 @@ achievemets_dict = {
 "Myrk Archer":["myrk"],"Small Ent":["ent"],"Duskvine Lasher":["duskvine"],"Myrk Assassin":["myrk"],"Duskvine Crusher":["duskvine"],"Myrk Warlock":["myrk"],
 "Lava Pango":["lava"],"Lava Smasher":["lava"],"Large Ent":["ent"],"Strange Monk":["w6"],"Origami Crane":["w6","flying"],
 "Oni-tekidanhei":["w6"],"Daruma":["w6","flying"],"Small Ghostfire":["w6","spirit"],"Chibi-Mahou":["w6"],"Harpi":["w6","flying"],"Skeleton Samurai":["w6","skeleton"],
-"Oni-baba":["w6"],"Koi-jin":["w6"],"Kakutouka":["w6"],"Oni-ken":["w6"],"Kagami-no-Yuurei":["w6","spirit"],"Namazu-jin":["w6"],
-"Oni Mask":["w6","spirit"],"Aoi Mask":["w6","spirit"],"Kami-no-Mahoutsukai":["w6"],"Kaeru-hei":["w6"],"Big Ghostfire":["w6","spirit"],
+"Oni-baba":["w6"],"Koi-jin":["w6","fishguard"],"Kakutouka":["w6"],"Oni-ken":["w6"],"Kagami-no-Yuurei":["w6","spirit"],"Namazu-jin":["w6","fishguard"],
+"Oni Mask":["w6","spirit"],"Aoi Mask":["w6","spirit"],"Kami-no-Mahoutsukai":["w6"],"Kaeru-hei":["w6","fishguard"],"Big Ghostfire":["w6","spirit"],
 "Shunmin-shi":["w6"],"Oni-kanadzuchi":["w6"]
 }
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))
