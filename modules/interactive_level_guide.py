@@ -445,8 +445,7 @@ class LevelAchievementMessage(InteractiveMessage):
       for name, kill in zip(achievements, kills):
         if kill > 0:
           kill_msg.append(f"`{kill:<{max_kill_len}} {name.title()} Enemies`")
-      if kill_msg:
-        embed.add_field(name="Achievement Counts:", value="\n".join(kill_msg), inline=False)
+      embed.add_field(name="Achievement Counts:", value="\n".join(kill_msg) if kill_msg else "None", inline=False)
       instruction = (f"{text_emojis['info']} Summary {num_emojis[1]}-{num_emojis[len(self.result)]} Results\n"
                      f"👽 Details of Enemy Waves")
       embed.add_field(name="For Other Details:", value=instruction, inline=False)
