@@ -416,7 +416,7 @@ class LevelAchievementMessage(InteractiveMessage):
         new_row = [str(i), f"{row[0]} {row[2][:3].title()}"]+self.info_fun(row)
         table.append(new_row)
         max_len = [max(column) for column in zip(max_len, [len(str(item)) for item in new_row])]
-      summary = ["`" + " ".join(f"{row[i]:<{max_len[i]}}" for i in range(len(row))) + "`" for row in table]
+      summary = ["`" + "  ".join(f"{row[i]:<{max_len[i]}}" for i in range(len(row))) + "`" for row in table]
       embed = discord.Embed(title=f"Search Results", colour=discord.Colour.green(), 
                             timestamp=datetime.utcnow(), description=description+"\n".join(summary))
       instruction = f"{text_emojis['info']} Summary {num_emojis[1]}-{num_emojis[len(self.result)]} Results"
