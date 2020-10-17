@@ -354,7 +354,7 @@ class LevelAchievementMessage(InteractiveMessage):
     if achievement == "fast":
       self.goal = "Levels with the shortest completion time"
       self.info = ["TIME"]
-      self.info_fun = lambda row: [f"{row[4] + self.extra_t:.0f}"]
+      self.info_fun = lambda row: [f"{row[4]/2.0+self.extra_t:.0f}"]
       sort_method = "time"
     else:
       ind = achievements.index(achievement) + 7 # index of achievement in results
@@ -362,25 +362,30 @@ class LevelAchievementMessage(InteractiveMessage):
       if num:
         self.goal = f"Levels that quickly farm **{num} {achievement.title()}** Enemies"
         self.info = ["KILL","TIME","RUN","SUM_T"]
-        self.info_fun = lambda row: [row[ind], f"{row[4] + self.extra_t:.0f}", 
-                        int(-(-num // row[ind])), f"{(row[4] + self.extra_t) * (-(-num // row[ind])):.0f}"]
+        self.info_fun = lambda row: [row[ind], f"{row[4]/2.0+self.extra_t:.0f}", 
+                        int(-(-num // row[ind])), f"{(row[4]/2.0+self.extra_t) * (-(-num//row[ind])):.0f}"]
         num = float(num)
-        sort_method = f"(time+{self.extra_t})*(CAST (({num}/{achievement}) AS INT) + (({num}/{achievement}) > CAST (({num}/{achievement}) AS INT)))"
+        sort_method = f"(time/2.0+{self.extra_t})*(CAST (({num}/{achievement}) AS INT)+(({num}/{achievement})>CAST (({num}/{achievement}) AS INT)))"
       else:
         self.goal = f"Levels that quickly farm **{achievement.title()}** Enemies"
         self.info = ["KILL","TIME","KPS"]
-        self.info_fun = lambda row: [row[ind], f"{row[4] + self.extra_t:.0f}", f"{float(row[ind]) / (row[4] + self.extra_t):.2f}"]
-        sort_method = f"CAST((time+{self.extra_t}) AS FLOAT)/{achievement}"
+        self.info_fun = lambda row: [row[ind], f"{row[4]/2.0+self.extra_t:.0f}", f"{float(row[ind])/(row[4]/2.0+self.extra_t):.2f}"]
+        sort_method = f"CAST((time/2.0+{self.extra_t}) AS FLOAT)/{achievement}"
     where_clause = " AND ".join(where_clause) if where_clause else "TRUE"
     select_clause = ", ".join(select_clause)
     self.result = self.context.bot.db[self.context.guild.id].query(
       f"SELECT {select_clause} FROM achievement NATURAL JOIN levels WHERE ({where_clause}) ORDER BY {sort_method} ASC LIMIT {limit}")
     if not self.result:
       raise custom_exceptions.DataNotFound("Level Achievement", achievement)
-    
-    # check the level's wave data to decide its child emojis
-    self.child_emojis = [text_emojis["info"], "👽"]
-    self.child_emojis += num_emojis[1:len(self.result)+1]
+    self.update_state(0)
+      
+  def update_state(self, state):
+    if state <= 0:
+      self.state = 0
+      self.child_emojis = [text_emojis["info"]] + num_emojis[1:len(self.result)+1]
+    else:
+      self.state = min(state, len(self.result))
+      self.child_emojis = [text_emojis["info"]] + num_emojis[1:len(self.result)+1] + ["👽"]
       
   @property
   def current_row(self):
@@ -400,12 +405,13 @@ class LevelAchievementMessage(InteractiveMessage):
     if state == self.state:
       return None
     else:
-      self.state = state
+      self.update_state(state)
       return self
     
   async def get_embed(self):
     if self.state <= 0: # return the summary
-      description = (f"🎯 Goal: Find {self.goal}\n📖 Assume: {self.extra_t} seconds to enter and exit the level\n"
+      description = (f"🎯 Goal: Find {self.goal}\n"
+                     f"📖 Assume: {self.extra_t:<.0f} seconds to enter and exit the level, and played under **x2 speed**\n"
                      f"Candidate levels with their attributes are shown below:\n")
       table = [["NO","LEVEL"]+self.info]
       max_len = [len(str(item)) for item in table[0]]
@@ -436,7 +442,7 @@ class LevelAchievementMessage(InteractiveMessage):
           description.append("⚔️ Strategy: Compelete the mission as fast as you can")
       else:
         description.append("⚔️ Strategy: Kill all enemies as fast as you can")
-      description.append(f"⏳ Completion Time: {time}s")
+      description.append(f"⏳ Completion Time (x1 speed): {time}s")
       embed = discord.Embed(title=f"{level}. {name} {mode.title()}", colour=discord.Colour.green(), 
                             timestamp=datetime.utcnow(), description="\n".join(description))
       kill_msg = []
