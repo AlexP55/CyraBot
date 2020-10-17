@@ -378,10 +378,15 @@ class LevelAchievementMessage(InteractiveMessage):
       f"SELECT {select_clause} FROM achievement NATURAL JOIN levels WHERE ({where_clause}) ORDER BY {sort_method} ASC LIMIT {limit}")
     if not self.result:
       raise custom_exceptions.DataNotFound("Level Achievement", achievement)
-    
-    # check the level's wave data to decide its child emojis
-    self.child_emojis = [text_emojis["info"], "👽"]
-    self.child_emojis += num_emojis[1:len(self.result)+1]
+    self.update_state(0)
+      
+  def update_state(self, state):
+    if state <= 0:
+      self.state = 0
+      self.child_emojis = [text_emojis["info"]] + num_emojis[1:len(self.result)+1]
+    else:
+      self.state = min(state, len(self.result))
+      self.child_emojis = [text_emojis["info"]] + num_emojis[1:len(self.result)+1] + ["👽"]
       
   @property
   def current_row(self):
@@ -401,7 +406,7 @@ class LevelAchievementMessage(InteractiveMessage):
     if state == self.state:
       return None
     else:
-      self.state = state
+      self.update_state(state)
       return self
     
   async def get_embed(self):
