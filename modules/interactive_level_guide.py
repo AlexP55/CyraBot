@@ -114,8 +114,7 @@ class LevelWorldMessage(InteractiveMessage):
     instructions = "\n".join([f"{emoji} `{category}`" for emoji, category in zip(self.child_emojis, self.categories)])
     embed = discord.Embed(title=f"{self.world_text} Level Menu", timestamp=datetime.utcnow(), colour=discord.Colour.green(),
       description=f"Choose a category (by reacting):\n{instructions}")
-    if isinstance(self.world, int):
-      embed.set_thumbnail(url=world_url[self.world])
+    embed.set_thumbnail(url=world_url[self.world])
     embed.set_footer(text=f"{self.world_text}")
     return embed
 

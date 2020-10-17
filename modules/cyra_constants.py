@@ -91,7 +91,12 @@ world_url = {1: "https://static.wikia.nocookie.net/realm-defense-hero-legends-td
   4: "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/d/d5/Worldmap_world4.png/revision/latest?cb=20200906151345",
   5: "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/c/ca/Worldmap_world5.png/revision/latest?cb=20200906151346",
   6: "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/e/ee/Worldmap_world6.png/revision/latest?cb=20200906151346",
-  7: "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/7/7f/Worldmap_comingSoon.png/revision/latest?cb=20200906151342"}
+  7: "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/7/7f/Worldmap_comingSoon.png/revision/latest?cb=20200906151342",
+  "S": "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/3/3b/SR.png/revision/latest?cb=20191128132619",
+  "A": "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/9/91/Arcade.png/revision/latest?cb=20191128132703",
+  "E": "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/1/14/Endless2.jpg/revision/latest?cb=20200209220437",
+  "C": "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/c/cd/Challenges.png/revision/latest?cb=20191128135100&format=original",
+  "Connie": "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/3/3e/Connie_Event_Chapter7.png/revision/latest?cb=20200228183358&format=original"}
   
 facts = [
   "The same buff will be replaced by a later one. Try stopping an enemy by a long stun, and attack it with heavy taiko, then it will wake up quickly.",
