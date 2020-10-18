@@ -6,7 +6,7 @@ import string
 from base.modules.settings_manager import DefaultSetting
 import modules.custom_exceptions as custom_exceptions
 from base_bot import BaseBot, dynamic_prefix
-from modules.cyra_constants import emoji_keys, bot_state, hero_list
+from modules.cyra_constants import emoji_keys, bot_state, hero_list, trans_hero_list
 import glob
 
 class CyraBot(BaseBot):
@@ -87,9 +87,9 @@ class CyraBot(BaseBot):
 
   async def transform(self, guild: discord.Guild, name=None, change_avatar=True):
     if name is None:
-      name = random.choice(hero_list)
+      name = random.choice(trans_hero_list)
       while name == self.get_nick(guild).lower():
-        name = random.choice(hero_list)
+        name = random.choice(trans_hero_list)
     if change_avatar:
       # get all possible avatars
       avatar_files = glob.glob(f"avatar/{name}*.png")
