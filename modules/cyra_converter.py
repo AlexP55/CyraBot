@@ -1,4 +1,5 @@
 import difflib
+import modules.custom_exceptions as custom_exceptions
 from modules.cyra_constants import hero_synonyms, ability_synonyms, hero_list, achievements, achievement_synonyms
 
 def find_hero(word):
@@ -9,7 +10,7 @@ def find_hero(word):
     close_word = difflib.get_close_matches(word, hero_list, n=1)
     if not len(close_word) == 0:
       return close_word[0]
-  raise custom_exceptions.HeroNotFound(string.capwords(word))
+  raise custom_exceptions.HeroNotFound(word.title())
   
 def find_ability(word):
   word = word.lower()
@@ -29,7 +30,7 @@ def find_achievement(name):
     close_word = difflib.get_close_matches(name, achievements, n=1)
     if not len(close_word) == 0:
       return close_word[0]
-  raise custom_exceptions.ItemNotFound("Achievement", string.capwords(name))
+  raise custom_exceptions.ItemNotFound("Achievement", name.title())
   
 def toMode(argument):
   if argument in ["legend", "legendary"]:

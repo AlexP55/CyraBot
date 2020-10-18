@@ -6,7 +6,8 @@ import string
 from base.modules.settings_manager import DefaultSetting
 import modules.custom_exceptions as custom_exceptions
 from base_bot import BaseBot, dynamic_prefix
-from modules.cyra_constants import emoji_keys
+from modules.cyra_constants import emoji_keys, bot_state, hero_list
+import glob
 
 class CyraBot(BaseBot):
 
@@ -15,21 +16,24 @@ class CyraBot(BaseBot):
 
   def get_emoji(self, guild, key):
     return discord.utils.get(guild.emojis, name=emoji_keys[key])
-
-  async def is_cyra(self, guild: discord.Guild):
-    if guild.me.nick == "Cyra":
-      return True
-    elif guild.me.nick == "Elara":
-      return False
-    else: # reset to Cyra
-      self.set_setting(guild, "BOT_ROLE_NAME", "Cyra")
-      await guild.me.edit(nick="Cyra")
-      return True
+    
+  def get_nick(self, guild):
+    nick = guild.me.nick
+    if not nick:
+      nick = self.user.name
+    return nick
+    
+  def get_state(self, name):
+    if isinstance(name, discord.Guild):
+      name = self.get_nick(name).lower()
+    if name in bot_state:
+      return bot_state[name]
+    return bot_state["_default"]
   
   def is_willing_to_answer(self, context):
-    if context.guild.me.nick == "Elara":
+    if self.get_nick(context.guild).lower() == "elara":
       #If the nick is Elara, there is a chance she will refuse to answer.
-      if context.message.content.startswith("?help"):
+      if context.command.qualified_name == "help":
         return True
       if context.author.id in self.owner_ids:
         return False #Bot owners are immune to Elaras chaos
@@ -57,113 +61,72 @@ class CyraBot(BaseBot):
     if hasattr(context.command, "on_error"):
       # This prevents any commands with local handlers being handled here.
       return
-    if context.guild.me.nick == "Cyra":
-      if isinstance(error, commands.CommandOnCooldown):
-        msg = f"Skill is on cooldown, I should have it ready in {round(error.retry_after)}s."
-      elif isinstance(error, custom_exceptions.HeroNotFound):
-        msg = f"Emm... None of my colleagues is called **{error.item}**."
-      elif isinstance(error, custom_exceptions.AbilityNotFound):
-        if error.hero.lower() == "cyra":
-          msg = f"Emm... I don't think I am able to use **{error.ability}**."
-        else:
-          msg = f"Emm... I don't think **{error.hero}** is able to use **{error.ability}**."
-      elif isinstance(error, custom_exceptions.DataNotFound):
-        msg = f"Sorry, I want to help but I don't know anything about **{error.category} {error.item}**."
-      elif isinstance(error, commands.UserInputError):
-        msg = f"{context.author.mention}, I'm not sure I understand those arguments.\nPlease refer to `?help {context.command.qualified_name}` for more information."
-      elif isinstance(error, commands.CheckFailure):
-        msg = f"I'm sorry, you do not have permission to use this command. Please ask my masters."
-      else:
-        msg = f"Elara stopped me from executing that command. Maybe try something else?\nPlease refer to `?help {context.command.qualified_name}` for information on my commands."
-    elif context.guild.me.nick == "Elara":
-      if isinstance(error, commands.CommandOnCooldown):
-        msg = f"Do not rush me mortal! I cannot use this skill so often ({round(error.retry_after)}s remains)."
-      elif isinstance(error, custom_exceptions.HeroNotFound):
-        msg = f"Who is **{error.item}**? Is that a new nickname?"
-      elif isinstance(error, custom_exceptions.AbilityNotFound):
-        if error.hero.lower() == "elara":
-          msg = f"**{error.ability}** sounds cool. Maybe I should learn it from now."
-        else:
-          msg = f"**{error.ability}** sounds cool. Maybe **{error.hero}** should learn it from now."
-      elif isinstance(error, custom_exceptions.DataNotFound):
-        msg = f"Tell you a secret: **{error.category} {error.item}** will be the next spoiler.\nJust kidding."
-      elif isinstance(error, custom_exceptions.ElaraRefuseToAnswer):
-        msg = f"{error}\n||*Elara destroyed your command, maybe you should try one more time?*||"
-      elif isinstance(error, commands.UserInputError):
-        msg = f"{context.author.mention}, a smart command with awful arguments. Study the `?help {context.command.qualified_name}`, mortal.\n"
-      elif isinstance(error, commands.CheckFailure):
-        msg = f"Why are you using this command without permission? Watch yourself!"
-      else:
-        msg = f"Cyra stopped me from executing that command. It's too dangerous, even for myself.\nRefer to `?help {context.command.qualified_name}` for information on my commands."
+    if isinstance(error, custom_exceptions.ElaraRefuseToAnswer):
+      msg = f"{error}\n||*Elara destroyed your command, maybe you should try one more time?*||"
     else:
-      msg = "I cannot process your command, please refer to `?help [command]` for more information."
+      state = self.get_state(context.guild)
+      if isinstance(error, commands.CommandOnCooldown):
+        msg = state["cooldown_msg"]
+      elif isinstance(error, custom_exceptions.HeroNotFound):
+        msg = state["nohero_msg"]
+      elif isinstance(error, custom_exceptions.AbilityNotFound):
+        if error.hero.lower() == self.get_nick(context.guild).lower():
+          msg = state["noability_msg_self"]
+        else:
+          msg = state["noability_msg_other"]
+      elif isinstance(error, custom_exceptions.DataNotFound):
+        msg = state["nodata_msg"]
+      elif isinstance(error, commands.UserInputError):
+        msg = state["badinput_msg"]
+      elif isinstance(error, commands.CheckFailure):
+        msg = state["noaccess_msg"]
+      else:
+        msg = state["unexpected_msg"]
     #Send response
-    await context.send(msg)
+    await context.send(msg.format(context=context, error=error))
 
-  async def transform(self, guild: discord.Guild):
-    is_cyra = await self.is_cyra(guild)
-    bot_category = self.get_bot_category(guild)
+  async def transform(self, guild: discord.Guild, name=None, change_avatar=True):
+    if name is None:
+      name = random.choice(hero_list)
+      while name == self.get_nick(guild).lower():
+        name = random.choice(hero_list)
+    if change_avatar:
+      # get all possible avatars
+      avatar_files = glob.glob(f"avatar/{name}*.png")
+      if avatar_files: # chooce a random skin
+        avatar_file = random.choice(avatar_files)
+        with open(avatar_file, "rb") as avatar:
+          await self.user.edit(avatar=avatar.read())
+    state = self.get_state(name)
+    name = name.title()
+    await guild.me.edit(nick=name)
     admin_role = self.get_admin_role(guild)
     mod_role = self.get_mod_role(guild)
     bot_role = self.get_bot_role(guild)
-    if is_cyra:
-      with open("avatar/Elara.png", "rb") as avatar:
-        await self.user.edit(avatar=avatar.read())
-      await guild.me.edit(nick="Elara")
-      if mod_role is not None:
-        mod_role_name = f"{guild.me.nick}'s Ravager"
-        await self.set_setting(guild, "MOD_ROLE_NAME", mod_role_name)
-        await mod_role.edit(name=mod_role_name)
-      if bot_role is not None:
-        bot_role_name = guild.me.nick
-        await self.set_setting(guild, "BOT_ROLE_NAME", bot_role_name)
-        await bot_role.edit(name=bot_role_name, color=discord.Colour.dark_purple())
-    else:
-      with open("avatar/Cyra.png", "rb") as avatar:
-        await self.user.edit(avatar=avatar.read())
-      await guild.me.edit(nick="Cyra")
-      if mod_role is not None:
-        mod_role_name = f"{guild.me.nick}'s Enforcer"
-        await self.set_setting(guild, "MOD_ROLE_NAME", mod_role_name)
-        await mod_role.edit(name=mod_role_name)
-      if not bot_role is None:
-        bot_role_name = guild.me.nick
-        await self.set_setting(guild, "BOT_ROLE_NAME", bot_role_name)
-        await bot_role.edit(name=bot_role_name, color=discord.Colour.red())
+    if bot_role is not None:
+      bot_role_name = name
+      await self.set_setting(guild, "BOT_ROLE_NAME", bot_role_name)
+      await bot_role.edit(name=bot_role_name, color=state["color"])
+    if mod_role is not None:
+      mod_role_name = f"{name}'s {state['mod_role']}"
+      await self.set_setting(guild, "MOD_ROLE_NAME", mod_role_name)
+      await mod_role.edit(name=mod_role_name)
     if admin_role is not None:
-      admin_role_name = f"{guild.me.nick}'s Master"
+      admin_role_name = f"{name}'s {state['admin_role']}"
       await self.set_setting(guild, "ADMIN_ROLE_NAME", admin_role_name)
       await admin_role.edit(name=admin_role_name)
-    if bot_category is not None:
-      bot_category_name = f"{guild.me.nick}s-bot-corner"
-      await self.set_setting(guild, "BOT_CATEGORY_NAME", bot_category_name)
-      await bot_category.edit(name=bot_category_name)
-    return is_cyra
+    return name
     
   async def init_bot(self, guild):
     # overrides the method: check nick name, add Cyra-specific variables
     await super().init_bot(guild)
-    if guild.me.nick not in ["Cyra", "Elara"]:
+    if self.get_nick(guild).lower() not in hero_list:
       await guild.me.edit(nick="Cyra")
 
   async def on_command_error(self, context, error):
-    ignored = (commands.CommandOnCooldown, )
-    if isinstance(error, ignored):
-      return
     if isinstance(error, commands.CommandNotFound):
-      if context.guild.me.nick == "Cyra":
-        await context.send(
-          f"{context.author.mention} I have my dignity as a goddess and what you ask is beneath me. "
-          f"Refer to `?help` to see how I can serve you."
-        )
-      elif context.guild.me.nick == "Elara":
-        await context.send(
-          f"{context.author.mention}, **do not try to fool me** with your fake command. Refer to `?help` to get a taste of the darkness."
-        )
-      else:
-        await context.send(
-          f"Command not found, please refer to `?help` for more information"
-        )
+      state = self.get_state(context.guild)
+      await context.send(state["nocommand_msg"].format(context=context, error=error))
     #Log the error.
     await super().on_command_error(context, error)
     
@@ -183,10 +146,9 @@ class CyraBot(BaseBot):
   def initialize_default_settings(self):
     super().initialize_default_settings()
     bot_name = "Cyra"
-    self.default_settings["MOD_ROLE_NAME"].default = f"{bot_name}'s Enforcer"
-    self.default_settings["ADMIN_ROLE_NAME"].default = f"{bot_name}'s Master"
+    self.default_settings["MOD_ROLE_NAME"].default = f"{bot_name}'s {bot_state[bot_name.lower()]['mod_role']}"
+    self.default_settings["ADMIN_ROLE_NAME"].default = f"{bot_name}'s {bot_state[bot_name.lower()]['admin_role']}"
     self.default_settings["BOT_ROLE_NAME"].default = f"{bot_name}"
-    self.default_settings["BOT_CATEGORY_NAME"].default = f"{bot_name}s-bot-corner"
     self.default_settings["ELARA_REFUSE_CHANCE"] = DefaultSetting(name="ELARA_REFUSE_CHANCE", default=10, description="chance to ignore command", 
       transFun=lambda x: float(x), checkFun=lambda x: x>=0, checkDescription="a non-negative number")
     self.default_settings["SEARCH_LIMIT"] = DefaultSetting(name="SEARCH_LIMIT", default=11, description="max num of entries by a query", 

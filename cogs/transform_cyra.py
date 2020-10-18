@@ -1,6 +1,7 @@
 from datetime import datetime
 import discord
 from discord.ext import commands, tasks
+from modules.cyra_converter import find_hero
 import time
 import logging
 
@@ -18,14 +19,16 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
   async def auto_transform(self):
     if self.auto_transform.current_loop == 0: # don't transform at the first time
       return
+    change_avatar = True
     for guild_id, db in self.bot.db.items():
       guild = discord.utils.get(self.bot.guilds, id=guild_id)
       if not self.get_auto_transform(guild):
         continue
       try:
         logger.debug(f"Transforming in {guild.name} ({guild.id}).")
-        was_cyra = await self.bot.transform(guild)
-        before, after = ("Cyra", "Elara") if was_cyra else ("Elara", "Cyra")
+        before = self.bot.get_nick(guild)
+        after = await self.bot.transform(guild, change_avatar=change_avatar)
+        change_avatar = False
         await self.bot.log_message(guild, "ADMIN_LOG",
           user=self.bot.user, action="auto transformed",
           description=f"Direction: {before} -> {after}"
@@ -51,14 +54,22 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
 
   @commands.command(
     name="transform",
-    brief="Transforms to Cyra/Elara",
+    brief="Transforms to another form",
   )
   @commands.is_owner()
   @commands.cooldown(1, 600, commands.BucketType.guild)
-  async def _transform(self, context):
-    was_cyra = await self.bot.transform(context.guild)
-    await context.send(f"*Elara is here to reap chaos.*" if was_cyra else f"*Cyra has taken control back.*")
-    before, after = ("Cyra", "Elara") if was_cyra else ("Elara", "Cyra")
+  async def _transform(self, context, hero:find_hero=None):
+    before = self.bot.get_nick(context.guild)
+    if before.lower() == hero:
+      await context.send(f"I'm currently {before} so no need to transform.")
+      return
+    after = await self.bot.transform(context.guild, hero)
+    if after.lower() == "cyra":
+      await context.send(f"*{after} has taken control back.*")
+    elif after.lower() == "elara":
+      await context.send(f"*{after} is here to reap chaos.*")
+    else:
+      await context.send(f"*{after} just landed on RD server.*")
     await self.bot.log_message(context.guild, "ADMIN_LOG",
       user=context.author, action="was transformed", target=self.bot.user,
       description=f"Direction: {before} -> {after}",
