@@ -7,6 +7,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
+def hero_and_secret(arg):
+  if arg.lower() == "secret":
+    return "secret"
+  else:
+    return find_hero(arg)
+
 class TransformationCog(commands.Cog, name="Transformation Commands"):
   def __init__(self, bot):
     self.bot = bot
@@ -58,7 +64,7 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
   )
   @commands.is_owner()
   @commands.cooldown(1, 600, commands.BucketType.guild)
-  async def _transform(self, context, hero:find_hero=None):
+  async def _transform(self, context, hero:hero_and_secret=None):
     before = self.bot.get_nick(context.guild)
     if before.lower() == hero:
       await context.send(f"I'm currently {before} so no need to transform.")
