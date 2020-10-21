@@ -37,7 +37,7 @@ def toMode(argument):
     return "legendary"
   elif argument in ["campaign"]:
     return "campaign"
-  raise
+  raise custom_exceptions.ItemNotFound("Mode", argument.title())
 
 def toWorld(argument):
   world = argument.lower()

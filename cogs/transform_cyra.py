@@ -2,8 +2,12 @@ from datetime import datetime
 import discord
 from discord.ext import commands, tasks
 from modules.cyra_converter import find_hero
+from base.modules.constants import CACHE_PATH as path
 import time
 import logging
+import json
+import random
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -17,27 +21,66 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
   def __init__(self, bot):
     self.bot = bot
     self.auto_transform.start()
+    if not os.path.isdir(path):
+      os.mkdir(path)
+    try:
+      with open(f'{path}/transform_list.json') as f:
+        data = json.load(f)
+        assert(isinstance(data, list))
+        self.transform_list = []
+        for hero in data:
+          try:
+            hero = hero_and_secret(hero)
+            if hero not in self.transform_list:
+              self.transform_list.append(hero)
+          except:
+            pass
+        assert(len(self.transform_list) >= 2)
+    except:
+      self.transform_list = ["cyra", "elara"]
     
   def cog_unload(self):
     self.auto_transform.cancel()
+    try:
+      with open(f'{path}/transform_list.json', 'w') as f:
+        json.dump(self.transform_list, f)
+    except:
+      pass
+    
+  async def cog_command_error(self, context, error):
+    if hasattr(context.command, "on_error"):
+      # This prevents any commands with local handlers being handled here.
+      return
+    if isinstance(error, commands.CommandOnCooldown):
+      await context.send(f"Skill is on cooldown, please try again in {round(error.retry_after)}s.")
+    elif isinstance(error, commands.CheckFailure):
+      await context.send(f"Sorry {context.author.mention}, but you do not have permission to transform the bot.")
+    elif isinstance(error, commands.UserInputError):
+      await context.send(f"Sorry {context.author.mention}, but I could not understand the arguments passed to `{context.command.qualified_name}`.")
+    else:
+      await context.send(f"Sorry {context.author.mention}, something unexpected happened during my transformation.")
   
   @tasks.loop(hours=2)
   async def auto_transform(self):
     if self.auto_transform.current_loop == 0: # don't transform at the first time
       return
-    change_avatar = True
+    after = None
     for guild_id, db in self.bot.db.items():
       guild = discord.utils.get(self.bot.guilds, id=guild_id)
       if not self.get_auto_transform(guild):
         continue
       try:
         logger.debug(f"Transforming in {guild.name} ({guild.id}).")
-        before = self.bot.get_nick(guild)
-        after = await self.bot.transform(guild, change_avatar=change_avatar)
-        change_avatar = False
+        before = self.bot.get_nick(guild).lower()
+        if after is None:
+          after = self.get_random_trans_hero(before)
+          change_avatar = True
+        else:
+          change_avatar = False
+        await self.bot.transform(guild, after, change_avatar=change_avatar)
         await self.bot.log_message(guild, "ADMIN_LOG",
           user=self.bot.user, action="auto transformed",
-          description=f"Direction: {before} -> {after}"
+          description=f"Direction: {before.title()} -> {after.title()}"
         )
         logger.debug(f"Finished Transforming in {guild.name} ({guild.id}).")
       except Exception as error:
@@ -57,38 +100,94 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
       return True
     else:
       return False
+      
+  def get_random_trans_hero(self, old_hero):
+    if not self.transform_list:
+      raise ValueError("Transform list needs to be non-empty.")
+    hero = random.choice(self.transform_list)
+    if len(self.transform_list) > 2:
+      while hero == old_hero:
+        hero = random.choice(self.transform_list)
+    return hero
+    
 
-  @commands.command(
+  @commands.group(
     name="transform",
     brief="Transforms to another form",
+    cooldown_after_parsing=True,
+    case_insensitive = True,
+    invoke_without_command=True
   )
   @commands.is_owner()
   @commands.cooldown(1, 600, commands.BucketType.guild)
   async def _transform(self, context, hero:hero_and_secret=None):
-    before = self.bot.get_nick(context.guild)
-    if before.lower() == hero:
-      await context.send(f"I'm currently {before} so no need to transform.")
+    before = self.bot.get_nick(context.guild).lower()
+    if before == hero:
+      await context.send(f"I'm currently {before.title()} so no need to transform.")
       return
-    after = await self.bot.transform(context.guild, hero)
-    if after.lower() == "cyra":
-      await context.send(f"*{after} has taken control back.*")
-    elif after.lower() == "elara":
-      await context.send(f"*{after} is here to reap chaos.*")
+    if hero is None:
+      hero = self.get_random_trans_hero(before)
+    after = hero
+    await self.bot.transform(context.guild, after)
+    if after == "cyra":
+      await context.send(f"*{after.title()} has taken control back.*")
+    elif after == "elara":
+      await context.send(f"*{after.title()} is here to reap chaos.*")
     else:
-      await context.send(f"*{after} just landed on RD server.*")
+      await context.send(f"*{after.title()} just landed on RD server.*")
     await self.bot.log_message(context.guild, "ADMIN_LOG",
       user=context.author, action="was transformed", target=self.bot.user,
-      description=f"Direction: {before} -> {after}",
+      description=f"Direction: {before.title()} -> {after.title()}",
       timestamp=context.message.created_at
     )
-  @_transform.error
-  async def _transform_error(self, context, error):
-    if isinstance(error, commands.CommandOnCooldown):
-      await context.send(f"Skill is on cooldown, please try again in {round(error.retry_after)}s.")
-    elif isinstance(error, commands.CheckFailure):
-      await context.send(f"Sorry {context.author.mention}, but you do not have permission to transform Cyra/Elara.")
+      
+  @_transform.command(
+    name="list",
+    brief="Shows list of auto transformation"
+  )
+  @commands.is_owner()
+  async def _list_transform(self, context):
+    await context.send(f"Below is the list of heroes that can be auto-transformed to:```\n" + 
+                        "\n".join([hero.title() for hero in self.transform_list]) + "```")
+        
+  @_transform.command(
+    name="add",
+    brief="Adds a hero to auto transformation"
+  )
+  @commands.is_owner()
+  async def _add_transform(self, context, heroes:commands.Greedy[hero_and_secret]):
+    added_heroes = []
+    for hero in heroes:
+      if hero not in self.transform_list:
+        self.transform_list.append(hero)
+        added_heroes.append(hero)
+    if added_heroes:
+      await context.send(f"Heroes added to the auto transformation:```\n" + 
+                          "\n".join([hero.title() for hero in added_heroes]) + "```")
     else:
-      await context.send(f"Sorry {context.author.mention}, something unexpected happened during my transformation.")
+      await context.send(f"No heroes added to the auto transformation.")
+        
+  @_transform.command(
+    name="remove",
+    brief="Removes a hero to auto transformation",
+    aliases=["rm"]
+  )
+  async def _rm_transform(self, context, heroes:commands.Greedy[hero_and_secret]):
+    removed_heroes = []
+    msg = ""
+    for hero in heroes:
+      if hero in self.transform_list:
+        if len(self.transform_list) <= 2:
+          msg += f"Warning: Cannot remove {hero.title()} because the number of transformable heroes should be at least 2.\n"
+          continue
+        self.transform_list.remove(hero)
+        removed_heroes.append(hero)
+    if removed_heroes:
+      msg += f"Heroes removed from the auto transformation:```\n" +  "\n".join([hero.title() for hero in removed_heroes]) + "```"
+    else:
+      msg += f"No heroes removed from the auto transformation."
+    await context.send(msg)
+    
 
 def setup(bot):
   bot.add_cog(TransformationCog(bot))

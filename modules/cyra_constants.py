@@ -61,10 +61,6 @@ hero_list = [
   "shamiko","smoulder","yan","normal connie","cyra","elara",
 ]
 
-trans_hero_list = [ # the heroes that may appear in auto-transformation
-  "bolton","hogan","obsidian","sethos","cyra","elara"
-]
-
 hero_transformable = {
   "leif": ("Weapon lv1", "Weapon lv6"),
   "caldera": ("True Form", "Giant Form"),

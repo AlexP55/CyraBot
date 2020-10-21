@@ -6,7 +6,7 @@ import string
 from base.modules.settings_manager import DefaultSetting
 import modules.custom_exceptions as custom_exceptions
 from base_bot import BaseBot, dynamic_prefix
-from modules.cyra_constants import emoji_keys, bot_state, hero_list, trans_hero_list
+from modules.cyra_constants import emoji_keys, bot_state, hero_list
 import glob
 
 class CyraBot(BaseBot):
@@ -85,11 +85,7 @@ class CyraBot(BaseBot):
     #Send response
     await context.send(msg.format(context=context, error=error))
 
-  async def transform(self, guild: discord.Guild, name=None, change_avatar=True):
-    if name is None:
-      name = random.choice(trans_hero_list)
-      while name == self.get_nick(guild).lower():
-        name = random.choice(trans_hero_list)
+  async def transform(self, guild: discord.Guild, name, change_avatar=True):
     if change_avatar:
       # get all possible avatars
       avatar_files = glob.glob(f"avatar/{name}*.png")
@@ -98,24 +94,23 @@ class CyraBot(BaseBot):
         with open(avatar_file, "rb") as avatar:
           await self.user.edit(avatar=avatar.read())
     state = self.get_state(name)
-    name = name.title()
-    await guild.me.edit(nick=name)
+    nickname = name.title()
+    await guild.me.edit(nick=nickname)
     admin_role = self.get_admin_role(guild)
     mod_role = self.get_mod_role(guild)
     bot_role = self.get_bot_role(guild)
     if bot_role is not None:
-      bot_role_name = name
+      bot_role_name = nickname
       await self.set_setting(guild, "BOT_ROLE_NAME", bot_role_name)
       await bot_role.edit(name=bot_role_name, color=state["color"])
     if mod_role is not None:
-      mod_role_name = f"{name}'s {state['mod_role']}"
+      mod_role_name = f"{nickname}'s {state['mod_role']}"
       await self.set_setting(guild, "MOD_ROLE_NAME", mod_role_name)
       await mod_role.edit(name=mod_role_name)
     if admin_role is not None:
-      admin_role_name = f"{name}'s {state['admin_role']}"
+      admin_role_name = f"{nickname}'s {state['admin_role']}"
       await self.set_setting(guild, "ADMIN_ROLE_NAME", admin_role_name)
       await admin_role.edit(name=admin_role_name)
-    return name
     
   async def init_bot(self, guild):
     # overrides the method: check nick name, add Cyra-specific variables
