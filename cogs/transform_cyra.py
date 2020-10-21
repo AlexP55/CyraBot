@@ -1,9 +1,7 @@
-from datetime import datetime
 import discord
 from discord.ext import commands, tasks
 from modules.cyra_converter import find_hero
 from base.modules.constants import CACHE_PATH as path
-import time
 import logging
 import json
 import random
