@@ -111,7 +111,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       where_clause = f'ability LIKE "%{abilityName}%" OR keyword LIKE "%{abilityName}%"'
     result = db.query(f'SELECT ability FROM ability WHERE hero="{heroName}" AND ({where_clause}) ORDER BY tag LIMIT {searchLimit}')
     if len(result) == 0:
-      raise custom_exceptions.AbilityNotFound(string.capwords(heroName), string.capwords(abilityName))
+      raise custom_exceptions.AbilityNotFound(heroName.title(), string.capwords(abilityName))
     elif len(result) == searchLimit: # too many results
       prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
       await context.send(
@@ -159,14 +159,14 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     except ValueError:
       raise commands.BadArgument("passed hero level has an invalid format.")
     if (not 0 < level1 <= max_level) or (not 0 < level2 <= max_level):
-      await context.send(f"Level of {string.capwords(unit)} must be between 1 and {max_level}.")
+      await context.send(f"Level of {unit.title()} must be between 1 and {max_level}.")
       return
     result = self.bot.db[context.guild.id].select("hero", unit)
     if result is None:
-      raise custom_exceptions.HeroNotFound(string.capwords(unit))
+      raise custom_exceptions.HeroNotFound(unit.title())
     minRank, maxRank = result["minRank"], result["maxRank"]
     if (not minRank <= rank1 <= maxRank) or (not minRank <= rank2 <= maxRank):
-      await context.send(f"Rank of {string.capwords(unit)} must be between rank {minRank} and rank {maxRank}.")
+      await context.send(f"Rank of {unit.title()} must be between rank {minRank} and rank {maxRank}.")
       return
     timeout = self.get_active_time(context.guild) * 60
     if rank1 == rank2 and level1 == level2:

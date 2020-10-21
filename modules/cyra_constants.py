@@ -1,3 +1,5 @@
+import discord
+
 max_level = 35
 
 emoji_keys = {
@@ -57,6 +59,10 @@ hero_list = [
   "fee","helios","hogan","koizuul","lancelot","leif",
   "mabyn","masamune","narlax","obsidian","raida","sethos",
   "shamiko","smoulder","yan","normal connie","cyra","elara",
+]
+
+trans_hero_list = [ # the heroes that may appear in auto-transformation
+  "bolton","hogan","obsidian","sethos","cyra","elara"
 ]
 
 hero_transformable = {
@@ -161,19 +167,26 @@ elixir_cost_hero = {
 
 achievemets_dict = {
 "Slime":["slime"],"Skeleton":["skeleton"],"Crow":["flying"],"Skeleton Archer":["skeleton"],"Spider":["spider"],"Poison Spider":["spider"],
-"Skeleton Mage":["skeleton"],"Bucket Slime":["slime"],"Giant Slime":["slime"],"Slime Queen":["slime"],"Slime Blob":["slime"],"Goblin Grunt":["goblin"],
-"Crow Rider":["flying"],"Goblin Archer":["goblin"],"Goblin Shaman":["goblin"],"Maniac":["goblin"],"Goblin Tallman":["goblin"],
-"Heretic":["goblin"],"Orc":["goblin"],"Goblin Chieftain":["goblin"],"Hordemonger":["goblin"],"Flying Scarab":["flying"],
-"Anubian":["anubian"],"Vulture Rider":["flying"],"Mega Anubian":["anubian"],"Cactus Golem":["golem"],"Fire Elemental":["elemental"],
-"Ice Elemental":["elemental"],"Whelp":["flying"],"Time Construct":["golem"],"Wizard Initiate":["wizard"],"Void Elemental":["elemental"],"Gravity Wizard":["wizard"],
-"Earth Elemental":["elemental"],"Ivory Golem":["golem"],"Duskvine Sproutling":["duskvine"],"Aqua Slime":["slime"],
-"Cave Bat":["flying"],"Lava Slime":["slime","lava"],"Lava Bat":["flying","lava"],"Lava Snail":["lava"],"Duskvine Sporophyte":["duskvine"],"Giant Cave Bat":["flying"],
-"Myrk Archer":["myrk"],"Small Ent":["ent"],"Duskvine Lasher":["duskvine"],"Myrk Assassin":["myrk"],"Duskvine Crusher":["duskvine"],"Myrk Warlock":["myrk"],
-"Lava Pango":["lava"],"Lava Smasher":["lava"],"Large Ent":["ent"],"Strange Monk":["w6"],"Origami Crane":["w6","flying"],
-"Oni-tekidanhei":["w6"],"Daruma":["w6","flying"],"Small Ghostfire":["w6","spirit"],"Chibi-Mahou":["w6"],"Harpi":["w6","flying"],"Skeleton Samurai":["w6","skeleton"],
-"Oni-baba":["w6"],"Koi-jin":["w6","fishguard"],"Kakutouka":["w6"],"Oni-ken":["w6"],"Kagami-no-Yuurei":["w6","spirit"],"Namazu-jin":["w6","fishguard"],
-"Oni Mask":["w6","spirit"],"Aoi Mask":["w6","spirit"],"Kami-no-Mahoutsukai":["w6"],"Kaeru-hei":["w6","fishguard"],"Big Ghostfire":["w6","spirit"],
-"Shunmin-shi":["w6"],"Oni-kanadzuchi":["w6"]
+"Skeleton Mage":["skeleton"],"Bucket Slime":["slime"],"Giant Slime":["slime"],"Slime Queen":["slime"],"Slime Blob":["slime"],
+
+"Goblin Grunt":["goblin"],"Crow Rider":["flying"],"Goblin Archer":["goblin"],"Goblin Shaman":["goblin"],"Maniac":["goblin"],
+"Goblin Tallman":["goblin"],"Heretic":["goblin"],"Orc":["goblin"],"Goblin Chieftain":["goblin"],"Hordemonger":["goblin"],
+
+"Flying Scarab":["flying"],"Anubian":["anubian"],"Vulture Rider":["flying"],"Mega Anubian":["anubian"],"Cactus Golem":["golem"],
+
+"Fire Elemental":["elemental"],"Ice Elemental":["elemental"],"Whelp":["flying"],"Time Construct":["golem"],"Wizard Initiate":["wizard"],
+"Void Elemental":["elemental"],"Gravity Wizard":["wizard"],"Earth Elemental":["elemental"],"Ivory Golem":["golem"],
+
+"Duskvine Sproutling":["duskvine"],"Aqua Slime":["slime"],"Cave Bat":["flying"],"Lava Slime":["slime","lava"],"Lava Bat":["flying","lava"],
+"Lava Snail":["lava"],"Duskvine Sporophyte":["duskvine"],"Giant Cave Bat":["flying"],"Myrk Archer":["myrk"],"Small Ent":["ent"],
+"Duskvine Lasher":["duskvine"],"Myrk Assassin":["myrk"],"Duskvine Crusher":["duskvine"],"Myrk Warlock":["myrk"],"Lava Pango":["lava"],
+"Lava Smasher":["lava"],"Large Ent":["ent"],
+
+"Strange Monk":["w6","monk"],"Origami Crane":["w6","flying"],"Oni-tekidanhei":["w6","Oni"],"Daruma":["w6","flying"],
+"Small Ghostfire":["w6","spirit"],"Chibi-Mahou":["w6","monk"],"Harpi":["w6","flying"],"Skeleton Samurai":["w6","skeleton"],
+"Oni-baba":["w6","Oni"],"Koi-jin":["w6","fishguard"],"Kakutouka":["w6","monk"],"Oni-ken":["w6","Oni"],"Kagami-no-Yuurei":["w6","spirit"],
+"Namazu-jin":["w6","fishguard"],"Oni Mask":["w6","spirit"],"Aoi Mask":["w6","spirit"],"Kami-no-Mahoutsukai":["w6","monk"],
+"Kaeru-hei":["w6","fishguard"],"Big Ghostfire":["w6","spirit"],"Shunmin-shi":["w6","monk"],"Oni-kanadzuchi":["w6","Oni"]
 }
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))
 achievement_synonyms = {
@@ -182,5 +195,52 @@ achievement_synonyms = {
 "world6":"w6",
 "bird":"flying",
 "birds":"flying",
-"air":"flying"
+"air":"flying",
+"flier":"flying",
+"fliers":"flying"
+}
+
+bot_state = {
+  "_default":{
+    "mod_role":"Enforcer",
+    "admin_role":"Master",
+    "color":discord.Colour.gold(),
+    "nocommand_msg":"{context.author.mention} There is no such command. Please refer to `{context.prefix}help`.",
+    "cooldown_msg":"Skill is on cooldown, please retry in {error.retry_after:.1f}s.",
+    "nohero_msg":"There is no hero called **{error.item}**.",
+    "noability_msg_self":"Emm... I don't think I am able to use **{error.ability}**.",
+    "noability_msg_other":"Emm... I don't think **{error.hero}** is able to use **{error.ability}**.",
+    "nodata_msg":"Sorry, there is nothing I know about **{error.category} {error.item}**.",
+    "badinput_msg":"{context.author.mention}, I'm not sure I understand those arguments.\nPlease refer to `{context.prefix}help {context.command.qualified_name}` for more information.",
+    "noaccess_msg":"I'm sorry, you do not have permission to use {context.command.qualified_name}. Please ask my masters.",
+    "unexpected_msg":"Something unexpected happened in my command. Maybe try something else?\nPlease refer to `{context.prefix}help {context.command.qualified_name}` for information on my commands."
+  },
+  "cyra": {
+    "mod_role":"Enforcer",
+    "admin_role":"Master",
+    "color":discord.Colour.red(),
+    "nocommand_msg":"{context.author.mention} I have my dignity as a goddess and what you ask is beneath me. Please refer to `{context.prefix}help`.",
+    "cooldown_msg":"Skill is on cooldown, I should have it ready in {error.retry_after:.1f}s.",
+    "nohero_msg":"Emm... None of my colleagues is called **{error.item}**.",
+    "noability_msg_self":"Emm... I don't think I am able to use **{error.ability}**.",
+    "noability_msg_other":"Emm... I don't think **{error.hero}** is able to use **{error.ability}**.",
+    "nodata_msg":"Sorry, I want to help but I don't know anything about **{error.category} {error.item}**.",
+    "badinput_msg":"{context.author.mention}, I'm not sure I understand those arguments.\nPlease refer to `{context.prefix}help {context.command.qualified_name}` for more information.",
+    "noaccess_msg":"I'm sorry, you do not have permission to use `{context.command.qualified_name}`. Please ask my masters.",
+    "unexpected_msg":"Elara stopped me from executing that command. Maybe try something else?\nPlease refer to `{context.prefix}help {context.command.qualified_name}` for information on my commands."
+  },
+  "elara": {
+    "mod_role":"Ravager",
+    "admin_role":"Master",
+    "color":discord.Colour.dark_purple(),
+    "nocommand_msg":"{context.author.mention}, **do not try to fool me** with your fake command. Refer to `{context.prefix}help` to get a taste of the darkness.",
+    "cooldown_msg":"Do not rush me mortal! I cannot use this skill so often ({error.retry_after:.1f}s remains).",
+    "nohero_msg":"Who is **{error.item}**? Is that a new nickname?",
+    "noability_msg_self":"**{error.ability}** sounds cool. Maybe I should learn it from now.",
+    "noability_msg_other":"**{error.ability}** sounds cool. Maybe **{error.hero}** should learn it from now.",
+    "nodata_msg":"Tell you a secret: **{error.category} {error.item}** will be the next spoiler.\nJust kidding.",
+    "badinput_msg":"{context.author.mention}, a smart command with awful arguments. Study the `{context.prefix}help {context.command.qualified_name}`, mortal.",
+    "noaccess_msg":"Why are you using this command without permission? Watch yourself!",
+    "unexpected_msg":"Cyra stopped me from executing that command. It's too dangerous, even for myself.\nRefer to `{context.prefix}help {context.command.qualified_name}` for information on my commands."
+  }
 }

@@ -6,7 +6,6 @@ import typing
 from modules.cyra_converter import find_hero, toLevelWorld, toWorld, toMode, find_achievement
 from modules.cyra_constants import facts, elixir_cost_hero, max_level
 import modules.interactive_level_guide as level_guide 
-import string
 import logging
 
 logger = logging.getLogger(__name__)
@@ -43,15 +42,15 @@ class InfoCog(commands.Cog, name="Information Commands"):
       )
       return
     if hero not in elixir_cost_hero:
-      raise custom_exceptions.HeroNotFound(string.capwords(hero))
+      raise custom_exceptions.HeroNotFound(hero.title())
     if lvEnd <= lvStart:
       lvEnd = lvStart + 1
     if lvStart <= 0 or lvEnd > max_level:
-      await context.send(f"Level of {string.capwords(hero)} must be between 1 and {max_level}.")
+      await context.send(f"Level of {hero.title()} must be between 1 and {max_level}.")
       return
     elixir_cost = sum(elixir_cost_hero[hero][lvStart-1:lvEnd-1])
     hero_str = self.bot.get_emoji(context.guild, hero)
-    hero_str = hero_str if hero_str else string.capwords(hero)
+    hero_str = hero_str if hero_str else hero.title()
     elixir_str = self.bot.get_emoji(context.guild, 'elixir')
     elixir_str = elixir_str if elixir_str else "elixirs"
     await context.send(
@@ -67,9 +66,9 @@ class InfoCog(commands.Cog, name="Information Commands"):
   )
   async def _elixir_up(self, context, hero:find_hero, numElixir:int, lvStart:int=1):
     if hero not in elixir_cost_hero:
-      raise custom_exceptions.HeroNotFound(string.capwords(hero))
+      raise custom_exceptions.HeroNotFound(hero.title())
     if lvStart <= 0 or lvStart >= max_level:
-      await context.send(f"Starting level of {string.capwords(hero)} must be between 1 and {max_level-1}.")
+      await context.send(f"Starting level of {hero.title()} must be between 1 and {max_level-1}.")
       return
     cost_list = elixir_cost_hero[hero]
     cost = 0
@@ -80,7 +79,7 @@ class InfoCog(commands.Cog, name="Information Commands"):
     else:
       lv += 1
     hero_str = self.bot.get_emoji(context.guild, hero)
-    hero_str = hero_str if hero_str else string.capwords(hero)
+    hero_str = hero_str if hero_str else hero.title()
     elixir_str = self.bot.get_emoji(context.guild, 'elixir')
     elixir_str = elixir_str if elixir_str else "elixirs"
     await context.send(f"You are able to upgrade {hero_str} from lv{lvStart} to lv{lv}, "
