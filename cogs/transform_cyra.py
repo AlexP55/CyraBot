@@ -10,8 +10,8 @@ import os
 logger = logging.getLogger(__name__)
 
 def hero_and_secret(arg):
-  if arg.lower() == "secret":
-    return "secret"
+  if arg == "secret":
+    return "🎃 spooky raida 🎃"
   else:
     return find_hero(arg)
 
