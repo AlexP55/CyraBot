@@ -115,8 +115,8 @@ class CyraBot(BaseBot):
   async def init_bot(self, guild):
     # overrides the method: check nick name, add Cyra-specific variables
     await super().init_bot(guild)
-    if self.get_nick(guild).lower() not in hero_list:
-      await guild.me.edit(nick="Cyra")
+    #if self.get_nick(guild).lower() not in hero_list:
+    #  await guild.me.edit(nick="Cyra")
 
   async def on_command_error(self, context, error):
     if isinstance(error, commands.CommandNotFound):
