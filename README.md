@@ -3,8 +3,6 @@
 
 This is a bot for Realm Defense discord server using the base bot: https://github.com/Kaldzkur/DiscordBaseBot.
 
-It supports server moderations as well as displays various information on mobile game Realm Defense: Epic Tower Defense Strategy Game.
-
 ## Main Features
 In addition to the basic features inherited from the base bot: https://github.com/Kaldzkur/DiscordBaseBot, the CyraBot has a few specific features for the Realm Defense game.
 
