@@ -175,11 +175,14 @@ if __name__ == "__main__":
     "Information":["Stats Commands", "Information Commands"],
     "Miscellaneous":["Transformation Commands", "Command Management", "General Commands"]
   }
+  intents = discord.Intents.default()
+  intents.members = True
   bot = CyraBot(
     command_prefix=dynamic_prefix,
     owner_ids=set([APPA, SIN]),
     case_insensitive = True,
     help_command = InteractiveHelpCommand(cog_categories),
+    intents=intents,
     #server_id = SERVER
   )
   bot.run(TOKEN)
