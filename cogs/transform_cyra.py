@@ -11,7 +11,7 @@ logger = logging.getLogger(__name__)
 
 def hero_and_secret(arg):
   if arg == "secret":
-    return "🎃 spooky raida 🎃"
+    return "secret"
   else:
     return find_hero(arg)
 
