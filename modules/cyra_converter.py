@@ -33,6 +33,7 @@ def find_achievement(name):
   raise custom_exceptions.ItemNotFound("Achievement", name.title())
   
 def toMode(argument):
+  argument = argument.lower()
   if argument in ["legend", "legendary"]:
     return "legendary"
   elif argument in ["campaign"]:

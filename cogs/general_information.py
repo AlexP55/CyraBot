@@ -130,7 +130,7 @@ class InfoCog(commands.Cog, name="Information Commands"):
     aliases=["achievement"],
     help="Shows which way is the best to farm achievements/daily missions. This command assumes you will spend time on entering and exiting a level, and the results are based on the time efficiency.\nFor example, to show which level is the fastest to farm 200 goblins, use:\n`{prefix}achieve goblin 200`\nTo show which level is the fastest to farm spiders in the sense of counts per second, use:\n`{prefix}achieve spider`\nTo show which w6 legendary level is the fastest to complete, use:\n`{prefix}achieve w6 legendary fast`"
   )
-  async def _achieve(self, context, world:typing.Optional[toWorld], mode:typing.Optional[toMode], achievement:find_achievement, num:int=None):
+  async def _achieve(self, context, world:typing.Optional[toWorld], mode:typing.Optional[toMode], achievement:find_achievement="fast", num:int=None):
     # check world argument
     if world is not None and (world <= 0 or world >= 8):
       raise custom_exceptions.DataNotFound("World", world)
