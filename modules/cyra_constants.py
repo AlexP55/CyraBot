@@ -182,7 +182,7 @@ achievemets_dict = {
 "Small Ghostfire":["w6","spirit"],"Chibi-Mahou":["w6","monk"],"Harpi":["w6","flying"],"Skeleton Samurai":["w6","skeleton"],
 "Oni-baba":["w6","Oni"],"Koi-jin":["w6","fishguard"],"Kakutouka":["w6","monk"],"Oni-ken":["w6","Oni"],"Kagami-no-Yuurei":["w6","spirit"],
 "Namazu-jin":["w6","fishguard"],"Oni Mask":["w6","spirit"],"Aoi Mask":["w6","spirit"],"Kami-no-Mahoutsukai":["w6","monk"],
-"Kaeru-hei":["w6","fishguard"],"Big Ghostfire":["w6","spirit"],"Shunmin-shi":["w6","monk"],"Oni-kanadzuchi":["w6","Oni"]
+"Kaeru-hei":["w6","fishguard"],"Big Ghostfire":["w6","spirit"],"Shunmin-shi":["w6"],"Oni-kanadzuchi":["w6","Oni"]
 }
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))
 achievement_synonyms = {
