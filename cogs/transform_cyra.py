@@ -36,7 +36,7 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
         self.transform_interval = data["interval"]
     except:
       self.transform_list = ["cyra", "elara"]
-      self.transform_interval = 2
+      self.transform_interval = 2.0
     self.auto_transform = self.create_task()
     self.auto_transform.start()
     
