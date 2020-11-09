@@ -18,15 +18,14 @@ def hero_and_secret(arg):
 class TransformationCog(commands.Cog, name="Transformation Commands"):
   def __init__(self, bot):
     self.bot = bot
-    self.auto_transform.start()
     if not os.path.isdir(path):
       os.mkdir(path)
     try:
       with open(f'{path}/transform_list.json') as f:
         data = json.load(f)
-        assert(isinstance(data, list))
+        assert(isinstance(data, dict))
         self.transform_list = []
-        for hero in data:
+        for hero in data["list"]:
           try:
             hero = hero_and_secret(hero)
             if hero not in self.transform_list:
@@ -34,14 +33,18 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
           except:
             pass
         assert(len(self.transform_list) >= 2)
+        self.transform_interval = data["interval"]
     except:
       self.transform_list = ["cyra", "elara"]
+      self.transform_interval = 2
+    self.auto_transform = self.create_task()
+    self.auto_transform.start()
     
   def cog_unload(self):
     self.auto_transform.cancel()
     try:
       with open(f'{path}/transform_list.json', 'w') as f:
-        json.dump(self.transform_list, f)
+        json.dump({"list":self.transform_list, "interval":self.transform_interval}, f)
     except:
       pass
     
@@ -58,39 +61,42 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
     else:
       await context.send(f"Sorry {context.author.mention}, something unexpected happened during my transformation.")
   
-  @tasks.loop(hours=2)
-  async def auto_transform(self):
-    if self.auto_transform.current_loop == 0: # don't transform at the first time
-      return
-    after = None
-    for guild_id, db in self.bot.db.items():
-      guild = discord.utils.get(self.bot.guilds, id=guild_id)
-      if not self.get_auto_transform(guild):
-        continue
-      try:
-        logger.debug(f"Transforming in {guild.name} ({guild.id}).")
-        before = self.bot.get_nick(guild).lower()
-        if after is None:
-          after = self.get_random_trans_hero(before)
-          change_avatar = True
-        else:
-          change_avatar = False
-        await self.bot.transform(guild, after, change_avatar=change_avatar)
-        await self.bot.log_message(guild, "ADMIN_LOG",
-          user=self.bot.user, action="auto transformed",
-          description=f"Direction: {before.title()} -> {after.title()}"
-        )
-        logger.debug(f"Finished Transforming in {guild.name} ({guild.id}).")
-      except Exception as error:
-        await self.bot.on_task_error("Cyra/Elara auto transformation", error, guild)
+  def create_task(self):
+    @tasks.loop(hours=self.transform_interval)
+    async def auto_transform():
+      if self.auto_transform.current_loop == 0: # don't transform at the first time
+        return
+      after = None
+      for guild_id, db in self.bot.db.items():
+        guild = discord.utils.get(self.bot.guilds, id=guild_id)
+        if not self.get_auto_transform(guild):
+          continue
+        try:
+          logger.debug(f"Transforming in {guild.name} ({guild.id}).")
+          before = self.bot.get_nick(guild).lower()
+          if after is None:
+            after = self.get_random_trans_hero(before)
+            change_avatar = True
+          else:
+            change_avatar = False
+          await self.bot.transform(guild, after, change_avatar=change_avatar)
+          await self.bot.log_message(guild, "ADMIN_LOG",
+            user=self.bot.user, action="auto transformed",
+            description=f"Direction: {before.title()} -> {after.title()}"
+          )
+          logger.debug(f"Finished Transforming in {guild.name} ({guild.id}).")
+        except Exception as error:
+          await self.bot.on_task_error("Cyra/Elara auto transformation", error, guild)
 
-  #@auto_transform.error
-  #async def auto_transform_error(self, error):
-    #TODO: Add logging via logging module
+    #@auto_transform.error
+    #async def auto_transform_error(error):
+      #TODO: Add logging via logging module
 
-  @auto_transform.before_loop
-  async def before_auto_transform(self):
-      await self.bot.wait_until_ready()
+    @auto_transform.before_loop
+    async def before_auto_transform():
+        await self.bot.wait_until_ready()
+        
+    return auto_transform
       
   def get_auto_transform(self, guild):
     auto_transform = self.bot.get_setting(guild, "AUTO_TRANSFORM")
@@ -170,6 +176,7 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
     brief="Removes a hero to auto transformation",
     aliases=["rm"]
   )
+  @commands.is_owner()
   async def _rm_transform(self, context, heroes:commands.Greedy[hero_and_secret]):
     removed_heroes = []
     msg = ""
@@ -186,6 +193,19 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
       msg += f"No heroes removed from the auto transformation."
     await context.send(msg)
     
+  @_transform.command(
+    name="time",
+    brief="Sets auto transformation interval",
+    aliases=["interval"]
+  )
+  @commands.is_owner()
+  async def _time_transform(self, context, hours:float=None):
+    if hours is None:
+      await context.send(f"Current transform interval is: {self.transform_interval} hour(s).")
+      return
+    self.auto_transform.change_interval(hours=hours)
+    self.transform_interval = hours
+    await context.send(f"Transform interval is changed to {hours} hour(s), the interval will be applied after the current iteration is completed.")
 
 def setup(bot):
   bot.add_cog(TransformationCog(bot))
