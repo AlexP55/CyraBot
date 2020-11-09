@@ -2,7 +2,7 @@ import discord
 import string
 from base.modules.interactive_message import InteractiveMessage
 from modules.stats import HeroStats
-from modules.cyra_constants import hero_transformable
+from modules.cyra_constants import hero_transformable, max_level
 from base.modules.constants import arrow_emojis
 from datetime import datetime
 
@@ -59,16 +59,16 @@ class StatsMessage(InteractiveMessage):
       else:
         return None
     elif emoji == arrow_emojis["up"]:
-      if self.level < 35:
+      if self.level < max_level:
         self.last_status = (self.current_stats, self.rank, self.level)
         self.level += 1
         return self
       else:
         return None
     elif emoji == arrow_emojis["fast_up"]:
-      if self.level < 35:
+      if self.level < max_level:
         self.last_status = (self.current_stats, self.rank, self.level)
-        self.level = min(self.level+5, 35)
+        self.level = min(self.level+5, max_level)
         return self
       else:
         return None
@@ -163,14 +163,14 @@ class StatsCmpMessage(InteractiveMessage):
       else:
         return None
     elif emoji == arrow_emojis["up"]:
-      if self.level[self.adjustR] < 35:
+      if self.level[self.adjustR] < max_level:
         self.level[self.adjustR] += 1
         return self
       else:
         return None
     elif emoji == arrow_emojis["fast_up"]:
-      if self.level[self.adjustR] < 35:
-        self.level[self.adjustR] = min(self.level[self.adjustR]+5, 35)
+      if self.level[self.adjustR] < max_level:
+        self.level[self.adjustR] = min(self.level[self.adjustR]+5, max_level)
         return self
       else:
         return None
