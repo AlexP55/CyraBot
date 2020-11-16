@@ -196,11 +196,11 @@ achievemets_dict = {
 "Duskvine Lasher":["duskvine"],"Myrk Assassin":["myrk"],"Duskvine Crusher":["duskvine"],"Myrk Warlock":["myrk"],"Lava Pango":["lava"],
 "Lava Smasher":["lava"],"Large Ent":["ent"],
 
-"Strange Monk":["w6","monk"],"Origami Crane":["w6","flying"],"Oni-tekidanhei":["w6","Oni"],"Daruma":["w6","flying"],
+"Strange Monk":["w6","monk"],"Origami Crane":["w6","flying"],"Oni-tekidanhei":["w6","oni"],"Daruma":["w6","flying"],
 "Small Ghostfire":["w6","spirit"],"Chibi-Mahou":["w6","monk"],"Harpi":["w6","flying"],"Skeleton Samurai":["w6","skeleton"],
-"Oni-baba":["w6","Oni"],"Koi-jin":["w6","fishguard"],"Kakutouka":["w6","monk"],"Oni-ken":["w6","Oni"],"Kagami-no-Yuurei":["w6","spirit"],
+"Oni-baba":["w6","oni"],"Koi-jin":["w6","fishguard"],"Kakutouka":["w6","monk"],"Oni-ken":["w6","oni"],"Kagami-no-Yuurei":["w6","spirit"],
 "Namazu-jin":["w6","fishguard"],"Oni Mask":["w6","spirit"],"Aoi Mask":["w6","spirit"],"Kami-no-Mahoutsukai":["w6","monk"],
-"Kaeru-hei":["w6","fishguard"],"Big Ghostfire":["w6","spirit"],"Shunmin-shi":["w6"],"Oni-kanadzuchi":["w6","Oni"]
+"Kaeru-hei":["w6","fishguard"],"Big Ghostfire":["w6","spirit"],"Shunmin-shi":["w6"],"Oni-kanadzuchi":["w6","oni"]
 }
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))
 achievement_synonyms = {
@@ -211,7 +211,9 @@ achievement_synonyms = {
 "birds":"flying",
 "air":"flying",
 "flier":"flying",
-"fliers":"flying"
+"fliers":"flying",
+"flyer":"flying",
+"flyers":"flying"
 }
 
 bot_state = {
