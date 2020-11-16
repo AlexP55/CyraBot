@@ -36,7 +36,7 @@ def toMode(argument):
   argument = argument.lower()
   if argument in ["legend", "legendary"]:
     return "legendary"
-  elif argument in ["campaign"]:
+  elif argument in ["camp", "campaign"]:
     return "campaign"
   raise custom_exceptions.ItemNotFound("Mode", argument.title())
 
@@ -65,5 +65,5 @@ def toLevelWorld(argument):
     return "C"
   elif world in ["connie", "connie story", "conniestrory"]:
     return "Connie"
-  raise custom_exceptions.DataNotFound("World", argument)
+  raise custom_exceptions.DataNotFound("World", argument.title())
   
