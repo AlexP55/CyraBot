@@ -1,10 +1,10 @@
 # CyraBot
 [![Discord Server](https://img.shields.io/badge/Discord-Realm%20Defense-green)](https://discord.gg/AUzWpS9)
 
-This is a bot for Realm Defense discord server using the base bot: https://github.com/Kaldzkur/DiscordBaseBot.
+This is a bot for Realm Defense discord server using the [Discord Base Bot](https://github.com/Kaldzkur/DiscordBaseBot).
 
 ## Main Features
-In addition to the basic features inherited from the base bot: https://github.com/Kaldzkur/DiscordBaseBot, the CyraBot has a few specific features for the Realm Defense game.
+In addition to the basic features inherited from the [Discord Base Bot](https://github.com/Kaldzkur/DiscordBaseBot), the CyraBot has a few specific features for the Realm Defense game.
 
 #### 1. Transformation between Cyra/Elara
 A cool visual transformation in the server every 2 hours which changes the bot's role, name, and profile picture. Bot owners can use `?transform` to force a transformation.
