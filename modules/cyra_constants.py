@@ -226,7 +226,7 @@ bot_state = {
     "nohero_msg":"There is no hero called **{error.item}**.",
     "noability_msg_self":"Emm... I don't think I am able to use **{error.ability}**.",
     "noability_msg_other":"Emm... I don't think **{error.hero}** is able to use **{error.ability}**.",
-    "nodata_msg":"Sorry, there is nothing I know about **{error.category} {error.item}**.",
+    "nodata_msg":"Sorry, there is nothing I know about **{error.category} - {error.item}**.",
     "badinput_msg":"{context.author.mention}, I'm not sure I understand those arguments.\nPlease refer to `{context.prefix}help {context.command.qualified_name}` for more information.",
     "noaccess_msg":"I'm sorry, you do not have permission to use {context.command.qualified_name}. Please ask my masters.",
     "unexpected_msg":"Something unexpected happened in my command. Maybe try something else?\nPlease refer to `{context.prefix}help {context.command.qualified_name}` for information on my commands."
@@ -240,7 +240,7 @@ bot_state = {
     "nohero_msg":"Emm... None of my colleagues is called **{error.item}**.",
     "noability_msg_self":"Emm... I don't think I am able to use **{error.ability}**.",
     "noability_msg_other":"Emm... I don't think **{error.hero}** is able to use **{error.ability}**.",
-    "nodata_msg":"Sorry, I want to help but I don't know anything about **{error.category} {error.item}**.",
+    "nodata_msg":"Sorry, I want to help but I don't know anything about **{error.category} - {error.item}**.",
     "badinput_msg":"{context.author.mention}, I'm not sure I understand those arguments.\nPlease refer to `{context.prefix}help {context.command.qualified_name}` for more information.",
     "noaccess_msg":"I'm sorry, you do not have permission to use `{context.command.qualified_name}`. Please ask my masters.",
     "unexpected_msg":"Elara stopped me from executing that command. Maybe try something else?\nPlease refer to `{context.prefix}help {context.command.qualified_name}` for information on my commands."
@@ -254,7 +254,7 @@ bot_state = {
     "nohero_msg":"Who is **{error.item}**? Is that a new nickname?",
     "noability_msg_self":"**{error.ability}** sounds cool. Maybe I should learn it from now.",
     "noability_msg_other":"**{error.ability}** sounds cool. Maybe **{error.hero}** should learn it from now.",
-    "nodata_msg":"Tell you a secret: **{error.category} {error.item}** will be the next spoiler.\nJust kidding.",
+    "nodata_msg":"**{error.category} - {error.item}** is beyond my knowledge, try to use some better words!",
     "badinput_msg":"{context.author.mention}, a smart command with awful arguments. Study the `{context.prefix}help {context.command.qualified_name}`, mortal.",
     "noaccess_msg":"Why are you using this command without permission? Watch yourself!",
     "unexpected_msg":"Cyra stopped me from executing that command. It's too dangerous, even for myself.\nRefer to `{context.prefix}help {context.command.qualified_name}` for information on my commands."

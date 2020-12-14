@@ -390,7 +390,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     
   @commands.command(
     name="item",
-    help="Shows information about one power item",
+    help="Shows information about one power item.\n\nAvailable items:\nFire potion, summon potion, healing potion, freeze potion, freeze potion lv2, armageddon, gold boost, meteor",
     brief="Shows power item",
     aliases=["consumable"]
   )
@@ -455,7 +455,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     
   @commands.command(
     name="buff",
-    help="Shows information about one buff/debuff",
+    help="Shows information about one buff/debuff.\n\nAvailable buffs/debuffs:\nHaste, slow, cold, decrepit, poison, burn, bleed, shield, armor break, terror, blind, curse, silence, stun, freeze, shock, cocoon, paralysis, bind, cloak, spirit curse, polymorph, charm",
     brief="Shows buff/debuff",
     aliases=["debuff"]
   )

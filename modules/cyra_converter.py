@@ -30,7 +30,7 @@ def find_achievement(name):
     close_word = difflib.get_close_matches(name, achievements, n=1)
     if not len(close_word) == 0:
       return close_word[0]
-  raise custom_exceptions.ItemNotFound("Achievement", name.title())
+  raise custom_exceptions.DataNotFound("Achievement", name.title())
   
 def toMode(argument):
   argument = argument.lower()
@@ -38,7 +38,7 @@ def toMode(argument):
     return "legendary"
   elif argument in ["camp", "campaign"]:
     return "campaign"
-  raise custom_exceptions.ItemNotFound("Mode", argument.title())
+  raise custom_exceptions.DataNotFound("Mode", argument.title())
 
 def toWorld(argument):
   world = argument.lower()
