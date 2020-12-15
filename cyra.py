@@ -171,7 +171,7 @@ if __name__ == "__main__":
   #SERVER = int(os.getenv("SERVER_ID"))
   cog_categories = {
     "Administration":["Database Commands", "Settings Management Commands", "Data Fetching Commands", "Administration Commands"],
-    "Moderation":["Message Management Commands", "User Management Commands", "Channel Management Commands", "Moderation Commands"],
+    "Moderation":["Message Management Commands", "User Management Commands", "Channel Management Commands", "Moderation Commands", "Role Management Commands"],
     "Information":["Stats Commands", "Information Commands"],
     "Miscellaneous":["Transformation Commands", "Command Management", "General Commands"]
   }
