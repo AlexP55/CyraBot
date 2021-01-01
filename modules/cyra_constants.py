@@ -199,7 +199,7 @@ achievemets_dict = {
 "Strange Monk":["w6","monk"],"Origami Crane":["w6","flying"],"Oni-tekidanhei":["w6","oni"],"Daruma":["w6","flying"],
 "Small Ghostfire":["w6","spirit"],"Chibi-Mahou":["w6","monk"],"Harpi":["w6","flying"],"Skeleton Samurai":["w6","skeleton"],
 "Oni-baba":["w6","oni"],"Koi-jin":["w6","fishguard"],"Kakutouka":["w6","monk"],"Oni-ken":["w6","oni"],"Kagami-no-Yuurei":["w6","spirit"],
-"Namazu-jin":["w6","fishguard"],"Oni Mask":["w6","spirit"],"Aoi Mask":["w6","spirit"],"Kami-no-Mahoutsukai":["w6","monk"],
+"Namazu-jin":["w6","fishguard"],"Oni Mask":["w6","spirit"],"Aoi Mask":["w6","spirit"],"Kami-no-Mahoutsukai":["w6"],
 "Kaeru-hei":["w6","fishguard"],"Big Ghostfire":["w6","spirit"],"Shunmin-shi":["w6"],"Oni-kanadzuchi":["w6","oni"]
 }
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))
