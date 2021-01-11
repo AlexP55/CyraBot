@@ -26,12 +26,12 @@ emoji_keys = {
   "leif":"hero_Leif1",
   "koizuul":"hero_Koizuul1",
   "azura":"hero_Azura1",
-  "normal connie":"hero_Connie",
-  "connie":"hero_ConnieNecro",
+  "normal connie":"hero_Connie1",
+  "connie":"hero_ConnieNecro1",
   "shamiko":"hero_Shamiko1",
-  "cyra":"hero_Cyra",
-  "elara":"hero_Elara",
-  "koizuul dragon":"hero_Koizuul5"
+  "cyra":"hero_Cyra1",
+  "elara":"hero_Elara1",
+  "koizuul dragon":"hero_Koizuul2"
 }
 
 hero_synonyms = {
