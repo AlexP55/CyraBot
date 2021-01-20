@@ -103,9 +103,9 @@ class InfoCog(commands.Cog, name="Information Commands"):
       f"Level  5: 1000 {gem_str} ( 75{elixir_str}/hour, Capacity:  600{elixir_str})\n"
       f"Level  6: 1500 {gem_str} (105{elixir_str}/hour, Capacity:  840{elixir_str})\n"
       f"Level  7: 2000 {gem_str} (140{elixir_str}/hour, Capacity: 1260{elixir_str})\n"
-      f"Level  8: 2500 {gem_str} (180{elixir_str}/hour, Capacity: 1620{elixir_str})\n"
-      f"Level  9: 4000 {gem_str} (220{elixir_str}/hour, Capacity: 3520{elixir_str})\n"
-      f"Level 10: 6000 {gem_str} (260{elixir_str}/hour, Capacity: 6240{elixir_str})"
+      f"Level  8: 2500 {gem_str} (180{elixir_str}/hour, Capacity: 2520{elixir_str})\n"
+      f"Level  9: 4000 {gem_str} (250{elixir_str}/hour, Capacity: 4000{elixir_str})\n"
+      f"Level 10: 6000 {gem_str} (315{elixir_str}/hour, Capacity: 7560{elixir_str})"
     )
 
   @commands.command(

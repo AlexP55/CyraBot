@@ -26,12 +26,12 @@ emoji_keys = {
   "leif":"hero_Leif1",
   "koizuul":"hero_Koizuul1",
   "azura":"hero_Azura1",
-  "normal connie":"hero_Connie",
-  "connie":"hero_ConnieNecro",
+  "normal connie":"hero_Connie1",
+  "connie":"hero_ConnieNecro1",
   "shamiko":"hero_Shamiko1",
-  "cyra":"hero_Cyra",
-  "elara":"hero_Elara",
-  "koizuul dragon":"hero_Koizuul5"
+  "cyra":"hero_Cyra1",
+  "elara":"hero_Elara1",
+  "koizuul dragon":"hero_Koizuul2"
 }
 
 hero_synonyms = {
@@ -199,7 +199,7 @@ achievemets_dict = {
 "Strange Monk":["w6","monk"],"Origami Crane":["w6","flying"],"Oni-tekidanhei":["w6","oni"],"Daruma":["w6","flying"],
 "Small Ghostfire":["w6","spirit"],"Chibi-Mahou":["w6","monk"],"Harpi":["w6","flying"],"Skeleton Samurai":["w6","skeleton"],
 "Oni-baba":["w6","oni"],"Koi-jin":["w6","fishguard"],"Kakutouka":["w6","monk"],"Oni-ken":["w6","oni"],"Kagami-no-Yuurei":["w6","spirit"],
-"Namazu-jin":["w6","fishguard"],"Oni Mask":["w6","spirit"],"Aoi Mask":["w6","spirit"],"Kami-no-Mahoutsukai":["w6","monk"],
+"Namazu-jin":["w6","fishguard"],"Oni Mask":["w6","spirit"],"Aoi Mask":["w6","spirit"],"Kami-no-Mahoutsukai":["w6"],
 "Kaeru-hei":["w6","fishguard"],"Big Ghostfire":["w6","spirit"],"Shunmin-shi":["w6"],"Oni-kanadzuchi":["w6","oni"]
 }
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))

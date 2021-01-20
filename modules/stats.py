@@ -95,6 +95,7 @@ class HeroStats(Stats):
       self.transformSpecialDamage = x * self.SpecialDamage
       self.transformMoveSpeed = 2.2
     elif self.unit in ["cyra", "elara"]:
+      self.transformPhysicalArmor = self.PhysicalArmor + 0.15
       self.transformMoveSpeed = self.MoveSpeed + 1
     
   def get_clean_stats(self, transform:bool=False):
