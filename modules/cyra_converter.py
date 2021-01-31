@@ -67,3 +67,9 @@ def toLevelWorld(argument):
     return "Connie"
   raise custom_exceptions.DataNotFound("World", argument.title())
   
+def numberComparisonConverter(argument):
+  if "->" in argument:
+    numbers = argument.split("->")
+    return int(numbers[0]), int(numbers[1])
+  else:
+    return int(argument)

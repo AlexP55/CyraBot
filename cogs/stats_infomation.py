@@ -5,7 +5,7 @@ import modules.custom_exceptions as custom_exceptions
 import modules.interactive_hero_guide as hero_guide
 import modules.interactive_tower_guide as tower_guide
 import modules.interactive_stats_guide as stats_guide
-from modules.cyra_converter import find_hero, find_ability, toWorld
+from modules.cyra_converter import find_hero, find_ability, toWorld, numberComparisonConverter
 from modules.cyra_constants import max_level
 from base.modules.message_helper import num_emojis, multiple_choice
 import asyncio
@@ -141,23 +141,15 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     brief="Shows or compares stats",
     aliases=["stat", "statscmp", "statcmp"]
   )
-  async def stats(self, context, unit:find_hero, rank, level):
-    try:
-      if "->" in rank:
-        rank = rank.split("->")
-        rank1, rank2 = int(rank[0]), int(rank[1])
-      else:
-        rank1, rank2 = int(rank), int(rank)
-    except ValueError:
-      raise commands.BadArgument("passed hero rank has an invalid format.")
-    try:
-      if "->" in level:
-        level = level.split("->")
-        level1, level2 = int(level[0]), int(level[1])
-      else:
-        level1, level2 = int(level), int(level)
-    except ValueError:
-      raise commands.BadArgument("passed hero level has an invalid format.")
+  async def stats(self, context, unit:find_hero, rank:numberComparisonConverter, level:numberComparisonConverter):
+    if isinstance(rank, tuple):
+      rank1, rank2 = rank[0], rank[1]
+    else:
+      rank1, rank2 = rank, rank
+    if isinstance(level, tuple):
+      level1, level2 = level[0], level[1]
+    else:
+      level1, level2 = level, level
     if (not 0 < level1 <= max_level) or (not 0 < level2 <= max_level):
       await context.send(f"Level of {unit.title()} must be between 1 and {max_level}.")
       return

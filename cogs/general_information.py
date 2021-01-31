@@ -3,7 +3,7 @@ from discord.ext import commands
 import random
 import modules.custom_exceptions as custom_exceptions
 import typing
-from modules.cyra_converter import find_hero, toLevelWorld, toWorld, toMode, find_achievement
+from modules.cyra_converter import find_hero, toLevelWorld, toWorld, toMode, find_achievement, numberComparisonConverter
 from modules.cyra_constants import facts, elixir_cost_hero, max_level
 import modules.interactive_level_guide as level_guide 
 import logging
@@ -26,9 +26,10 @@ class InfoCog(commands.Cog, name="Information Commands"):
     brief="Shows info on elixir",
     case_insensitive = True,
     invoke_without_command=True,
-    usage="[hero] [lvStart=1] [lvEnd]"
+    usage="[hero] [lvStart=1] [lvEnd=lvStart+1]",
+    help="Shows general elixir information or calculates how many elixirs are required to upgrade a hero.\nExample: `{prefix}elixir fee 1 30` or `{prefix}elixir fee 1->30`"
   )
-  async def elixir(self, context, hero:find_hero=None, lvStart=1, lvEnd=-1):
+  async def elixir(self, context, hero:find_hero=None, lvStart:numberComparisonConverter=1, lvEnd=-1):
     if hero is None:
       prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
       elixir_str = self.bot.get_emoji(context.guild, 'elixir')
@@ -43,6 +44,9 @@ class InfoCog(commands.Cog, name="Information Commands"):
       return
     if hero not in elixir_cost_hero:
       raise custom_exceptions.HeroNotFound(hero.title())
+    if isinstance(lvStart, tuple):
+      lvEnd = lvStart[1]
+      lvStart = lvStart[0]
     if lvEnd <= lvStart:
       lvEnd = lvStart + 1
     if lvStart <= 0 or lvEnd > max_level:
