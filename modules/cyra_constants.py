@@ -179,6 +179,18 @@ elixir_cost_hero = {
   "elara":elixir_cost_7500
 }
 
+rank_cost = [5, 10, 15, 20, 40, 80, 100]
+
+def elixir_cost(hero, lvlow, lvhigh):
+  if lvlow > lvhigh:
+    lvlow, lvhigh = lvhigh, lvlow
+  return sum(elixir_cost_hero[hero][lvlow-1:lvhigh-1])
+  
+def token_cost(ranklow, rankhigh):
+  if ranklow > rankhigh:
+    ranklow, rankhigh = rankhigh, ranklow
+  return sum(rank_cost[ranklow:rankhigh])
+
 achievemets_dict = {
 "Slime":["slime"],"Skeleton":["skeleton"],"Crow":["flying"],"Skeleton Archer":["skeleton"],"Spider":["spider"],"Poison Spider":["spider"],
 "Skeleton Mage":["skeleton"],"Bucket Slime":["slime"],"Giant Slime":["slime"],"Slime Queen":["slime"],"Slime Blob":["slime"],

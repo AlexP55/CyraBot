@@ -4,7 +4,7 @@ import random
 import modules.custom_exceptions as custom_exceptions
 import typing
 from modules.cyra_converter import find_hero, toLevelWorld, toWorld, toMode, find_achievement, numberComparisonConverter
-from modules.cyra_constants import facts, elixir_cost_hero, max_level
+from modules.cyra_constants import facts, elixir_cost, elixir_cost_hero, max_level
 import modules.interactive_level_guide as level_guide 
 import logging
 
@@ -42,8 +42,6 @@ class InfoCog(commands.Cog, name="Information Commands"):
         f"To show the elixir cost for upgrading a hero, use `{prefix}elixir <hero> <lvStart> <lvEnd>`"
       )
       return
-    if hero not in elixir_cost_hero:
-      raise custom_exceptions.HeroNotFound(hero.title())
     if isinstance(lvStart, tuple):
       lvEnd = lvStart[1]
       lvStart = lvStart[0]
@@ -52,7 +50,7 @@ class InfoCog(commands.Cog, name="Information Commands"):
     if lvStart <= 0 or lvEnd > max_level:
       await context.send(f"Level of {hero.title()} must be between 1 and {max_level}.")
       return
-    elixir_cost = sum(elixir_cost_hero[hero][lvStart-1:lvEnd-1])
+    elixir_cost = elixir_cost(hero, lvStart, lvEnd)
     hero_str = self.bot.get_emoji(context.guild, hero)
     hero_str = hero_str if hero_str else hero.title()
     elixir_str = self.bot.get_emoji(context.guild, 'elixir')
@@ -69,8 +67,6 @@ class InfoCog(commands.Cog, name="Information Commands"):
     aliases=["up"]
   )
   async def _elixir_up(self, context, hero:find_hero, numElixir:int, lvStart:int=1):
-    if hero not in elixir_cost_hero:
-      raise custom_exceptions.HeroNotFound(hero.title())
     if lvStart <= 0 or lvStart >= max_level:
       await context.send(f"Starting level of {hero.title()} must be between 1 and {max_level-1}.")
       return
