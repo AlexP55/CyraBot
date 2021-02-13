@@ -18,7 +18,7 @@ class StatsMessage(InteractiveMessage):
     if hero in hero_transformable.keys():
       self.child_emojis.append(arrow_emojis["trans"])
       self.transform_text = hero_transformable[hero]
-    self.child_emojis.extend((arrow_emojis["back"], arrow_emojis["forward"], arrow_emojis["down"], 
+    self.child_emojis.extend((arrow_emojis["backward"], arrow_emojis["forward"], arrow_emojis["down"], 
       arrow_emojis["fast_down"], arrow_emojis["up"], arrow_emojis["fast_up"]))
     
   @property
@@ -30,7 +30,7 @@ class StatsMessage(InteractiveMessage):
       self.last_status = (self.current_stats, self.rank, self.level)
       self.transform = not self.transform
       return self
-    elif emoji == arrow_emojis["back"]:
+    elif emoji == arrow_emojis["backward"]:
       if self.rank > self.dbrow["minRank"]:
         self.last_status = (self.current_stats, self.rank, self.level)
         self.rank -= 1
@@ -75,7 +75,7 @@ class StatsMessage(InteractiveMessage):
         
   async def get_embed(self):
     self.current_stats = self.stats
-    instruction = f"{arrow_emojis['back']} {arrow_emojis['forward']} Rank  {arrow_emojis['down']} {arrow_emojis['up']} Level"
+    instruction = f"{arrow_emojis['backward']} {arrow_emojis['forward']} Rank  {arrow_emojis['down']} {arrow_emojis['up']} Level"
     if arrow_emojis["trans"] in self.child_emojis:
       form_text = f"__{self.transform_text[self.transform]}__ "
       instruction = f"{instruction}\n{arrow_emojis['trans']} Transform"
@@ -120,7 +120,7 @@ class StatsCmpMessage(InteractiveMessage):
     if hero in hero_transformable.keys():
       self.child_emojis.append(arrow_emojis["trans"])
       self.transform_text = hero_transformable[hero]
-    self.child_emojis.extend((arrow_emojis["left_right"], arrow_emojis["back"], arrow_emojis["forward"], 
+    self.child_emojis.extend((arrow_emojis["left_right"], arrow_emojis["backward"], arrow_emojis["forward"], 
       arrow_emojis["down"], arrow_emojis["fast_down"], arrow_emojis["up"], arrow_emojis["fast_up"]))
     
   @property
@@ -138,7 +138,7 @@ class StatsCmpMessage(InteractiveMessage):
     elif emoji == arrow_emojis["trans"]:
       self.transform = not self.transform
       return self
-    elif emoji == arrow_emojis["back"]:
+    elif emoji == arrow_emojis["backward"]:
       if self.rank[self.adjustR] > self.dbrow["minRank"]:
         self.rank[self.adjustR] -= 1
         return self
@@ -177,7 +177,7 @@ class StatsCmpMessage(InteractiveMessage):
         
   async def get_embed(self):
     leftStats, rightStats = self.statsL, self.statsR
-    instruction = f"{arrow_emojis['back']} {arrow_emojis['forward']} Rank {arrow_emojis['down']} {arrow_emojis['up']} Level\n{arrow_emojis['left_right']} Switch Left/Right"
+    instruction = f"{arrow_emojis['backward']} {arrow_emojis['forward']} Rank {arrow_emojis['down']} {arrow_emojis['up']} Level\n{arrow_emojis['left_right']} Switch Left/Right"
     if arrow_emojis["trans"] in self.child_emojis:
       form_text = f"on __{self.transform_text[self.transform]}__ "
       instruction = f"{instruction}\n{arrow_emojis['trans']} Transform"
