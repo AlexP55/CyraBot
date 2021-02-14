@@ -50,14 +50,14 @@ class InfoCog(commands.Cog, name="Information Commands"):
     if lvStart <= 0 or lvEnd > max_level:
       await context.send(f"Level of {hero.title()} must be between 1 and {max_level}.")
       return
-    elixir_cost = elixir_cost(hero, lvStart, lvEnd)
+    cost = elixir_cost(hero, lvStart, lvEnd)
     hero_str = self.bot.get_emoji(context.guild, hero)
     hero_str = hero_str if hero_str else hero.title()
     elixir_str = self.bot.get_emoji(context.guild, 'elixir')
     elixir_str = elixir_str if elixir_str else "elixirs"
     await context.send(
       f"Upgrading {hero_str} from level {lvStart} to {lvEnd} costs:\n"
-      f"{elixir_cost} {elixir_str}"
+      f"{cost} {elixir_str}"
     )
     
   @elixir.command(
