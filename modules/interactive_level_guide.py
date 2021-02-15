@@ -376,7 +376,7 @@ class LevelAchievementMessage(InteractiveMessage):
     self.result = self.context.bot.db[self.context.guild.id].query(
       f"SELECT {select_clause} FROM achievement NATURAL JOIN levels WHERE ({where_clause}) ORDER BY {sort_method} ASC LIMIT {limit}")
     if not self.result:
-      raise custom_exceptions.DataNotFound("Level Achievement", achievement)
+      raise custom_exceptions.DataNotFound("Achievement", f"{achievement} in W{world}" if world else achievement)
     self.update_state(0)
       
   def update_state(self, state):

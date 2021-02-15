@@ -137,7 +137,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       
 
   @commands.command(
-    help="Displays or compares the stats of a hero at different levels and ranks, [rank] [level] must have the format [num] or [num]->[num], for example, to display Fee at rank 5 lv30, use:\n`{prefix}stats fee 5 30`\nTo compare Fee at rank 5 lv 30 with she at rank 5 lv 35, use:\n`{prefix}statscmp fee 5 30->35`",
+    help="Displays or compares the stats of a hero at different levels and ranks, [rank] [level] must have the format [num] or [num]->[num], for example, to display Fee at rank 5 lv30, use:\n`{prefix}stats fee 5 30`\nTo compare Fee at rank 5 lv 30 with she at rank 5 lv 35, use:\n`{prefix}stats fee 5 30->35`",
     brief="Shows or compares stats",
     aliases=["stat", "statscmp", "statcmp"]
   )
