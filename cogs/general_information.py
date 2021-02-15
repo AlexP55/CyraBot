@@ -4,8 +4,9 @@ import random
 import modules.custom_exceptions as custom_exceptions
 import typing
 from modules.cyra_converter import find_hero, toLevelWorld, toWorld, toMode, find_achievement, numberComparisonConverter
-from modules.cyra_constants import facts, elixir_cost, elixir_cost_hero, max_level
-import modules.interactive_level_guide as level_guide 
+from modules.cyra_constants import facts, elixir_cost, elixir_cost_hero, max_level, tappables
+from base.modules.message_helper import num_emojis, multiple_choice
+import modules.interactive_level_guide as level_guide
 import logging
 
 logger = logging.getLogger(__name__)
@@ -135,8 +136,24 @@ class InfoCog(commands.Cog, name="Information Commands"):
     if world is not None and (world <= 0 or world >= 8):
       raise custom_exceptions.DataNotFound("World", world)
     timeout = self.bot.get_setting(context.guild, "ACTIVE_TIME") * 60
-    guide = level_guide.LevelAchievementMessage(achievement, num, context=context, timeout=timeout, world=world, mode=mode)
-    await guide.start()
+    if achievement in tappables:
+      result = self.bot.db[context.guild.id].query(f"SELECT * FROM levels WHERE tappable LIKE '%{achievement}%' LIMIT {self.bot.get_setting(context.guild, 'SEARCH_LIMIT')}")
+      if len(result) == 0:
+        raise custom_exceptions.DataNotFound("Achievement", achievement.title())
+      elif len(result) == 1:
+        valid_row = result[0]
+      else:
+        levels = [f"{num_emojis[i+1]} `Level {result[i][0]:<5} {result[i][2]}`" for i in range(len(result))]
+        content = f"You can complete the mission in below levels, react to see the details of a level:\n" + '\n'.join(levels)
+        response, msg = await multiple_choice(context, content, num=len(result))
+        if response is None:
+          return
+        valid_row = result[response]
+      guide = level_guide.LevelIndividualMessage(valid_row[0], context=context, timeout=timeout, dbrow=valid_row)
+      await guide.start(msg)
+    else:
+      guide = level_guide.LevelAchievementMessage(achievement, num, context=context, timeout=timeout, world=world, mode=mode)
+      await guide.start()
 
   @commands.command(
     brief="Displays link to wiki",

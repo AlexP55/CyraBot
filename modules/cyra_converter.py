@@ -2,14 +2,17 @@ import difflib
 import modules.custom_exceptions as custom_exceptions
 from modules.cyra_constants import hero_synonyms, ability_synonyms, hero_list, achievements, achievement_synonyms
 
+def find_closest(word, word_list):
+  close_word = difflib.get_close_matches(word, word_list, n=1)
+  if close_word:
+    return close_word[0]
+  return None
+
 def find_hero(word):
   word = word.lower()
-  if word in hero_synonyms:
-    return hero_synonyms[word]
-  else:
-    close_word = difflib.get_close_matches(word, hero_list, n=1)
-    if not len(close_word) == 0:
-      return close_word[0]
+  close_word = find_closest(word, list(hero_synonyms))
+  if close_word:
+    return hero_synonyms[close_word]
   raise custom_exceptions.HeroNotFound(word.title())
   
 def find_ability(word):
@@ -22,14 +25,9 @@ def find_ability(word):
   
 def find_achievement(name):
   name = name.lower()
-  if name in ["shortest", "fastest", "short", "fast", "quick", "quickest"]:
-    return "fast"
-  elif name in achievement_synonyms:
-    return achievement_synonyms[name]
-  else:
-    close_word = difflib.get_close_matches(name, achievements, n=1)
-    if not len(close_word) == 0:
-      return close_word[0]
+  close_word = find_closest(name, list(achievement_synonyms))
+  if close_word:
+    return achievement_synonyms[close_word]
   raise custom_exceptions.DataNotFound("Achievement", name.title())
   
 def toMode(argument):

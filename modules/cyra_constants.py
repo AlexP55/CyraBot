@@ -34,26 +34,6 @@ emoji_keys = {
   "koizuul dragon":"hero_Koizuul2"
 }
 
-hero_synonyms = {
-  "koi":"koizuul",
-  "elsa":"efrigid",
-  "efridge":"efrigid",
-  "lance":"lancelot",
-  "maybe":"mabyn",
-  "masa":"masamune",
-  "shampoo":"shamiko",
-  "necroconnie":"connie",
-  "normalconnie":"normal connie",
-  "elana":"elara",
-}
-
-ability_synonyms = {
-  "range":"ranged",
-  "melee attack":"melee",
-  "ranged attack":"ranged",
-  "range attack":"ranged"
-}
-
 hero_list = [
   "azura","bolton","caldera","connie","efrigid",
   "fee","helios","hogan","koizuul","lancelot","leif",
@@ -69,6 +49,26 @@ hero_transformable = {
   "elara": ("Normal Form", "Goddess Form")
 }
 
+hero_synonyms = {hero:hero for hero in hero_list}
+hero_synonyms.update({ # hero synonyms
+  "koi":"koizuul",
+  "elsa":"efrigid",
+  "efridge":"efrigid",
+  "lance":"lancelot",
+  "maybe":"mabyn",
+  "masa":"masamune",
+  "shampoo":"shamiko",
+  "necroconnie":"connie",
+  "normalconnie":"normal connie",
+  "elana":"elara",
+})
+
+ability_synonyms = {
+  "range":"ranged",
+  "melee attack":"melee",
+  "ranged attack":"ranged",
+  "range attack":"ranged"
+}
 
 # which world are heroes in
 world_hero = {
@@ -215,18 +215,31 @@ achievemets_dict = {
 "Kaeru-hei":["w6","fishguard"],"Big Ghostfire":["w6","spirit"],"Shunmin-shi":["w6"],"Oni-kanadzuchi":["w6","oni"]
 }
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))
-achievement_synonyms = {
+
+tappables = ["trap", "hidden enemies", "loose change", "chicken dinner", "snowman", "windmill", "cow", "boneheaded"]
+
+achievement_synonyms = {achievement:achievement for achievement in achievements}
+achievement_synonyms.update({tappable:tappable for tappable in tappables})
+achievement_synonyms.update({ # achievement synonyms
 "w6enemy":"w6",
-"w6enemies":"w6",
 "world6":"w6",
 "bird":"flying",
-"birds":"flying",
 "air":"flying",
-"flier":"flying",
-"fliers":"flying",
-"flyer":"flying",
-"flyers":"flying"
-}
+"flier":"flying"
+})
+achievement_synonyms.update({ # tappable synonyms
+"hidden": "hidden enemies",
+"unleash": "hidden enemies",
+"enemies": "hidden enemies",
+"loose": "loose change",
+"change": "loose change",
+"chicken": "chicken dinner"
+})
+achievement_synonyms.update({ # synonyms for "fast"
+"fast": "fast",
+"quick": "fast",
+"short": "fast"
+})
 
 bot_state = {
   "_default":{
