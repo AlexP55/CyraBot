@@ -141,7 +141,8 @@ class InfoCog(commands.Cog, name="Information Commands"):
       if world:
         where_clause.append(f"world={world}")
       where_clause = " AND ".join(where_clause) if where_clause else "TRUE"
-      result = self.bot.db[context.guild.id].query(f"SELECT * FROM levels WHERE ({where_clause}) LIMIT 10")
+      limit = self.bot.get_setting(context.guild, "SEARCH_LIMIT")-1
+      result = self.bot.db[context.guild.id].query(f"SELECT * FROM levels WHERE ({where_clause}) LIMIT {limit}")
       if len(result) == 0:
         raise custom_exceptions.DataNotFound("Achievement", f"{achievement} in W{world}" if world else achievement)
       elif len(result) == 1:
