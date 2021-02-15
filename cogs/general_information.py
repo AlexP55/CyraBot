@@ -137,13 +137,14 @@ class InfoCog(commands.Cog, name="Information Commands"):
       raise custom_exceptions.DataNotFound("World", world)
     timeout = self.bot.get_setting(context.guild, "ACTIVE_TIME") * 60
     if achievement in tappables:
-      result = self.bot.db[context.guild.id].query(f"SELECT * FROM levels WHERE tappable LIKE '%{achievement}%' LIMIT {self.bot.get_setting(context.guild, 'SEARCH_LIMIT')}")
+      result = self.bot.db[context.guild.id].query(f"SELECT * FROM levels WHERE tappable LIKE '%{achievement}%' LIMIT 10")
       if len(result) == 0:
         raise custom_exceptions.DataNotFound("Achievement", achievement.title())
       elif len(result) == 1:
         valid_row = result[0]
+        msg = None
       else:
-        levels = [f"{num_emojis[i+1]} `Level {result[i][0]:<5} {result[i][2]}`" for i in range(len(result))]
+        levels = [f"{num_emojis[i+1]} `W{result[i][1]} lv.{result[i][0]:<5} {result[i][2]}`" for i in range(len(result))]
         content = f"You can complete the mission in below levels, react to see the details of a level:\n" + '\n'.join(levels)
         response, msg = await multiple_choice(context, content, num=len(result))
         if response is None:

@@ -216,7 +216,7 @@ achievemets_dict = {
 }
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))
 
-tappables = ["trap", "hidden enemies", "loose change", "chicken dinner", "snowman", "windmill", "cow", "boneheaded"]
+tappables = ["trap", "hidden enemies", "loose change", "chicken dinner", "snowman", "windmill", "cow", "boneheaded", "seeker"]
 
 achievement_synonyms = {achievement:achievement for achievement in achievements}
 achievement_synonyms.update({tappable:tappable for tappable in tappables})

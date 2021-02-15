@@ -76,8 +76,6 @@ class CyraBot(BaseBot):
           msg = state["noability_msg_other"]
       elif isinstance(error, custom_exceptions.DataNotFound):
         msg = state["nodata_msg"]
-        if error.category.lower() == "achievement":
-          msg = f"{msg}\nIf you are looking for other missions, please refer to https://realm-defense-hero-legends-td.fandom.com/wiki/Mission_Board"
       elif isinstance(error, commands.UserInputError):
         msg = state["badinput_msg"]
       elif isinstance(error, commands.CheckFailure):
