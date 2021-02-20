@@ -209,7 +209,9 @@ class LevelIndividualMessage(InteractiveMessage):
     
   async def get_embed(self):
     level, world, name, handicap, tappable, link, remark = self.dbrow
-    embed = discord.Embed(title=f"{level}. {name}", colour=discord.Colour.green(), timestamp=datetime.utcnow())
+    if remark:
+      description = f"Level Type: {remark.title()}"
+    embed = discord.Embed(title=f"{level}. {name}", colour=discord.Colour.green(), timestamp=datetime.utcnow(), description=description)
     if handicap and handicap != "NONE":
       embed.add_field(name="Legendary Handicap:", value=handicap, inline=False)
     if tappable and tappable != "NONE":
@@ -342,7 +344,8 @@ class LevelAchievementMessage(InteractiveMessage):
     mode = attributes.pop("mode", None)
     # use the world and mode arguments to limit the search
     where_clause = []
-    select_clause = ["level","name","mode","strategy","time","link","remark"] + achievements
+    general_columns = ["level","name","mode","strategy","time","link","remark"]
+    select_clause = general_columns + achievements
     # the time required for entering exiting the level and
     self.extra_t = self.context.bot.get_setting(self.context.guild, "LEVEL_EXTRA_TIME")
     limit = self.context.bot.get_setting(self.context.guild, "SEARCH_LIMIT")-1
@@ -354,27 +357,32 @@ class LevelAchievementMessage(InteractiveMessage):
     if achievement == "fast":
       self.goal = "Levels with the shortest completion time"
       self.info = ["TIME"]
-      self.info_fun = lambda row: [f"{row[4]/2.0+self.extra_t:.0f}"]
-      sort_method = "time"
+      self.info_fun = lambda row: [f"{row[-1]:.0f}"]
+      select_clause.append(f"MIN(time/2.0+{self.extra_t}) AS criteria")
+      sort_method = "criteria ASC"
     else:
-      ind = achievements.index(achievement) + 7 # index of achievement in results
+      ind = achievements.index(achievement) + len(general_columns) # index of achievement in results
       where_clause.append(f"{achievement}>0")
       if num:
         self.goal = f"Levels that quickly farm **{num} {achievement.title()}** Enemies"
         self.info = ["KILL","TIME","RUN","SUM_T"]
         self.info_fun = lambda row: [row[ind], f"{row[4]/2.0+self.extra_t:.0f}", 
-                        int(-(-num // row[ind])), f"{(row[4]/2.0+self.extra_t) * (-(-num//row[ind])):.0f}"]
+                        int(-(-num // row[ind])), f"{row[-1]:.0f}"]
         num = float(num)
-        sort_method = f"(time/2.0+{self.extra_t})*(CAST (({num}/{achievement}) AS INT)+(({num}/{achievement})>CAST (({num}/{achievement}) AS INT)))"
+        criteria_str = f"(time/2.0+{self.extra_t})*(CAST (({num}/{achievement}) AS INT)+(({num}/{achievement})>CAST (({num}/{achievement}) AS INT)))"
+        select_clause.append(f"MIN({criteria_str}) AS criteria")
+        sort_method = "criteria ASC"
       else:
         self.goal = f"Levels that quickly farm **{achievement.title()}** Enemies"
         self.info = ["KILL","TIME","KPS"]
-        self.info_fun = lambda row: [row[ind], f"{row[4]/2.0+self.extra_t:.0f}", f"{float(row[ind])/(row[4]/2.0+self.extra_t):.2f}"]
-        sort_method = f"CAST((time/2.0+{self.extra_t}) AS FLOAT)/{achievement}"
+        self.info_fun = lambda row: [row[ind], f"{row[4]/2.0+self.extra_t:.0f}", f"{row[-1]:.2f}"]
+        criteria_str = f"CAST({achievement} AS FLOAT)/(time/2.0+{self.extra_t})"
+        select_clause.append(f"MAX({criteria_str}) AS criteria")
+        sort_method = f"criteria DESC"
     where_clause = " AND ".join(where_clause) if where_clause else "TRUE"
     select_clause = ", ".join(select_clause)
     self.result = self.context.bot.db[self.context.guild.id].query(
-      f"SELECT {select_clause} FROM achievement NATURAL JOIN levels WHERE ({where_clause}) ORDER BY {sort_method} ASC LIMIT {limit}")
+      f"SELECT {select_clause} FROM achievement NATURAL JOIN levels WHERE ({where_clause}) GROUP BY level, mode ORDER BY {sort_method} LIMIT {limit}")
     if not self.result:
       raise custom_exceptions.DataNotFound("Achievement", f"{achievement} in W{world}" if world else achievement)
     self.update_state(0)
@@ -428,7 +436,7 @@ class LevelAchievementMessage(InteractiveMessage):
       embed.add_field(name="For Level Details:", value=instruction, inline=False)
     else: # return the level info
       level, name, mode, strategy, time, link, remark = self.current_row[:7]
-      kills = self.current_row[7:]
+      kills = self.current_row[7:-1]
       description = []
       if strategy == "long":
         if remark == "boss":
@@ -440,6 +448,8 @@ class LevelAchievementMessage(InteractiveMessage):
           description.append("⚔️ Strategy: Kill the boss as fast as you can")
         else:
           description.append("⚔️ Strategy: Compelete the mission as fast as you can")
+      elif strategy.startswith("skip"):
+        description.append(f"⚔️ Strategy: {strategy.capitalize()} by killing the boss quickly, but delay as long as you can in other waves")
       else:
         description.append("⚔️ Strategy: Kill all enemies as fast as you can")
       description.append(f"⏳ Completion Time (x1 speed): {time}s")

@@ -356,8 +356,20 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
               strategy = "short"
               time, achievement_count = parse_achievements(parsed_level["enemy_waves"][:-1])
               db.insert_or_update("achievement", level, mode, strategy, time, *achievement_count.values())
+          elif level in ["S1","S5","S6","S9","S10","S36","S38"]: # SR boss levels, you can choose to skip waves
+            wave_num = len(parsed_level["enemy_waves"])
+            for ind in range(1, 2**wave_num):
+               valid_waves = [int(d) for d in bin(ind)[2:].zfill(wave_num)] # a list of 0's and 1's
+               skipped_waves = [str(i+1) for i in range(len(valid_waves)) if valid_waves[i]==0] # a list of skipped waves
+               if skipped_waves:
+                 strategy = "skip wave " + ", ".join(skipped_waves)
+               else:
+                 strategy = "long"
+               valid_waves = [parsed_level["enemy_waves"][i] for i in range(len(valid_waves)) if valid_waves[i]==1]
+               time, achievement_count = parse_achievements(valid_waves)
+               db.insert_or_update("achievement", level, mode, strategy, time, *achievement_count.values())
           else:
-            if level in ["S1","S5","S6","S9","S10","S36","S38","A5-1","A5-2","A5-3"]:
+            if level in ["A5-1","A5-2","A5-3"]:
               # these levels can be run as long as possible
               strategy = "long"
             else:
