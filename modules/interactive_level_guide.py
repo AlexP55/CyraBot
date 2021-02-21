@@ -435,8 +435,9 @@ class LevelAchievementMessage(InteractiveMessage):
       instruction = f"{text_emojis['info']} Summary {num_emojis[1]}-{num_emojis[len(self.result)]} Results"
       embed.add_field(name="For Level Details:", value=instruction, inline=False)
     else: # return the level info
-      level, name, mode, strategy, time, link, remark = self.current_row[:7]
-      kills = self.current_row[7:-1]
+      general_columns_num = 7
+      level, name, mode, strategy, time, link, remark = self.current_row[:general_columns_num]
+      kills = self.current_row[general_columns_num:general_columns_num+len(achievements)]
       description = []
       if strategy == "long":
         if remark == "boss":
