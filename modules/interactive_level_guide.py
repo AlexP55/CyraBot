@@ -209,8 +209,7 @@ class LevelIndividualMessage(InteractiveMessage):
     
   async def get_embed(self):
     level, world, name, handicap, tappable, link, remark = self.dbrow
-    if remark:
-      description = f"Level Type: {remark.title()}"
+    description = f"Level Type: {remark.title()}" if remark else None
     embed = discord.Embed(title=f"{level}. {name}", colour=discord.Colour.green(), timestamp=datetime.utcnow(), description=description)
     if handicap and handicap != "NONE":
       embed.add_field(name="Legendary Handicap:", value=handicap, inline=False)

@@ -1,9 +1,10 @@
 import discord
 from discord.ext import commands
 from base.modules.access_checks import has_admin_role
+from modules.custom_exceptions import DataNotFound
 import xlrd
 from base.modules.constants import DB_PATH as path
-from modules.cyra_constants import achievements, achievemets_dict
+from modules.cyra_constants import achievements, achievemets_dict, level_boss
 from modules.level_parser import parse_achievements, parse_wave
 import os
 import json
@@ -344,10 +345,19 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
           waves = entry["enemy_waves"]
           for wave in waves:
             parsed_level["enemy_waves"].append(parse_wave(wave))
+            
+          # get level info
+          result = db.select("levels", level)
+          remark = result["remark"] if result else ""
+            
+          # add additional boss info to the level
+          if name in level_boss:
+            for wave in level_boss[name]:
+              for enemy in level_boss[name][wave]:
+                parsed_level["enemy_waves"][wave]["enemies"][enemy] = level_boss[name][wave][enemy]
+          
           # parse achievements info
-          if (mode != "legendary" and level in 
-             ["10","20","30","40","50","60","70","80","90","100","110","130","140","150",
-             "160","170","180","190","200","C1-5","C2-10","C3-9","C3-10","C6-3","C6-6","C6-10"]):
+          if (mode != "legendary" and remark == "boss"):
             # boss level, can skip the last wave by instantly killing the boss
             strategy = "long"
             time, achievement_count = parse_achievements(parsed_level["enemy_waves"])
@@ -356,7 +366,7 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
               strategy = "short"
               time, achievement_count = parse_achievements(parsed_level["enemy_waves"][:-1])
               db.insert_or_update("achievement", level, mode, strategy, time, *achievement_count.values())
-          elif level in ["S1","S5","S6","S9","S10","S36","S38"]: # SR boss levels, you can choose to skip waves
+          elif remark == "boss rush": # SR boss levels, you can choose to skip waves
             wave_num = len(parsed_level["enemy_waves"])
             for ind in range(1, 2**wave_num):
                valid_waves = [int(d) for d in bin(ind)[2:].zfill(wave_num)] # a list of 0's and 1's
@@ -369,7 +379,7 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
                time, achievement_count = parse_achievements(valid_waves)
                db.insert_or_update("achievement", level, mode, strategy, time, *achievement_count.values())
           else:
-            if level in ["A5-1","A5-2","A5-3"]:
+            if level.startswith("A5-"):
               # these levels can be run as long as possible
               strategy = "long"
             else:

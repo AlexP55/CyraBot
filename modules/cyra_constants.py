@@ -241,6 +241,47 @@ achievement_synonyms.update({ # synonyms for "fast"
 "short": "fast"
 })
 
+level_boss = { # additional boss info which is not in assets
+"10_campaign":{-1:{"Slime Mage Boss":1}},
+"10_legendary":{-1:{"Slime Mage Boss":1}},
+"20_campaign":{-1:{"Slime King Boss":1}},
+"20_legendary":{-1:{"Slime King Boss":1}},
+"30_campaign":{-1:{"Yeti Boss":1}},
+"30_legendary":{-1:{"Yeti Boss":1}},
+"40_campaign":{-1:{"Goblin Boss":1}},
+"40_legendary":{-1:{"Goblin Boss":1}},
+"50_campaign":{-1:{"Sethos Boss":1}},
+"60_campaign":{-1:{"Helios Boss":1}},
+"70_campaign":{-1:{"Pharaoh Guardian":2}},
+"80_campaign":{-1:{"Pharaoh Guardian":4, "Pharaoh Boss":1}},
+"90_campaign":{-1:{"Yan Boss":1}},
+"100_campaign":{-1:{"Narlax Boss":1}},
+"110_campaign":{-1:{"Narlax Boss":1}},
+"130_campaign":{-1:{"Leif Boss":1}},
+"140_campaign":{-1:{"Caldera Boss":1}},
+"150_campaign":{-1:{"Ent Rider Campaign":1}},
+"160_campaign":{-1:{"Ancient Tree Boss":1}},
+"170_campaign":{-1:{"Rokujo Campaign":1}},
+"180_campaign":{-1:{"Raijin Campaign":1}},
+"190_campaign":{-1:{"Koizuul Campaign":1}},
+"200_campaign":{-1:{"Gashadokuro Campaign":1}},
+"C1-5":{-4:{"Skeleton Boss":1}, -1:{"Skeleton Boss":2, "Death Knight Challenge":1}},
+"C2-10":{-1:{"Crystal Guardian":6, "Lich King":1}},
+"C3-9":{-1:{"Scarab Boss":1}},
+"C3-10":{-1:{"Scarab Boss":1}},
+"C6-3":{-1:{"Skeletal Rokujo Challenge":1}},
+"C6-6":{-1:{"Skeletal Koizuul Challenge":1}},
+"C6-10":{-1:{"Skeletal Raijin Challenge":1}},
+"E2":{14:{"Skeleton Boss":1}},
+"S1":{0:{"Skeleton Boss":1}, 1:{"Slime King Boss":1}, 2:{"Skeleton Boss":1}, 3:{"Slime Mage Boss":1}, 4:{"Slime King Boss":1}, 5:{"Slime Mage Boss":1}},
+"S5":{0:{"Skeleton Boss":1}, 1:{"Slime Mage Boss":1}, 2:{"Skeleton Boss":1}, 3:{"Slime King Boss":1}, 4:{"Slime Mage Boss":1}, 5:{"Slime King Boss":1}},
+"S6":{0:{"Skeleton Boss":1}, 1:{"Goblin Boss":1}, 2:{"Skeleton Boss":1}, 3:{"Yeti Boss":1}, 4:{"Goblin Boss":1}, 5:{"Yeti Boss":1}},
+"S9":{0:{"Skeleton Boss":1}, 1:{"Yeti Boss":1}, 2:{"Skeleton Boss":1}, 3:{"Goblin Boss":1}, 4:{"Yeti Boss":1}, 5:{"Goblin Boss":1}},
+"S10":{0:{"Skeleton Boss":1}, 1:{"Goblin Boss":1}, 2:{"Yeti Boss":1}, 3:{"Goblin Boss":1}, 4:{"Skeleton Boss":1}, 5:{"Yeti Boss":1}},
+"S36":{0:{"Goblin Boss":1}, 1:{"Skeleton Boss":1}, 2:{"Yeti Boss":1}, 3:{"Skeleton Boss":1}, 4:{"Goblin Boss":1}, 5:{"Yeti Boss":1}},
+"S38":{0:{"Goblin Boss":1}, 1:{"Skeleton Boss":1}, 2:{"Yeti Boss":1}, 3:{"Skeleton Boss":1}, 4:{"Goblin Boss":1}, 5:{"Yeti Boss":1}},
+}
+
 bot_state = {
   "_default":{
     "mod_role":"Enforcer",
