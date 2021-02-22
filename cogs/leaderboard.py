@@ -313,8 +313,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
         time = "???"
       else:
         minutes, seconds = divmod(time, 60)
-        seconds, reminder = divmod(seconds, 1)
-        time = f"{minutes:02.0f}:{seconds:02.0f}.{reminder*1000:03.0f}"
+        time = f"{minutes:02.0f}:{seconds:05.3f}"
       kill = "???" if kill is None else str(kill)
       table.append([r_emoji, flag, name, heroes, kill, time, mention])
     name_maxlen = max([len(table[i][2]) for i in range(len(table))])
