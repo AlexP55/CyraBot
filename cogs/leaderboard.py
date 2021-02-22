@@ -2,7 +2,7 @@ import discord
 from discord.ext import commands
 from modules.cyra_converter import hero_emoji_converter, find_hero, TournamentTimeConverter
 from base.modules.basic_converter import UnicodeEmoji
-from base.modules.access_checks import has_mod_role
+from base.modules.access_checks import has_mod_role, mod_role_check
 from base.modules.constants import CACHE_PATH as path, num_emojis, arrow_emojis, letter_emojis, empty_space
 from base.modules.interactive_message import InteractiveMessage
 from datetime import datetime, timedelta
@@ -143,7 +143,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       heroes = heroes[0:3]
     self.bot.db[context.guild.id].insert_or_update("leaderboard", player.id, self.season, self.week, *heroes, 
                                                    kill, time.total_seconds() if time else None, group_rank, gm_rank)
-    await context.send("GM score submitted successfully!")
+    await context.send(f"GM score of {player} submitted successfully!")
     await self.update_dynamic_leaderboard(context)
     
   @_ldb.command(
@@ -155,7 +155,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
   @has_mod_role()
   async def _ldb_delete(self, context, player:discord.Member):
     self.bot.db[context.guild.id].delete_row("leaderboard", [player.id, self.season, self.week])
-    await context.send("GM score deleted successfully!")
+    await context.send(f"GM score of {player} deleted successfully!")
     await self.update_dynamic_leaderboard(context)
     
   @_ldb.command(
@@ -164,10 +164,10 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     help="Registers player info to be displayed on leaderboard.",
   )
   async def _ldb_register(self, context, gameid, player:typing.Optional[discord.Member], flag:typing.Optional[UnicodeEmoji]):
-    if player is None:
+    if player is None or not mod_role_check(context):
       player = context.author
     self.bot.db[context.guild.id].insert_or_update("player_info", player.id, gameid, flag)
-    await context.send("Player info registered successfully!")
+    await context.send(f"Player info of {player} registered successfully!")
     
   @_ldb.command(
     name="blessed",
@@ -181,7 +181,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       await context.send("Week number must be a positive integer!")
       return
     self.bot.db[context.guild.id].insert_or_update("blessed_hero", self.season, self.week if week is None else week, hero)
-    await context.send("Blessed hero updated successfully!")
+    await context.send(f"Season {self.season} week {self.week} blessed hero {hero.title()} updated successfully!")
     
   @_ldb.command(
     name="season",
