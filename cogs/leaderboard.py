@@ -3,7 +3,7 @@ from discord.ext import commands
 from modules.cyra_converter import hero_emoji_converter, find_hero, TournamentTimeConverter
 from base.modules.basic_converter import UnicodeEmoji
 from base.modules.access_checks import has_mod_role
-from base.modules.constants import CACHE_PATH as path, num_emojis, arrow_emojis, letter_emojis
+from base.modules.constants import CACHE_PATH as path, num_emojis, arrow_emojis, letter_emojis, empty_space
 from base.modules.interactive_message import InteractiveMessage
 from datetime import datetime, timedelta
 import enum
@@ -20,8 +20,26 @@ async def fetch_msg(guild, channelid, messageid):
     return await channel.fetch_message(messageid)
   except:
     return None
+    
+def size_limit_grouping(lines, size_limits, separator="\n"):
+  ind = -1
+  output = [""] * len(size_limits)
+  while lines:
+    new_line = lines.pop(0)
+    if ind < 0 or len(output[ind]) + len(new_line) + len(separator) > size_limits[ind]:
+      ind += 1
+      if ind >= len(size_limits):
+        lines.insert(1, new_line)
+        break
+      output[ind] = new_line
+      assert len(output[ind]) <= size_limits[ind]
+    else:
+      output[ind] = f"{output[ind]}{separator}{new_line}"
+  return output
 
 class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
+  embed_size_group = [2048, 1024, 1024, 1024]
+
   def __init__(self, bot):
     self.bot = bot
     self.params = {}
@@ -123,7 +141,6 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       heroes += [None] * (3-len(heroes))
     else:
       heroes = heroes[0:3]
-    print(str(time))
     self.bot.db[context.guild.id].insert_or_update("leaderboard", player.id, self.season, self.week, *heroes, 
                                                    kill, time.total_seconds() if time else None, group_rank, gm_rank)
     await context.send("GM score submitted successfully!")
@@ -260,13 +277,13 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     else:
       where_clause = "TRUE"
     # db query
-    leaderboard_query = (f"SELECT playerid, MAX(season*100+week), hero1, hero2, hero3, COUNT(playerid) AS gm_num "
+    leaderboard_query = (f"SELECT playerid, season, week, kill, time, MAX(season*100+week), hero1, hero2, hero3, COUNT(playerid) AS gm_num "
                          f"FROM leaderboard WHERE {where_clause} GROUP BY playerid")
     result = self.bot.db[guild.id].query(f"SELECT ldb.playerid, gameid, flag, hero1, hero2, hero3, gm_num "
                            f"FROM ({leaderboard_query}) AS ldb LEFT JOIN player_info on ldb.playerid=player_info.playerid "
-                           f"ORDER BY gm_num DESC")
+                           f"ORDER BY gm_num DESC, season ASC, week ASC, kill DESC NULLS LAST, time ASC NULLS LAST")
     # return the seasonly leaderboard embed
-    table = [["⬛", "⬛", "Game ID", "⬛⬛⬛", "GMs", "` Member `"]]
+    table = [["⬛", "⬛", "Game ID", "⬛⬛⬛", "GMs", "Member"]]
     rank = 0
     for playerid, gameid, flag, hero1, hero2, hero3, gm_num in result:
       rank += 1
@@ -274,22 +291,36 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       member = guild.get_member(playerid)
       name = gameid if gameid else (member.name if member else "???")
       if flag is None:
-        flag = "🏴"
+        flag = "🏁"
       heroes = "".join([hero if hero is not None else "⬛" for hero in [hero1, hero2, hero3]])
-      mention = member.mention if member is not None else ""
+      mention = str(member) if member is not None else ""
       table.append([r_emoji, flag, name, heroes, str(gm_num), mention])
     name_maxlen = max([len(table[i][2]) for i in range(len(table))])
     gm_num_maxlen = max([len(table[i][4]) for i in range(len(table))])
-    lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}  ` {heroes} ` {gm_num:<{gm_num_maxlen}}` {mention}"
+    mention_maxlen = max([len(table[i][5]) for i in range(len(table))])
+    lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}  ` {heroes} ` {gm_num:<{gm_num_maxlen}}` ` {mention:<{mention_maxlen}}`"
              for r_emoji, flag, name, heroes, gm_num, mention in table]
-    lines.insert(1, "`"+"-"*(name_maxlen+gm_num_maxlen+29)+"`")
-    lines = "\n".join(lines) 
+    lines.insert(1, "`"+"-"*(name_maxlen+gm_num_maxlen+mention_maxlen+22)+"`")
+    
     gm_emoji = self.bot.get_emoji(guild, "gm")
     descript_emoji = gm_emoji if gm_emoji else '🏆'
-    description = f"GM @ Season {season}" if season is not None else f"GM Since 2-21-2021"
-    description = f"{descript_emoji} **{description}** {descript_emoji}\n\n{lines}"
+    header = f"GM @ Season {season}" if season is not None else f"GM Since 2-21-2021"
+    header = f"{descript_emoji} **{header}** {descript_emoji}\n"
+    
+    lines.insert(0, header)
+    
+    # grouping the lines by size limit
+    group = size_limit_grouping(lines, self.embed_size_group)
+    description = group[0]
+    
     embed = discord.Embed(title=f"Discord GM Seasonal Leaderboard" if season is not None else f"Discord GM Leaderboard",
                           colour=discord.Colour.gold(), timestamp=datetime.utcnow(), description=description)
+    for i in range(1, len(group)):
+      if group[i]:
+        embed.add_field(name=empty_space, value=group[i], inline=False)
+    if lines: # there are remainding lines now showing
+      embed.add_field(name=empty_space, value=f"{len(lines)} user(s) not showing up in the table.", inline=False)
+    
     footer_emoji = self.bot.get_emoji(guild, "meteor")
     embed.set_footer(text="Seasonal GM" if season is not None else "GM Summary", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
     return embed
@@ -308,7 +339,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
                            f"FROM ({leaderboard_query}) AS ldb LEFT JOIN player_info on ldb.playerid=player_info.playerid "
                            f"ORDER BY kill DESC NULLS LAST, time ASC NULLS LAST")
     # return the weekly leaderboard embed
-    table = [["⬛", "⬛", "Game ID", "⬛⬛⬛", "Kill", "Time", "` Member `"]]
+    table = [["⬛", "⬛", "Game ID", "⬛⬛⬛", "Kill", "Time", "Member"]]
     rank = 0
     for playerid, gameid, flag, hero1, hero2, hero3, kill, time, group_rank, gm_rank in result:
       rank += 1
@@ -318,7 +349,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       if flag is None:
         flag = "🏁"
       heroes = "".join([hero if hero is not None else "⬛" for hero in [hero1, hero2, hero3]])
-      mention = member.mention if member is not None else ""
+      mention = str(member) if member is not None else ""
       if time is None:
         time = "???"
       else:
@@ -329,18 +360,29 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     name_maxlen = max([len(table[i][2]) for i in range(len(table))])
     kill_maxlen = max([len(table[i][4]) for i in range(len(table))])
     time_maxlen = max([len(table[i][5]) for i in range(len(table))])
-    lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}  ` {heroes} ` {kill:<{kill_maxlen}}` ` {time:<{time_maxlen}}` {mention}"
+    mention_maxlen = max([len(table[i][6]) for i in range(len(table))])
+    lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}  ` {heroes} ` {kill:<{kill_maxlen}}` ` {time:<{time_maxlen}}` ` {mention:<{mention_maxlen}}`"
              for r_emoji, flag, name, heroes, kill, time, mention in table]
-    lines.insert(1, "`"+"-"*(name_maxlen+kill_maxlen+time_maxlen+31)+"`")
-    lines = "\n".join(lines)
+    lines.insert(1, "`"+"-"*(name_maxlen+kill_maxlen+time_maxlen+mention_maxlen+24)+"`")
     gm_emoji = self.bot.get_emoji(guild, "gm")
     descript_emoji = gm_emoji if gm_emoji else '🏆'
-    description = f"{descript_emoji} **GM @ Season {season} Week {week}** {descript_emoji}"
+    header = f"{descript_emoji} **GM @ Season {season} Week {week}** {descript_emoji}\n"
     if blessed is not None:
-      description = f"{description}\nBlessed hero: {blessed}"
-    description = f"{description}\n\n{lines}"
+      header = f"{header}Blessed hero: {blessed}\n"
+    
+    lines.insert(0, header)
+    
+    # grouping the lines by size limit
+    group = size_limit_grouping(lines, self.embed_size_group)
+    description = group[0]
     embed = discord.Embed(title=f"Discord GM Weekly Leaderboard", colour=discord.Colour.gold(), 
                           timestamp=datetime.utcnow(), description=description)
+    for i in range(1, len(group)):
+      if group[i]:
+        embed.add_field(name=empty_space, value=group[i], inline=False)
+    if lines: # there are remainding lines now showing
+      embed.add_field(name=empty_space, value=f"{len(lines)} user(s) not showing up in the table.", inline=False)
+      
     footer_emoji = self.bot.get_emoji(guild, "meteor")
     embed.set_footer(text="Weekly GM", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
     return embed
