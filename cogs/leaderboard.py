@@ -289,7 +289,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       rank += 1
       r_emoji = self.get_rank_emoji(guild, rank)
       member = guild.get_member(playerid)
-      name = gameid if gameid else (member.name if member else "???")
+      name = gameid if gameid else (member.display_name if member else "???")
       if flag is None:
         flag = "🏁"
       heroes = "".join([hero if hero is not None else "⬛" for hero in [hero1, hero2, hero3]])
@@ -300,7 +300,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     mention_maxlen = max([len(table[i][5]) for i in range(len(table))])
     lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}  ` {heroes} ` {gm_num:<{gm_num_maxlen}}` ` {mention:<{mention_maxlen}}`"
              for r_emoji, flag, name, heroes, gm_num, mention in table]
-    lines.insert(1, "`"+"-"*(name_maxlen+gm_num_maxlen+mention_maxlen+22)+"`")
+    lines.insert(1, "")
     
     gm_emoji = self.bot.get_emoji(guild, "gm")
     descript_emoji = gm_emoji if gm_emoji else '🏆'
@@ -345,7 +345,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       rank += 1
       r_emoji = self.get_rank_emoji(guild, rank)
       member = guild.get_member(playerid)
-      name = gameid if gameid else (member.name if member else "???")
+      name = gameid if gameid else (member.display_name if member else "???")
       if flag is None:
         flag = "🏁"
       heroes = "".join([hero if hero is not None else "⬛" for hero in [hero1, hero2, hero3]])
@@ -363,7 +363,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     mention_maxlen = max([len(table[i][6]) for i in range(len(table))])
     lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}  ` {heroes} ` {kill:<{kill_maxlen}}` ` {time:<{time_maxlen}}` ` {mention:<{mention_maxlen}}`"
              for r_emoji, flag, name, heroes, kill, time, mention in table]
-    lines.insert(1, "`"+"-"*(name_maxlen+kill_maxlen+time_maxlen+mention_maxlen+24)+"`")
+    lines.insert(1, "")
     gm_emoji = self.bot.get_emoji(guild, "gm")
     descript_emoji = gm_emoji if gm_emoji else '🏆'
     header = f"{descript_emoji} **GM @ Season {season} Week {week}** {descript_emoji}\n"
