@@ -278,10 +278,10 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     descript_emoji = gm_emoji if gm_emoji else '🏆'
     description = f"GM @ Season {season}" if season is not None else f"GM Since 2-21-2021"
     description = f"{descript_emoji} **{description}** {descript_emoji}\n\n{lines}"
-    embed = discord.Embed(title=f"Discord Tournament Leaderboard", colour=discord.Colour.gold(), 
-                          timestamp=datetime.utcnow(), description=description)
+    embed = discord.Embed(title=f"Discord GM Seasonal Leaderboard" if season is not None else f"Discord GM Leaderboard",
+                          colour=discord.Colour.gold(), timestamp=datetime.utcnow(), description=description)
     footer_emoji = self.bot.get_emoji(guild, "meteor")
-    embed.set_footer(text="GM Seasonly Summary", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
+    embed.set_footer(text="Seasonal GM" if season is not None else "GM Summary", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
     return embed
     
   def get_week_leaderboard(self, guild, season=0, week=0):
@@ -329,10 +329,10 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     if blessed is not None:
       description = f"{description}\nBlessed hero: {blessed}"
     description = f"{description}\n\n{lines}"
-    embed = discord.Embed(title=f"Discord Tournament Leaderboard", colour=discord.Colour.gold(), 
+    embed = discord.Embed(title=f"Discord GM Weekly Leaderboard", colour=discord.Colour.gold(), 
                           timestamp=datetime.utcnow(), description=description)
     footer_emoji = self.bot.get_emoji(guild, "meteor")
-    embed.set_footer(text="GM Weekly Summary", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
+    embed.set_footer(text="Weekly GM", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
     return embed
     
   def get_rank_emoji(self, guild, rank):
