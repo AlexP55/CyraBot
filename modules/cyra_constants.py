@@ -53,6 +53,11 @@ hero_list = [
   "shamiko","smoulder","yan","normal connie","cyra","elara",
 ]
 
+emoji_dict = {
+  "ConnieNecro": "connie",
+  "Connie": "normal connie"
+}
+
 hero_transformable = {
   "leif": ("Weapon lv1", "Weapon lv6"),
   "caldera": ("True Form", "Giant Form"),

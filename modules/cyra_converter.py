@@ -3,7 +3,7 @@ import re
 import discord
 from discord.ext import commands
 import modules.custom_exceptions as custom_exceptions
-from modules.cyra_constants import hero_synonyms, ability_synonyms, hero_list, achievements, achievement_synonyms
+from modules.cyra_constants import hero_synonyms, ability_synonyms, hero_list, achievements, achievement_synonyms, emoji_dict
 
 def find_closest(word, word_list):
   close_word = difflib.get_close_matches(word, word_list, n=1)
@@ -13,9 +13,10 @@ def find_closest(word, word_list):
   
 def find_hero_from_emoji(ctx, argument):
   # read a hero emoji
-  match = re.match(r'<(a?):hero_([a-zA-Z]+)([0-9]+):([0-9]+)>$', argument)
+  match = re.match(r'<(a?):hero_([a-zA-Z]+)([0-9]+)?:([0-9]+)>$', argument)
   if match:
-    hero_name = match.group(2).lower()
+    hero_name = match.group(2)
+    hero_name = emoji_dict[hero_name] if hero_name in emoji_dict else hero_name.lower()
     if hero_name not in hero_list:
       raise custom_exceptions.HeroNotFound(hero_name.title())
     emoji_id = int(match.group(4))
