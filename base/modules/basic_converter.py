@@ -26,6 +26,7 @@ def DateConverter(argument):
   return date
   
 def TimedeltaConverter(argument):
+  # format ??d??h??m??s??ms
   regex = re.compile(r'((?P<days>\d+?)d)?((?P<hours>\d+?)h)?((?P<minutes>\d+?)m)?((?P<seconds>\d+?)s)?((?P<milliseconds>\d+?)ms)?')
   parts = regex.match(argument)
   if not parts:
