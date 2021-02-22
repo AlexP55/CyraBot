@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands, tasks
-from modules.cyra_converter import find_hero
+from modules.cyra_converter import find_hero_from_text
 from base.modules.constants import CACHE_PATH as path
 import logging
 import json
@@ -13,7 +13,7 @@ def hero_and_secret(arg):
   if arg == "secret":
     return "secret"
   else:
-    return find_hero(arg)
+    return find_hero_from_text(arg)
 
 class TransformationCog(commands.Cog, name="Transformation Commands"):
   def __init__(self, bot):
