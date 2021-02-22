@@ -24,6 +24,13 @@ def find_hero_from_emoji(ctx, argument):
       emoji = ctx.bot.get_emoji(ctx.guild, hero_name)
     return hero_name, emoji
   raise custom_exceptions.HeroNotFound(argument.title())
+  
+def find_hero_from_text(word):
+  word = word.lower()
+  close_word = find_closest(word, list(hero_synonyms))
+  if close_word:
+    return hero_synonyms[close_word]
+  raise custom_exceptions.HeroNotFound(word.title())
 
 class find_hero(commands.Converter):
   # convert a hero input to a string
@@ -32,19 +39,15 @@ class find_hero(commands.Converter):
       hero, _ = find_hero_from_emoji(ctx, word)
       return hero
     except:
-      word = word.lower()
-      close_word = find_closest(word, list(hero_synonyms))
-      if close_word:
-        return hero_synonyms[close_word]
-      raise custom_exceptions.HeroNotFound(word.title())
+      return find_hero_from_text(word)
   
-class hero_emoji_converter(find_hero):
+class hero_emoji_converter(commands.Converter):
   # convert a hero input to an emoji, can be used to distinguish skins
   async def convert(self, ctx, argument):
     try:
-      _, emoji = find_hero_from_emoji(ctx, word)
+      _, emoji = find_hero_from_emoji(ctx, argument)
     except:
-      hero = await super().convert(ctx, argument)
+      hero = find_hero_from_text(argument)
       emoji = ctx.bot.get_emoji(ctx.guild, hero)
     if emoji:
       return emoji

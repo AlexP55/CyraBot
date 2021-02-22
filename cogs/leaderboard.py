@@ -280,7 +280,8 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     description = f"{descript_emoji} **{description}** {descript_emoji}\n\n{lines}"
     embed = discord.Embed(title=f"Discord Tournament Leaderboard", colour=discord.Colour.gold(), 
                           timestamp=datetime.utcnow(), description=description)
-    embed.set_footer(text="GM Seasonly Summary", icon_url=gm_emoji.url if gm_emoji else discord.Embed.Empty)
+    footer_emoji = self.bot.get_emoji(guild, "meteor")
+    embed.set_footer(text="GM Seasonly Summary", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
     return embed
     
   def get_week_leaderboard(self, guild, season=0, week=0):
@@ -330,7 +331,8 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     description = f"{description}\n\n{lines}"
     embed = discord.Embed(title=f"Discord Tournament Leaderboard", colour=discord.Colour.gold(), 
                           timestamp=datetime.utcnow(), description=description)
-    embed.set_footer(text="GM Weekly Summary", icon_url=gm_emoji.url if gm_emoji else discord.Embed.Empty)
+    footer_emoji = self.bot.get_emoji(guild, "meteor")
+    embed.set_footer(text="GM Weekly Summary", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
     return embed
     
   def get_rank_emoji(self, guild, rank):
