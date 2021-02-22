@@ -133,7 +133,7 @@ class CyraBot(BaseBot):
     
   def load_all_cogs(self):
     super().load_all_cogs()
-    self.load_cogs("cogs.general_information","cogs.stats_infomation","cogs.data_fetching", "cogs.transform_cyra")
+    self.load_cogs("cogs.general_information","cogs.stats_infomation","cogs.data_fetching", "cogs.transform_cyra", "cogs.leaderboard")
 
   async def on_guild_remove(self, guild):
     await super().on_guild_remove(guild)
@@ -152,6 +152,16 @@ class CyraBot(BaseBot):
       transFun=lambda x: float(x), checkFun=lambda x: x>=0, checkDescription="a non-negative number")
     self.default_settings["AUTO_TRANSFORM"] = DefaultSetting(name="AUTO_TRANSFORM", default="ON", description="on/off auto transform", 
       transFun=lambda x: x.upper(), checkFun=lambda x: x in ["ON", "OFF"], checkDescription="either ON or OFF")
+
+  def create_tables(self, guild):
+    super().create_tables(guild)
+    if "leaderboard" not in self.db[guild.id]:
+      self.db[guild.id].create_table("leaderboard", ["playerid", "season", "week"], playerid="int", season="int", week="int", 
+                                     hero1="txt", hero2="txt", hero3="txt", kill="int", time="real", group_rank="int", gm_rank="int")
+    if "player_info" not in self.db[guild.id]:
+      self.db[guild.id].create_table("player_info", "playerid", playerid="int", gameid="txt", flag="txt")
+    if "blessed_hero" not in self.db[guild.id]:
+      self.db[guild.id].create_table("blessed_hero", ["season", "week"], season="int", week="int", hero="txt")
   
   async def close(self):
     await super().close()
@@ -172,7 +182,7 @@ if __name__ == "__main__":
   cog_categories = {
     "Administration":["Database Commands", "Settings Management Commands", "Data Fetching Commands", "Administration Commands"],
     "Moderation":["Message Management Commands", "User Management Commands", "Channel Management Commands", "Moderation Commands", "Role Management Commands"],
-    "Information":["Stats Commands", "Information Commands"],
+    "Information":["Stats Commands", "Information Commands", "Leaderboard Commands"],
     "Miscellaneous":["Transformation Commands", "Command Management", "General Commands"]
   }
   intents = discord.Intents.default()

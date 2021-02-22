@@ -8,6 +8,7 @@ emoji_keys = {
   "medal":"item_Medal",
   "star":"item_star",
   "coin":"item_coin",
+  "meteor":"item_Meteor",
   "fee":"hero_Fee1",
   "lancelot":"hero_Lancelot1",
   "smoulder":"hero_Smoulder1",
@@ -31,7 +32,18 @@ emoji_keys = {
   "shamiko":"hero_Shamiko1",
   "cyra":"hero_Cyra1",
   "elara":"hero_Elara1",
-  "koizuul dragon":"hero_Koizuul2"
+  "koizuul dragon":"hero_Koizuul2",
+  "gm":"title_4_gm",
+  "squire":"title_1_squire",
+  "knight":"title_2_knight",
+  "ruler":"title_3_ruler",
+  "bronze":"league_1_bronze",
+  "silver":"league_2_silver",
+  "gold":"league_3_gold",
+  "platinum":"league_4_platinum",
+  "diamond":"league_5_diamond",
+  "master":"league_6_master",
+  "legendary":"league_7_legendary"
 }
 
 hero_list = [

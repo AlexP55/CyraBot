@@ -229,7 +229,7 @@ class InfoCog(commands.Cog, name="Information Commands"):
         "3rd place":f"100 {gem_emoji}, 300 {elixir_emoji}, 5 {medal_emoji}",
         "4th through 6th place":f"20 {gem_emoji}, 300 {elixir_emoji}, 3 {medal_emoji}",
         "7th through 10th place":f"10 {gem_emoji}, 100 {elixir_emoji}, 1 {medal_emoji}"}
-      icon = discord.utils.get(guild.emojis, name="league_1_bronze")
+      icon = self.bot.get_emoji(guild, "bronze")
     elif league.lower() in ["silver"]:
       league = "Silver League"
       description = "Top 3 of 15 get promoted."
@@ -238,7 +238,7 @@ class InfoCog(commands.Cog, name="Information Commands"):
         "3rd place":f"100 {gem_emoji}, 300 {elixir_emoji}, 10 {medal_emoji}",
         "4th through 6th place":f"20 {gem_emoji}, 300 {elixir_emoji}, 5 {medal_emoji}",
         "7th through 10th place":f"15 {gem_emoji}, 100 {elixir_emoji}, 3 {medal_emoji}"}
-      icon = discord.utils.get(guild.emojis, name="league_2_silver")
+      icon = self.bot.get_emoji(guild, "silver")
     elif league.lower() in ["gold"]:
       league = "Gold League"
       description = "Top 3 of 20 get promoted."
@@ -247,7 +247,7 @@ class InfoCog(commands.Cog, name="Information Commands"):
         "3rd place":f"150 {gem_emoji}, 800 {elixir_emoji}, 20 {medal_emoji}",
         "4th through 6th place":f"30 {gem_emoji}, 800 {elixir_emoji}, 10 {medal_emoji}",
         "7th through 10th place":f"20 {gem_emoji}, 400 {elixir_emoji}, 5 {medal_emoji}"}
-      icon = discord.utils.get(guild.emojis, name="league_3_gold")
+      icon = self.bot.get_emoji(guild, "gold")
     elif league.lower() in ["platinum","plat"]:
       league = "Platinum League"
       description = "Top 3 of 25 get promoted."
@@ -256,7 +256,7 @@ class InfoCog(commands.Cog, name="Information Commands"):
         "3rd place":f"200 {gem_emoji}, 800 {elixir_emoji}, 30 {medal_emoji}",
         "4th through 6th place":f"30 {gem_emoji}, 800 {elixir_emoji}, 15 {medal_emoji}",
         "7th through 10th place":f"20 {gem_emoji}, 400 {elixir_emoji}, 10 {medal_emoji}"}
-      icon = discord.utils.get(guild.emojis, name="league_4_platinum")
+      icon = self.bot.get_emoji(guild, "platinum")
     elif league.lower() in ["diamond", "dia"]:
       league = "Diamond League"
       description = "Top 5 of 30 get promoted."
@@ -265,7 +265,7 @@ class InfoCog(commands.Cog, name="Information Commands"):
         "4th and 5th place":f"200 {gem_emoji}, 1000 {elixir_emoji}, 50 {medal_emoji}",
         "6th through 10th place":f"40 {gem_emoji}, 1000 {elixir_emoji}, 25 {medal_emoji}",
         "11th through 15th place":f"25 {gem_emoji}, 500 {elixir_emoji}, 15 {medal_emoji}"}
-      icon = discord.utils.get(guild.emojis, name="league_5_diamond")
+      icon = self.bot.get_emoji(guild, "diamond")
     elif league.lower() in ["master"]:
       league = "Master League"
       description = "Top 5 of 30 get promoted."
@@ -274,10 +274,10 @@ class InfoCog(commands.Cog, name="Information Commands"):
         "4th and 5th place":f"200 {gem_emoji}, 1000 {elixir_emoji}, 80 {medal_emoji}",
         "6th through 10th place":f"40 {gem_emoji}, 1000 {elixir_emoji}, 40 {medal_emoji}",
         "11th through 15th place":f"25 {gem_emoji}, 500 {elixir_emoji}, 20 {medal_emoji}"}
-      icon = discord.utils.get(guild.emojis, name="league_6_master")
+      icon = self.bot.get_emoji(guild, "master")
     elif league.lower() in ["legend", "legendary", "grandmaster", 'gm']:
       league = "Legendary League"
-      gm_emoji = discord.utils.get(guild.emojis, name="title_4_gm")
+      gm_emoji = self.bot.get_emoji(guild, "gm")
       if gm_emoji is not None:
         description = f"Top 3 of 50 get Grandmaster title {gm_emoji}."
       else:
@@ -288,17 +288,14 @@ class InfoCog(commands.Cog, name="Information Commands"):
         "4th through 6th place":f"50 {gem_emoji}, 2000 {elixir_emoji}, 80 {medal_emoji}",
         "7th through 10th place":f"30 {gem_emoji}, 1000 {elixir_emoji}, 40 {medal_emoji}",
         "11th through 25th place":f"25 {gem_emoji}, 600 {elixir_emoji}, 20 {medal_emoji}"}
-      icon = discord.utils.get(guild.emojis, name="league_7_legendary")
+      icon = self.bot.get_emoji(guild, "legendary")
     else:
       await context.send(f"There is no league called {league}.")
       return
     embed = discord.Embed(title=league, description=description)
     for position, reward in rewards.items():
       embed.add_field(name=f"{position}:", value=f"{reward}", inline=False)
-    if icon is not None:
-      embed.set_footer(text="LEAGUE REWARDS", icon_url=icon.url)
-    else:
-      embed.set_footer(text="LEAGUE REWARDS")
+    embed.set_footer(text="LEAGUE REWARDS", icon_url=icon.url if icon else discord.Embed.Empty)
     await context.send(content=None, embed=embed)
     
   @commands.group(
