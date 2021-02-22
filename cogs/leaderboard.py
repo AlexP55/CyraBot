@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
-from modules.cyra_converter import hero_emoji_converter, find_hero
-from base.modules.basic_converter import UnicodeEmoji, TimedeltaConverter
+from modules.cyra_converter import hero_emoji_converter, find_hero, TournamentTimeConverter
+from base.modules.basic_converter import UnicodeEmoji
 from base.modules.access_checks import has_mod_role
 from base.modules.constants import CACHE_PATH as path, num_emojis, arrow_emojis, letter_emojis
 from base.modules.interactive_message import InteractiveMessage
@@ -102,18 +102,28 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     await guild.start()
     
   @_ldb.command(
+    name="info",
+    brief="Shows current season and week",
+    help="Shows current season and week.",
+  )
+  @has_mod_role()
+  async def _ldb_info(self, context):
+    await context.send(f"Current season: {self.season}\nCurrent week: {self.week}")
+    
+  @_ldb.command(
     name="submit",
     brief="Submits a GM run",
     help="Submits a GM run, the info will be updated on dynamic leaderboard.",
   )
   @has_mod_role()
   async def _ldb_submit(self, context, player:discord.Member, heroes:commands.Greedy[hero_emoji_converter],
-                        kill:int=None, time:TimedeltaConverter=None, group_rank:int=None, gm_rank:int=None):
+                        kill:int=None, time:TournamentTimeConverter=None, group_rank:int=None, gm_rank:int=None):
     heroes = [str(hero) for hero in heroes]
     if len(heroes) < 3:
       heroes += [None] * (3-len(heroes))
     else:
       heroes = heroes[0:3]
+    print(str(time))
     self.bot.db[context.guild.id].insert_or_update("leaderboard", player.id, self.season, self.week, *heroes, 
                                                    kill, time.total_seconds() if time else None, group_rank, gm_rank)
     await context.send("GM score submitted successfully!")
@@ -313,7 +323,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
         time = "???"
       else:
         minutes, seconds = divmod(time, 60)
-        time = f"{minutes:02.0f}:{seconds:05.3f}"
+        time = f"{minutes:02.0f}:{seconds:06.3f}"
       kill = "???" if kill is None else str(kill)
       table.append([r_emoji, flag, name, heroes, kill, time, mention])
     name_maxlen = max([len(table[i][2]) for i in range(len(table))])

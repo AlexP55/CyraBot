@@ -1,5 +1,6 @@
 import difflib
 import re
+from datetime import timedelta
 import discord
 from discord.ext import commands
 import modules.custom_exceptions as custom_exceptions
@@ -110,3 +111,18 @@ def numberComparisonConverter(argument):
     return int(numbers[0]), int(numbers[1])
   else:
     return int(argument)
+    
+def TournamentTimeConverter(argument):
+  # format minutes:seconds.milliseconds
+  regex = re.compile(r'^(?P<minutes>\d+?):(?P<seconds>\d+?)[.:](?P<milliseconds>\d+?)$')
+  parts = regex.match(argument)
+  if not parts:
+    raise Exception # cannot parse
+  parts = parts.groupdict()
+  time_params = {}
+  for (name, param) in parts.items():
+    if param:
+      time_params[name] = int(param)
+  if not time_params:
+    raise Exception # cannot parse
+  return timedelta(**time_params)
