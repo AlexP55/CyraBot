@@ -306,7 +306,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       member = guild.get_member(playerid)
       name = gameid if gameid else (member.name if member else "???")
       if flag is None:
-        flag = "🏴"
+        flag = "🏁"
       heroes = "".join([hero if hero is not None else "⬛" for hero in [hero1, hero2, hero3]])
       mention = member.mention if member is not None else ""
       if time is None:
