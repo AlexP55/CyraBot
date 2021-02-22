@@ -394,11 +394,11 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       r_emoji = self.bot.get_emoji(guild, "legendary")
     elif rank == 3:
       r_emoji = self.bot.get_emoji(guild, "master")
-    elif 4 <= rank <= 5:
+    elif rank <= 5:
       r_emoji = self.bot.get_emoji(guild, "diamond")
-    elif 6 <= rank == 7:
+    elif rank <= 7:
       r_emoji = self.bot.get_emoji(guild, "gold")
-    elif 8 <= rank <= 10:
+    elif rank <= 10:
       r_emoji = self.bot.get_emoji(guild, "silver")
     else:
       r_emoji = self.bot.get_emoji(guild, "bronze")
