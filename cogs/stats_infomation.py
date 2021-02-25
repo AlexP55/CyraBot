@@ -464,7 +464,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     elif name in ["slow"]:
       name = "slow"
       description = "Decrease the speed of a unit by some percentage value."
-      stack = "There are 4 kinds of slows and they stack with each other.\n1) The most common slow by 50% with a clock on top\n2) Slow by 25% from Sethos' R6 sandstorm\n3) Move speed x0.4 from Smoulder's r4 aura\n4) Slow from Shamiko"
+      stack = "There are 5 kinds of slows and they stack with each other.\n1) The most common slow by 50% with a clock on top\n2) Slow by 25% from Sethos' R6 sandstorm\n3) Move speed x0.4 from Smoulder's r4 aura\n4) Slow from Shamiko\n4) Slow by 60% from Elara's rifts' explosion (explosion only, slow from her active and aura of rifts is 50%)"
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/5/54/Slow.jpg/revision/latest?cb=20200822214559"
     elif name in ["cold"]:
       name = "cold"
