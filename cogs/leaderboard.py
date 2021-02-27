@@ -180,8 +180,9 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     if week is not None and week <= 0:
       await context.send("Week number must be a positive integer!")
       return
-    self.bot.db[context.guild.id].insert_or_update("blessed_hero", self.season, self.week if week is None else week, hero)
-    await context.send(f"Season {self.season} week {self.week} blessed hero {hero.title()} updated successfully!")
+    week = self.week if week is None else week
+    self.bot.db[context.guild.id].insert_or_update("blessed_hero", self.season, week, hero)
+    await context.send(f"Season {self.season} week {week} blessed hero {hero.title()} updated successfully!")
     
   @_ldb.command(
     name="season",
