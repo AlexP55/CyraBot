@@ -63,11 +63,11 @@ class SheetReader:
     if sheet is None:
       logging.warning("Warning, no levels sheet found")
       return
-    expected = 7
+    expected = 8
     if not sheet.ncols == expected:
       raise Exception(f"Levels sheet columns do not match, expected {expected} but found {sheet.ncols}")
     self.db.delete_table("levels")
-    self.db.create_table("levels", "level", level="txt", world="int", name="txt", handicap="txt", tappable="txt", link="txt", remark="txt")
+    self.db.create_table("levels", "level", level="txt", world="int", name="txt", handicap="txt", task="txt", tappable="txt", link="txt", remark="txt")
     self.insertSheet(sheet, "levels")
 
   def fetchQuotes(self):

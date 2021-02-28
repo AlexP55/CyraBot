@@ -3,7 +3,7 @@ from datetime import datetime
 import json
 import modules.custom_exceptions as custom_exceptions
 from base.modules.interactive_message import InteractiveMessage
-from modules.cyra_constants import world_url, tower_menu_url, achievements
+from modules.cyra_constants import world_url, tower_menu_url, achievements, tasks
 from base.modules.constants import num_emojis, text_emojis, letter_emojis
 from modules.level_parser import parse_wave_achievements, sum_dict
 
@@ -194,7 +194,7 @@ class LevelIndividualMessage(InteractiveMessage):
       for row in wave_info:
         if row[1].lower() == "legendary":
           self.legendary_info = row
-        elif row[1] in ["", "campaign"]:
+        elif row[1].lower() in ["", "campaign"]:
           self.wave_info = row
     if self.wave_info:
       self.child_emojis.append("👽")
@@ -203,14 +203,18 @@ class LevelIndividualMessage(InteractiveMessage):
     
   async def transfer_to_child(self, emoji):
     if emoji == "👽":
-      return LevelWaveMessage(self.level, self.wave_info[1], self, dbrow=self.wave_info, link=self.dbrow[5])
+      return LevelWaveMessage(self.level, self.wave_info[1], self, dbrow=self.wave_info, link=self.dbrow[6], task=self.dbrow[4])
     elif emoji == "🏆":
-      return LevelWaveMessage(self.level, self.legendary_info[1], self, dbrow=self.legendary_info, link=self.dbrow[5])
+      return LevelWaveMessage(self.level, self.legendary_info[1], self, dbrow=self.legendary_info, link=self.dbrow[6], task=self.dbrow[4])
     
   async def get_embed(self):
-    level, world, name, handicap, tappable, link, remark = self.dbrow
+    level, world, name, handicap, task, tappable, link, remark = self.dbrow
     description = f"Level Type: {remark.title()}" if remark else None
     embed = discord.Embed(title=f"{level}. {name}", colour=discord.Colour.green(), timestamp=datetime.utcnow(), description=description)
+    if task == "bandit":
+      embed.add_field(name="Campaign Task:", value="Kill the bandit", inline=False)
+    elif task == "villager":
+      embed.add_field(name="Campaign Task:", value="Protect the villager", inline=False)
     if handicap and handicap != "NONE":
       embed.add_field(name="Legendary Handicap:", value=handicap, inline=False)
     if tappable and tappable != "NONE":
@@ -240,13 +244,19 @@ class LevelWaveMessage(InteractiveMessage):
     self.achieve = False
     dbrow = attributes.pop("dbrow", None)
     self.link = attributes.pop("link", None)
+    self.task = attributes.pop("task", None)
     if not dbrow:
-      db = self.context.bot.db[self.context.guild.id]
-      dbrow = db.select("wave", [level, mode])
+      dbrow = self.context.bot.db[self.context.guild.id].select("wave", [level, mode])
       if not dbrow:
         raise custom_exceptions.DataNotFound("Level Waves", f"{level} {mode}" if mode else level)
       else:
         dbrow = list(dbrow.values())
+    if self.task is None:
+      level_general = self.context.bot.db[self.context.guild.id].select("levels", level)
+      if not level_general:
+        raise custom_exceptions.DataNotFound("Level", level)
+      else:
+        self.task = level_general["task"]
     if self.parent is None:
       self.parent = LevelIndividualMessage(level, **attributes)
     # check the level's wave data to decide its child emojis
@@ -311,15 +321,18 @@ class LevelWaveMessage(InteractiveMessage):
     embed = discord.Embed(title=f"Level {self.level} {self.mode.title()}", colour=discord.Colour.green(), 
                           timestamp=datetime.utcnow(), description=description)
     embed.add_field(name=f"{category}:", value=text, inline=False)
+    max_num_len = 1
     if enemies:
       max_num_len = max(len(str(num)) for num in enemies.values())
       if self.achieve:
-        text = "\n".join([f"`{num:<{max_num_len}} {enemy.title()} Enemies`" for enemy, num in enemies.items()])
+        kill_msg = [f"`{num:<{max_num_len}} {enemy.title()} Enemies`" for enemy, num in enemies.items()]
       else:
-        text = "\n".join([f"`{num:<{max_num_len}} {enemy}`" for enemy, num in enemies.items()])
+        kill_msg = [f"`{num:<{max_num_len}} {enemy.title()}`" for enemy, num in enemies.items()]
     else:
-      text = "None"
-    embed.add_field(name="Enemies:" if not self.achieve else "Achievements:", value=text, inline=False)
+      kill_msg = []
+    if self.state == 0 and self.mode != "legendary" and (self.task == "bandit" or (self.task == "villager" and self.achieve)):
+      kill_msg.append(f"`{1:<{max_num_len}} {self.task.title()}`")
+    embed.add_field(name="Enemies:" if not self.achieve else "Achievements:", value="\n".join(kill_msg) if kill_msg else "None", inline=False)
     if len(self.level_info["enemy_waves"]) > 1:
       wave_emojis = " ".join(num_emojis[1:len(self.level_info["enemy_waves"])+1])
       instruction = (f"{text_emojis['info']} Overview {num_emojis[1]}-{num_emojis[len(self.level_info['enemy_waves'])]} Wave Info\n"
@@ -333,6 +346,7 @@ class LevelWaveMessage(InteractiveMessage):
     return embed
     
 class LevelAchievementMessage(InteractiveMessage):
+  general_columns = ["level","name","mode","strategy","time","link","remark","task"]
     
   def __init__(self, achievement, num, parent=None, **attributes):
     super().__init__(parent, **attributes)
@@ -343,8 +357,7 @@ class LevelAchievementMessage(InteractiveMessage):
     mode = attributes.pop("mode", None)
     # use the world and mode arguments to limit the search
     where_clause = []
-    general_columns = ["level","name","mode","strategy","time","link","remark"]
-    select_clause = general_columns + achievements
+    select_clause = self.general_columns + achievements
     # the time required for entering exiting the level and
     self.extra_t = self.context.bot.get_setting(self.context.guild, "LEVEL_EXTRA_TIME")
     limit = self.context.bot.get_setting(self.context.guild, "SEARCH_LIMIT")-1
@@ -359,8 +372,16 @@ class LevelAchievementMessage(InteractiveMessage):
       self.info_fun = lambda row: [f"{row[-1]:.0f}"]
       select_clause.append(f"MIN(time/2.0+{self.extra_t}) AS criteria")
       sort_method = "criteria ASC"
+    elif achievement in tasks:
+      self.goal = f"Shortest levels where **{achievement.title()}s** can be found"
+      self.info = ["TIME"]
+      self.info_fun = lambda row: [f"{row[-1]:.0f}"]
+      select_clause.append(f"MIN(time/2.0+{self.extra_t}) AS criteria")
+      where_clause.append(f"task='{achievement}'")
+      where_clause.append(f'mode="campaign"')
+      sort_method = "criteria ASC"
     else:
-      ind = achievements.index(achievement) + len(general_columns) # index of achievement in results
+      ind = achievements.index(achievement) + len(self.general_columns) # index of achievement in results
       where_clause.append(f"{achievement}>0")
       if num:
         self.goal = f"Levels that quickly farm **{num} {achievement.title()}** Enemies"
@@ -383,7 +404,12 @@ class LevelAchievementMessage(InteractiveMessage):
     self.result = self.context.bot.db[self.context.guild.id].query(
       f"SELECT {select_clause} FROM achievement NATURAL JOIN levels WHERE ({where_clause}) GROUP BY level, mode ORDER BY {sort_method} LIMIT {limit}")
     if not self.result:
-      raise custom_exceptions.DataNotFound("Achievement", f"{achievement} in W{world}" if world else achievement)
+      condition = []
+      if world:
+        condition.append(f"W{world}")
+      if mode:
+        condition.append(f"{mode.title()} mode")
+      raise custom_exceptions.DataNotFound("Achievement", f"{achievement.title()} in {' '.join(condition)}" if condition else achievement.title())
     self.update_state(0)
       
   def update_state(self, state):
@@ -402,7 +428,7 @@ class LevelAchievementMessage(InteractiveMessage):
   async def transfer_to_child(self, emoji):
     if emoji == "👽":
       if self.state > 0:
-        return LevelWaveMessage(self.current_row[0], self.current_row[2], self, link=self.current_row[5])
+        return LevelWaveMessage(self.current_row[0], self.current_row[2], self, link=self.current_row[5], task=self.current_row[7])
       else:
         return None
     if emoji == text_emojis["info"]:
@@ -434,8 +460,8 @@ class LevelAchievementMessage(InteractiveMessage):
       instruction = f"{text_emojis['info']} Summary {num_emojis[1]}-{num_emojis[len(self.result)]} Results"
       embed.add_field(name="For Level Details:", value=instruction, inline=False)
     else: # return the level info
-      general_columns_num = 7
-      level, name, mode, strategy, time, link, remark = self.current_row[:general_columns_num]
+      general_columns_num = len(self.general_columns)
+      level, name, mode, strategy, time, link, remark, task = self.current_row[:general_columns_num]
       kills = self.current_row[general_columns_num:general_columns_num+len(achievements)]
       description = []
       if strategy == "long":
@@ -460,6 +486,8 @@ class LevelAchievementMessage(InteractiveMessage):
       for name, kill in zip(achievements, kills):
         if kill > 0:
           kill_msg.append(f"`{kill:<{max_kill_len}} {name.title()} Enemies`")
+      if task:
+        kill_msg.append(f"`{1:<{max_kill_len}} {task.title()}`")
       embed.add_field(name="Achievement Counts:", value="\n".join(kill_msg) if kill_msg else "None", inline=False)
       instruction = (f"{text_emojis['info']} Summary {num_emojis[1]}-{num_emojis[len(self.result)]} Results\n"
                      f"👽 Details of Enemy Waves")

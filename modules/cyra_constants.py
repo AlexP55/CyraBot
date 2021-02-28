@@ -234,9 +234,11 @@ achievemets_dict = {
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))
 
 tappables = ["trap", "hidden enemies", "loose change", "chicken dinner", "snowman", "windmill", "cow", "boneheaded", "seeker"]
+tasks = ["villager", "bandit"]
 
 achievement_synonyms = {achievement:achievement for achievement in achievements}
 achievement_synonyms.update({tappable:tappable for tappable in tappables})
+achievement_synonyms.update({task:task for task in tasks})
 achievement_synonyms.update({ # achievement synonyms
 "w6enemy":"w6",
 "world6":"w6",
@@ -282,6 +284,8 @@ level_boss = { # additional boss info which is not in assets
 "180_campaign":{-1:{"Raijin Campaign":1}},
 "190_campaign":{-1:{"Koizuul Campaign":1}},
 "200_campaign":{-1:{"Gashadokuro Campaign":1}},
+"C1-2":{-4:{"Death Knight Challenge":1}, -1:{"Death Knight Challenge":1}},
+"C1-4":{-4:{"Death Knight Challenge":1}, -1:{"Death Knight Challenge":1}},
 "C1-5":{-4:{"Skeleton Boss":1}, -1:{"Skeleton Boss":2, "Death Knight Challenge":1}},
 "C2-6":{-5:{"Crystal Guardian":1}, -1:{"Crystal Guardian":2}},
 "C2-10":{-1:{"Crystal Guardian":6, "Lich King":1}},
