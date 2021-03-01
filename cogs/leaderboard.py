@@ -320,7 +320,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       if group[i]:
         embed.add_field(name=empty_space, value=group[i], inline=False)
     if lines: # there are remainding lines now showing
-      embed.add_field(name=empty_space, value=f"{len(lines)} user(s) not showing up in the table.", inline=False)
+      embed.add_field(name=empty_space, value=f"{len(lines)} player(s) not displayed in the table.", inline=False)
     
     footer_emoji = self.bot.get_emoji(guild, "meteor")
     embed.set_footer(text="Seasonal GM" if season is not None else "GM Summary", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
@@ -382,7 +382,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       if group[i]:
         embed.add_field(name=empty_space, value=group[i], inline=False)
     if lines: # there are remainding lines now showing
-      embed.add_field(name=empty_space, value=f"{len(lines)} user(s) not showing up in the table.", inline=False)
+      embed.add_field(name=empty_space, value=f"{len(lines)} player(s) not displayed in the table.", inline=False)
       
     footer_emoji = self.bot.get_emoji(guild, "meteor")
     embed.set_footer(text="Weekly GM", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
