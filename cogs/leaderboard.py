@@ -282,7 +282,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
                          f"FROM leaderboard WHERE {where_clause} GROUP BY playerid")
     result = self.bot.db[guild.id].query(f"SELECT ldb.playerid, gameid, flag, hero1, hero2, hero3, gm_num "
                            f"FROM ({leaderboard_query}) AS ldb LEFT JOIN player_info on ldb.playerid=player_info.playerid "
-                           f"ORDER BY gm_num DESC, season ASC, week ASC, kill DESC NULLS LAST, time ASC NULLS LAST")
+                           f"ORDER BY gm_num DESC, season DESC, week DESC, kill DESC NULLS LAST, time ASC NULLS LAST")
     # return the seasonly leaderboard embed
     table = [["⬛", "⬛", "Game ID", "⬛⬛⬛", "GMs", "Member"]]
     rank = 0
