@@ -381,7 +381,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     for i in range(1, len(group)):
       if group[i]:
         embed.add_field(name=empty_space, value=group[i], inline=False)
-    if lines: # there are remainding lines now showing
+    if lines: # there are remaining lines not displayed
       embed.add_field(name=empty_space, value=f"{len(lines)} player(s) not displayed in the table.", inline=False)
       
     footer_emoji = self.bot.get_emoji(guild, "meteor")

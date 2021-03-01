@@ -209,18 +209,19 @@ class LevelIndividualMessage(InteractiveMessage):
     
   async def get_embed(self):
     level, world, name, handicap, task, tappable, link, remark = self.dbrow
-    description = f"Level Type: {remark.title()}" if remark else None
-    embed = discord.Embed(title=f"{level}. {name}", colour=discord.Colour.green(), timestamp=datetime.utcnow(), description=description)
+    descriptions = []
+    if remark: descriptions.append(f"🕹️ Level Type: {remark.title()}")
     if task == "bandit":
-      embed.add_field(name="Campaign Task:", value="Kill the bandit", inline=False)
+      descriptions.append(f"📝 Campaign Task: Kill the bandit")
     elif task == "villager":
-      embed.add_field(name="Campaign Task:", value="Protect the villager", inline=False)
-    if handicap and handicap != "NONE":
-      embed.add_field(name="Legendary Handicap:", value=handicap, inline=False)
+      descriptions.append(f"📝 Campaign Task: Protect the villager")
+    if handicap and handicap != "NONE": descriptions.append(f"🏅 Legendary Handicap: {handicap}")
+    description = "\n".join(descriptions) if descriptions else None
+    embed = discord.Embed(title=f"{level}. {name}", colour=discord.Colour.green(), timestamp=datetime.utcnow(), description=description)
     if tappable and tappable != "NONE":
       coin_emoji = self.context.bot.get_emoji(self.context.guild, "coin")
       if coin_emoji is not None:
-        tappable = tappable.replace(":moneybag:", f"{coin_emoji}")
+        tappable = tappable.replace("💰", f"{coin_emoji}")
       embed.add_field(name="Tappable(s):", value=tappable, inline=False)
     if self.wave_info or self.legendary_info:
       instructions = []

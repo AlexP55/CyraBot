@@ -88,14 +88,14 @@ class TowerIndividualMessage(InteractiveMessage):
     coin_emoji = self.context.bot.get_emoji(self.context.guild, "coin")
     star_emoji = self.context.bot.get_emoji(self.context.guild, "star")
     if star_emoji is not None:
-      self.towerInfo[1] = self.towerInfo[1].replace(":star:", f"{star_emoji}")
+      self.towerInfo[1] = self.towerInfo[1].replace("⭐", f"{star_emoji}")
     else:
       star_emoji = item_emojis["star"]
     if coin_emoji is not None:
-      self.towerInfo[2] = self.towerInfo[2].replace(":moneybag:", f"{coin_emoji}")
-      self.towerInfo[4] = self.towerInfo[4].replace(":moneybag:", f"{coin_emoji}")
-      self.towerInfo[6] = self.towerInfo[6].replace(":moneybag:", f"{coin_emoji}")
-      self.towerInfo[7] = self.towerInfo[7].replace(":moneybag:", f"{coin_emoji}")
+      self.towerInfo[2] = self.towerInfo[2].replace("💰", f"{coin_emoji}")
+      self.towerInfo[4] = self.towerInfo[4].replace("💰", f"{coin_emoji}")
+      self.towerInfo[6] = self.towerInfo[6].replace("💰", f"{coin_emoji}")
+      self.towerInfo[7] = self.towerInfo[7].replace("💰", f"{coin_emoji}")
     self.child_emojis = [text_emojis["info"], star_emoji, text_emojis["up"], letter_emojis["L"], letter_emojis["R"]]
     self.emoji_descriptions = ["Basic Info", "Star Upgrade", "Level Upgrade", "Left Branch", "Right Branch"]
     
