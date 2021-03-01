@@ -365,8 +365,8 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}` {heroes} ` {kill:<{kill_maxlen}}` ` {time:<{time_maxlen}}` ` {mention} `"
              for r_emoji, flag, name, heroes, kill, time, mention in table]
     lines.insert(1, "")
-    gm_emoji = self.bot.get_emoji(guild, "gm")
-    descript_emoji = gm_emoji if gm_emoji else '🏆'
+    descript_emoji = self.bot.get_emoji(guild, "medal")
+    descript_emoji = descript_emoji if descript_emoji else '🏆'
     header = f"{descript_emoji} **GM @ Season {season} Week {week}** {descript_emoji}\n"
     if blessed is not None:
       header = f"{header}Blessed hero: {blessed}\n"
