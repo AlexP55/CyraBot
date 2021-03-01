@@ -1,6 +1,6 @@
 import discord
 from discord.ext import commands
-from modules.cyra_converter import hero_emoji_converter, find_hero, TournamentTimeConverter
+from modules.cyra_converter import hero_emoji_converter, find_hero, TournamentTimeConverter, deEmojify
 from base.modules.basic_converter import UnicodeEmoji
 from base.modules.access_checks import has_mod_role, mod_role_check
 from base.modules.constants import CACHE_PATH as path, num_emojis, arrow_emojis, letter_emojis, empty_space
@@ -290,7 +290,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       rank += 1
       r_emoji = self.get_rank_emoji(guild, rank)
       member = guild.get_member(playerid)
-      name = gameid if gameid else (member.display_name if member else "???")
+      name = deEmojify(gameid if gameid else (member.display_name if member else "???"))
       if flag is None:
         flag = "🏁"
       heroes = "".join([hero if hero is not None else "⬛" for hero in [hero1, hero2, hero3]])
@@ -346,7 +346,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       rank += 1
       r_emoji = self.get_rank_emoji(guild, rank)
       member = guild.get_member(playerid)
-      name = gameid if gameid else (member.display_name if member else "???")
+      name = deEmojify(gameid if gameid else (member.display_name if member else "???"))
       if flag is None:
         flag = "🏁"
       heroes = "".join([hero if hero is not None else "⬛" for hero in [hero1, hero2, hero3]])
