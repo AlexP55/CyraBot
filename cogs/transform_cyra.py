@@ -124,7 +124,7 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
   )
   @commands.is_owner()
   @commands.cooldown(1, 600, commands.BucketType.guild)
-  async def _transform(self, context, hero:hero_and_secret=None):
+  async def _transform(self, context, hero:hero_and_secret=None, skin_num:int=None):
     before = self.bot.get_nick(context.guild).lower()
     if before == hero:
       await context.send(f"I'm currently {before.title()} so no need to transform.")
@@ -132,7 +132,7 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
     if hero is None:
       hero = self.get_random_trans_hero(before)
     after = hero
-    await self.bot.transform(context.guild, after)
+    await self.bot.transform(context.guild, after, skin=skin_num)
     if after == "cyra":
       await context.send(f"*{after.title()} has taken control back.*")
     elif after == "elara":

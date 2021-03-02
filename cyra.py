@@ -85,12 +85,16 @@ class CyraBot(BaseBot):
     #Send response
     await context.send(msg.format(context=context, error=error))
 
-  async def transform(self, guild: discord.Guild, name, change_avatar=True):
+  async def transform(self, guild: discord.Guild, name, change_avatar=True, skin:int=None):
     if change_avatar:
       # get all possible avatars
-      avatar_files = glob.glob(f"avatar/{name}*.png")
+      avatar_files = glob.glob(f"avatar/{name.title()}*.png")
       if avatar_files: # chooce a random skin
-        avatar_file = random.choice(avatar_files)
+        avatar_file = None
+        if skin is not None:
+          expect_file = f"avatar/{name.title()}{skin}.png"
+          if expect_file in avatar_files: avatar_file = expect_file
+        if avatar_file is None: avatar_file = random.choice(avatar_files)
         with open(avatar_file, "rb") as avatar:
           await self.user.edit(avatar=avatar.read())
     state = self.get_state(name)

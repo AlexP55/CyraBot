@@ -34,7 +34,6 @@ emoji_keys = {
   "elara":"hero_Elara1",
   "koizuul dragon":"hero_Koizuul2",
   "gm":"title_4_gm",
-  "squire":"title_1_squire",
   "knight":"title_2_knight",
   "ruler":"title_3_ruler",
   "bronze":"league_1_bronze",
