@@ -243,7 +243,8 @@ achievement_synonyms.update({ # achievement synonyms
 "world6":"w6",
 "bird":"flying",
 "air":"flying",
-"flier":"flying"
+"flier":"flying",
+"lavacreature":"lava"
 })
 achievement_synonyms.update({ # tappable synonyms
 "hidden": "hidden enemies",
