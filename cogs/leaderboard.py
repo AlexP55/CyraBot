@@ -319,8 +319,6 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     embed.set_footer(text="Seasonal GM" if season is not None else "GM Summary", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
     
     self.add_embed_fields(embed, lines)
-    
-    print(f"Embed size: {len(embed)}")
     return embed
     
   def get_week_leaderboard(self, guild, season=0, week=0):
@@ -380,8 +378,6 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     embed.set_footer(text="Weekly GM", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
     
     self.add_embed_fields(embed, lines)
-    
-    print(f"Embed size: {len(embed)}")
     return embed
     
   def add_embed_fields(self, embed, lines):
