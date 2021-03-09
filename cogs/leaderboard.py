@@ -29,7 +29,7 @@ def size_limit_grouping(lines, size_limits, separator="\n"):
     if ind < 0 or len(output[ind]) + len(new_line) + len(separator) > size_limits[ind]:
       ind += 1
       if ind >= len(size_limits):
-        lines.insert(1, new_line)
+        lines.insert(0, new_line)
         break
       output[ind] = new_line
       assert len(output[ind]) <= size_limits[ind]
@@ -38,7 +38,7 @@ def size_limit_grouping(lines, size_limits, separator="\n"):
   return output
 
 class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
-  embed_size_group = [2048, 1024, 1024, 1024]
+  embed_size_group = [2048, 1024, 1024, 1024, 1024]
 
   def __init__(self, bot):
     self.bot = bot
@@ -324,6 +324,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     
     footer_emoji = self.bot.get_emoji(guild, "meteor")
     embed.set_footer(text="Seasonal GM" if season is not None else "GM Summary", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
+    print(f"Embed size: {len(embed)}")
     return embed
     
   def get_week_leaderboard(self, guild, season=0, week=0):
@@ -386,6 +387,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       
     footer_emoji = self.bot.get_emoji(guild, "meteor")
     embed.set_footer(text="Weekly GM", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
+    print(f"Embed size: {len(embed)}")
     return embed
     
   def get_rank_emoji(self, guild, rank):
