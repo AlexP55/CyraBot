@@ -21,24 +21,23 @@ async def fetch_msg(guild, channelid, messageid):
   except:
     return None
     
-def size_limit_grouping(lines, size_limits, separator="\n"):
-  ind = -1
-  output = [""] * len(size_limits)
+def size_limit_join(lines, size_limit, separator="\n"):
+  if len(lines[0]) > size_limit:
+    return ""
+  output = lines.pop(0)
   while lines:
     new_line = lines.pop(0)
-    if ind < 0 or len(output[ind]) + len(new_line) + len(separator) > size_limits[ind]:
-      ind += 1
-      if ind >= len(size_limits):
-        lines.insert(0, new_line)
-        break
-      output[ind] = new_line
-      assert len(output[ind]) <= size_limits[ind]
+    if len(output) + len(new_line) + len(separator) > size_limit:
+      lines.insert(0, new_line)
+      break
     else:
-      output[ind] = f"{output[ind]}{separator}{new_line}"
+      output = f"{output}{separator}{new_line}"
   return output
 
 class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
-  embed_size_group = [2048, 1024, 1024, 1024, 1024]
+  embed_description_limit = 2048
+  embed_field_limit = 1024
+  embed_total_limit = 6000
 
   def __init__(self, bot):
     self.bot = bot
@@ -284,23 +283,24 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
                            f"FROM ({leaderboard_query}) AS ldb LEFT JOIN player_info on ldb.playerid=player_info.playerid "
                            f"ORDER BY gm_num DESC, season DESC, week DESC, kill DESC NULLS LAST, time ASC NULLS LAST")
     # return the seasonly leaderboard embed
-    table = [["⬛", "⬛", "Game ID", "⬛⬛⬛", "GMs", "Member"]]
+    table = [["", "⬛", "Game ID", "⬛⬛⬛", "GMs", "Member"]]
     rank = 0
     for playerid, gameid, flag, hero1, hero2, hero3, gm_num in result:
       rank += 1
-      r_emoji = self.get_rank_emoji(guild, rank)
+      #r_emoji = self.get_rank_emoji(guild, rank)
       member = guild.get_member(playerid)
       name = deEmojify(gameid if gameid else (member.display_name if member else "???"))
       if flag is None:
         flag = "🏁"
       heroes = "".join([hero if hero is not None else "⬛" for hero in [hero1, hero2, hero3]])
       mention = member.name if member is not None else ""
-      table.append([r_emoji, flag, name, heroes, str(gm_num), mention])
+      table.append([str(rank), flag, name, heroes, str(gm_num), mention])
+    rank_maxlen = max([len(table[i][0]) for i in range(len(table))])
     name_maxlen = max([len(table[i][2]) for i in range(len(table))])
     gm_num_maxlen = max([len(table[i][4]) for i in range(len(table))])
     #mention_maxlen = max([len(table[i][5]) for i in range(len(table))])
-    lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}` {heroes} ` {gm_num:<{gm_num_maxlen}}` ` {mention} `"
-             for r_emoji, flag, name, heroes, gm_num, mention in table]
+    lines = [f"`{rank:<{rank_maxlen}}` {flag} `{name:<{name_maxlen}}` {heroes} ` {gm_num:<{gm_num_maxlen}}` ` {mention} `"
+             for rank, flag, name, heroes, gm_num, mention in table]
     lines.insert(1, "")
     
     gm_emoji = self.bot.get_emoji(guild, "gm")
@@ -310,20 +310,16 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     
     lines.insert(0, header)
     
-    # grouping the lines by size limit
-    group = size_limit_grouping(lines, self.embed_size_group)
-    description = group[0]
+    # join the lines to get the description
+    description = size_limit_join(lines, self.embed_description_limit)
     
     embed = discord.Embed(title=f"Discord GM Seasonal Leaderboard" if season is not None else f"Discord GM Leaderboard",
                           colour=discord.Colour.gold(), timestamp=datetime.utcnow(), description=description)
-    for i in range(1, len(group)):
-      if group[i]:
-        embed.add_field(name=empty_space, value=group[i], inline=False)
-    if lines: # there are remainding lines now showing
-      embed.add_field(name=empty_space, value=f"{len(lines)} player(s) not displayed in the table.", inline=False)
-    
     footer_emoji = self.bot.get_emoji(guild, "meteor")
     embed.set_footer(text="Seasonal GM" if season is not None else "GM Summary", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
+    
+    self.add_embed_fields(embed, lines)
+    
     print(f"Embed size: {len(embed)}")
     return embed
     
@@ -341,11 +337,11 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
                            f"FROM ({leaderboard_query}) AS ldb LEFT JOIN player_info on ldb.playerid=player_info.playerid "
                            f"ORDER BY kill DESC NULLS LAST, time ASC NULLS LAST")
     # return the weekly leaderboard embed
-    table = [["⬛", "⬛", "Game ID", "⬛⬛⬛", "Kill", "Time", "Member"]]
+    table = [["", "⬛", "Game ID", "⬛⬛⬛", "Kill", "Time", "Member"]]
     rank = 0
     for playerid, gameid, flag, hero1, hero2, hero3, kill, time, group_rank, gm_rank in result:
       rank += 1
-      r_emoji = self.get_rank_emoji(guild, rank)
+      #r_emoji = self.get_rank_emoji(guild, rank)
       member = guild.get_member(playerid)
       name = deEmojify(gameid if gameid else (member.display_name if member else "???"))
       if flag is None:
@@ -358,13 +354,14 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
         minutes, seconds = divmod(time, 60)
         time = f"{minutes:02.0f}:{seconds:06.3f}"
       kill = "???" if kill is None else str(kill)
-      table.append([r_emoji, flag, name, heroes, kill, time, mention])
+      table.append([str(rank), flag, name, heroes, kill, time, mention])
+    rank_maxlen = max([len(table[i][0]) for i in range(len(table))])
     name_maxlen = max([len(table[i][2]) for i in range(len(table))])
     kill_maxlen = max([len(table[i][4]) for i in range(len(table))])
     time_maxlen = max([len(table[i][5]) for i in range(len(table))])
     #mention_maxlen = max([len(table[i][6]) for i in range(len(table))])
-    lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}` {heroes} ` {kill:<{kill_maxlen}}` ` {time:<{time_maxlen}}` ` {mention} `"
-             for r_emoji, flag, name, heroes, kill, time, mention in table]
+    lines = [f"`{rank:<{rank_maxlen}}` {flag} `{name:<{name_maxlen}}` {heroes} ` {kill:<{kill_maxlen}}` ` {time:<{time_maxlen}}` ` {mention} `"
+             for rank, flag, name, heroes, kill, time, mention in table]
     lines.insert(1, "")
     descript_emoji = self.bot.get_emoji(guild, "medal")
     descript_emoji = descript_emoji if descript_emoji else '🏆'
@@ -374,21 +371,37 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     
     lines.insert(0, header)
     
-    # grouping the lines by size limit
-    group = size_limit_grouping(lines, self.embed_size_group)
-    description = group[0]
+    # join the lines to get the description
+    description = size_limit_join(lines, self.embed_description_limit)
+
     embed = discord.Embed(title=f"Discord GM Weekly Leaderboard", colour=discord.Colour.gold(), 
                           timestamp=datetime.utcnow(), description=description)
-    for i in range(1, len(group)):
-      if group[i]:
-        embed.add_field(name=empty_space, value=group[i], inline=False)
-    if lines: # there are remaining lines not displayed
-      embed.add_field(name=empty_space, value=f"{len(lines)} player(s) not displayed in the table.", inline=False)
-      
     footer_emoji = self.bot.get_emoji(guild, "meteor")
     embed.set_footer(text="Weekly GM", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
+    
+    self.add_embed_fields(embed, lines)
+    
     print(f"Embed size: {len(embed)}")
     return embed
+    
+  def add_embed_fields(self, embed, lines):
+    # add the fields to an embed
+    save_size = 0 # the size to be saved to avoid exceeding size limit
+    if len(embed) + sum([len(line) for line in lines]) + 10 > self.embed_total_limit:
+      # contents cannot be all fit in, need to save size for a field
+      save_size += len(f"{len(lines)} player(s) not displayed in the table.") + len(empty_space)
+    while lines:
+      # compute the size of the current field
+      remaining_size = self.embed_total_limit - len(embed) - len(empty_space) - save_size
+      field_limit = min(self.embed_field_limit, remaining_size)
+      new_field = size_limit_join(lines, field_limit)
+      if new_field:
+        embed.add_field(name=empty_space, value=new_field, inline=False)
+      if remaining_size <= self.embed_field_limit or not new_field:
+        # no more size to add a new field
+        break
+    if lines:
+      embed.add_field(name=empty_space, value=f"{len(lines)} player(s) not displayed in the table.", inline=False)
     
   def get_rank_emoji(self, guild, rank):
     if rank <= 1:
