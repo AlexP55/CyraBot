@@ -283,11 +283,11 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
                            f"FROM ({leaderboard_query}) AS ldb LEFT JOIN player_info on ldb.playerid=player_info.playerid "
                            f"ORDER BY gm_num DESC, season DESC, week DESC, kill DESC NULLS LAST, time ASC NULLS LAST")
     # return the seasonly leaderboard embed
-    table = [["", "⬛", "Game ID", "⬛⬛⬛", "GMs", "Member"]]
+    table = [["⬛", "⬛", "Game ID", "⬛⬛⬛", "GMs", "Member"]]
     rank = 0
     for playerid, gameid, flag, hero1, hero2, hero3, gm_num in result:
       rank += 1
-      #r_emoji = self.get_rank_emoji(guild, rank)
+      r_emoji = self.get_rank_emoji(guild, rank)
       member = guild.get_member(playerid)
       name = deEmojify(gameid if gameid else (member.display_name if member else "???"))
       if flag is None:
@@ -299,7 +299,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     name_maxlen = max([len(table[i][2]) for i in range(len(table))])
     gm_num_maxlen = max([len(table[i][4]) for i in range(len(table))])
     #mention_maxlen = max([len(table[i][5]) for i in range(len(table))])
-    lines = [f"`{rank:<{rank_maxlen}}` {flag} `{name:<{name_maxlen}}` {heroes} ` {gm_num:<{gm_num_maxlen}}` ` {mention} `"
+    lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}` {heroes} ` {gm_num:<{gm_num_maxlen}}` ` {mention} `"
              for rank, flag, name, heroes, gm_num, mention in table]
     lines.insert(1, "")
     
