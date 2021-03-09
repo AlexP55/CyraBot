@@ -294,12 +294,12 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       if flag is None:
         flag = "🏁"
       heroes = "".join([hero if hero is not None else "⬛" for hero in [hero1, hero2, hero3]])
-      mention = str(member) if member is not None else ""
+      mention = member.name if member is not None else ""
       table.append([r_emoji, flag, name, heroes, str(gm_num), mention])
     name_maxlen = max([len(table[i][2]) for i in range(len(table))])
     gm_num_maxlen = max([len(table[i][4]) for i in range(len(table))])
     #mention_maxlen = max([len(table[i][5]) for i in range(len(table))])
-    lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}` {heroes} ` {gm_num:<{gm_num_maxlen}}` ` {mention} `"
+    lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}` {heroes} ` {gm_num:<{gm_num_maxlen}}  {mention} `"
              for r_emoji, flag, name, heroes, gm_num, mention in table]
     lines.insert(1, "")
     
@@ -350,7 +350,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       if flag is None:
         flag = "🏁"
       heroes = "".join([hero if hero is not None else "⬛" for hero in [hero1, hero2, hero3]])
-      mention = str(member) if member is not None else ""
+      mention = member.name if member is not None else ""
       if time is None:
         time = "???"
       else:
@@ -362,7 +362,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     kill_maxlen = max([len(table[i][4]) for i in range(len(table))])
     time_maxlen = max([len(table[i][5]) for i in range(len(table))])
     #mention_maxlen = max([len(table[i][6]) for i in range(len(table))])
-    lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}` {heroes} ` {kill:<{kill_maxlen}}` ` {time:<{time_maxlen}}` ` {mention} `"
+    lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}` {heroes} ` {kill:<{kill_maxlen}}  {time:<{time_maxlen}}  {mention} `"
              for r_emoji, flag, name, heroes, kill, time, mention in table]
     lines.insert(1, "")
     descript_emoji = self.bot.get_emoji(guild, "medal")

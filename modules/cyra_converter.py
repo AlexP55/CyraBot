@@ -6,6 +6,7 @@ import discord
 from discord.ext import commands
 import modules.custom_exceptions as custom_exceptions
 from modules.cyra_constants import hero_synonyms, ability_synonyms, hero_list, achievements, achievement_synonyms, emoji_dict
+from unidecode import unidecode
 
 def find_closest(word, word_list):
   close_word = difflib.get_close_matches(word, word_list, n=1)
@@ -129,4 +130,5 @@ def TournamentTimeConverter(argument):
   return timedelta(**time_params)
   
 def deEmojify(text):
-  return emoji.get_emoji_regexp().sub(u'', text)
+  text = emoji.get_emoji_regexp().sub(u'', text)
+  return unidecode(text, "replace")
