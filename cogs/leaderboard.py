@@ -38,6 +38,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
   embed_description_limit = 2048
   embed_field_limit = 1024
   embed_total_limit = 6000
+  name_limit = 20
 
   def __init__(self, bot):
     self.bot = bot
@@ -294,7 +295,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
         flag = "🏁"
       heroes = "".join([hero if hero is not None else "⬛" for hero in [hero1, hero2, hero3]])
       mention = member.name if member is not None else ""
-      table.append([str(rank) if rank < 100 else "", flag, name, heroes, str(gm_num), mention])
+      table.append([str(rank) if rank < 100 else "", flag, name[:self.name_limit], heroes, str(gm_num), mention])
     rank_maxlen = max([len(table[i][0]) for i in range(len(table))])
     name_maxlen = max([len(table[i][2]) for i in range(len(table))])
     gm_num_maxlen = max([len(table[i][4]) for i in range(len(table))])
@@ -352,7 +353,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
         minutes, seconds = divmod(time, 60)
         time = f"{minutes:02.0f}:{seconds:06.3f}"
       kill = "???" if kill is None else str(kill)
-      table.append([str(rank) if rank < 100 else "", flag, name, heroes, kill, time, mention])
+      table.append([str(rank) if rank < 100 else "", flag, name[:self.name_limit], heroes, kill, time, mention])
     rank_maxlen = max([len(table[i][0]) for i in range(len(table))])
     name_maxlen = max([len(table[i][2]) for i in range(len(table))])
     kill_maxlen = max([len(table[i][4]) for i in range(len(table))])
