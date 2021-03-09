@@ -315,7 +315,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     
     embed = discord.Embed(title=f"Discord GM Seasonal Leaderboard" if season is not None else f"Discord GM Leaderboard",
                           colour=discord.Colour.gold(), timestamp=datetime.utcnow(), description=description)
-    footer_emoji = self.bot.get_emoji(guild, "meteor")
+    footer_emoji = self.bot.get_emoji(guild, "gm")
     embed.set_footer(text="Seasonal GM" if season is not None else "GM Summary", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
     
     self.add_embed_fields(embed, lines)
@@ -374,7 +374,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
 
     embed = discord.Embed(title=f"Discord GM Weekly Leaderboard", colour=discord.Colour.gold(), 
                           timestamp=datetime.utcnow(), description=description)
-    footer_emoji = self.bot.get_emoji(guild, "meteor")
+    footer_emoji = self.bot.get_emoji(guild, "gm")
     embed.set_footer(text="Weekly GM", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
     
     self.add_embed_fields(embed, lines)
