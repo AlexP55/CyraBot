@@ -304,7 +304,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
              for rank, flag, name, heroes, gm_num, mention in table]
     lines.insert(1, "")
     
-    gm_emoji = self.bot.get_emoji(guild, "gm")
+    gm_emoji = self.bot.get_emoji(guild, "medal")
     descript_emoji = gm_emoji if gm_emoji else '🏆'
     header = f"GM @ Season {season}" if season is not None else f"GM Since 2-21-2021"
     header = f"{descript_emoji} **{header}** {descript_emoji}\n"
