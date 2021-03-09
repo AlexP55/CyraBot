@@ -299,7 +299,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     name_maxlen = max([len(table[i][2]) for i in range(len(table))])
     gm_num_maxlen = max([len(table[i][4]) for i in range(len(table))])
     #mention_maxlen = max([len(table[i][5]) for i in range(len(table))])
-    lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}` {heroes} ` {gm_num:<{gm_num_maxlen}}  {mention} `"
+    lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}` {heroes} ` {gm_num:<{gm_num_maxlen}}` ` {mention} `"
              for r_emoji, flag, name, heroes, gm_num, mention in table]
     lines.insert(1, "")
     
@@ -362,7 +362,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     kill_maxlen = max([len(table[i][4]) for i in range(len(table))])
     time_maxlen = max([len(table[i][5]) for i in range(len(table))])
     #mention_maxlen = max([len(table[i][6]) for i in range(len(table))])
-    lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}` {heroes} ` {kill:<{kill_maxlen}}  {time:<{time_maxlen}}  {mention} `"
+    lines = [f"{r_emoji} {flag} `{name:<{name_maxlen}}` {heroes} ` {kill:<{kill_maxlen}}` ` {time:<{time_maxlen}}` ` {mention} `"
              for r_emoji, flag, name, heroes, kill, time, mention in table]
     lines.insert(1, "")
     descript_emoji = self.bot.get_emoji(guild, "medal")
