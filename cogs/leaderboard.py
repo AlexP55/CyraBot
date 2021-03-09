@@ -294,7 +294,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       if flag is None:
         flag = "🏁"
       heroes = "".join([hero if hero is not None else "⬛" for hero in [hero1, hero2, hero3]])
-      mention = member.name if member is not None else ""
+      mention = str(member) if member is not None else ""
       table.append([str(rank) if rank < 100 else "", flag, name[:self.name_limit], heroes, str(gm_num), mention])
     rank_maxlen = max([len(table[i][0]) for i in range(len(table))])
     name_maxlen = max([len(table[i][2]) for i in range(len(table))])
@@ -346,7 +346,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       if flag is None:
         flag = "🏁"
       heroes = "".join([hero if hero is not None else "⬛" for hero in [hero1, hero2, hero3]])
-      mention = member.name if member is not None else ""
+      mention = str(member) if member is not None else ""
       if time is None:
         time = "???"
       else:
