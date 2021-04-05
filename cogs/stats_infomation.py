@@ -141,7 +141,16 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     brief="Shows or compares stats",
     aliases=["stat", "statscmp", "statcmp"]
   )
-  async def stats(self, context, unit:find_hero, rank:numberComparisonConverter, level:numberComparisonConverter):
+  async def stats(self, context, unit:find_hero, rank:numberComparisonConverter=None, level:numberComparisonConverter=None):
+    result = self.bot.db[context.guild.id].select("hero", unit)
+    if result is None:
+      raise custom_exceptions.HeroNotFound(unit.title())
+    minRank, maxRank = result["minRank"], result["maxRank"]
+    if rank is None:
+      rank = maxRank
+    if level is None:
+      level = max_level
+      
     if isinstance(rank, tuple):
       rank1, rank2 = rank[0], rank[1]
     else:
@@ -153,10 +162,6 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     if (not 0 < level1 <= max_level) or (not 0 < level2 <= max_level):
       await context.send(f"Level of {unit.title()} must be between 1 and {max_level}.")
       return
-    result = self.bot.db[context.guild.id].select("hero", unit)
-    if result is None:
-      raise custom_exceptions.HeroNotFound(unit.title())
-    minRank, maxRank = result["minRank"], result["maxRank"]
     if (not minRank <= rank1 <= maxRank) or (not minRank <= rank2 <= maxRank):
       await context.send(f"Rank of {unit.title()} must be between rank {minRank} and rank {maxRank}.")
       return
