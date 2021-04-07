@@ -3,6 +3,8 @@ import discord
 import json
 import os
 import typing
+import asyncio
+from urllib.parse import urlparse
 from queue import Queue
 from discord.ext import commands
 from base.modules.access_checks import has_mod_role, check_channel_permissions
@@ -54,6 +56,9 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
       
   def get_max_cache(self, guild):
     return self.bot.get_setting(guild, "NUM_DELETE_CACHE")
+    
+  def get_auto_suppress(self, guild):
+    return self.bot.get_setting(guild, "AUTO_SUPPRESS")
 
   async def cog_command_error(self, context, error):
     if hasattr(context.command, "on_error"):
@@ -127,6 +132,19 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
       await self.bot.log_message(guild, "MESSAGE_LOG",
         title="A message was deleted", fields=fields
       )
+      
+  @commands.Cog.listener()
+  async def on_message(self, message):
+    suppress_delay = self.get_auto_suppress(message.guild)
+    if suppress_delay > 0:
+      url = urlparse(message.content)
+      if url.netloc in ["tenor.com", "giphy.com"] and message.channel.permissions_for(message.guild.me).manage_messages:
+        # only supports tenor and giphy gifs
+        await asyncio.sleep(suppress_delay*60)
+        try:
+          await message.edit(suppress=True)
+        except:
+          pass
 
   @commands.group(
     name="delete",
@@ -233,11 +251,11 @@ class MessageManagementCog(commands.Cog, name="Message Management Commands"):
     fields = {
       "Author(s)":"\n".join([f"{member.mention}\n{member}\nUID: {member.id}" for member in members]) if members else None,
       "From Channel(s)":"\n".join([f"{channel.mention}\nCID: {channel.id}" for channel in channels]) if channels else None,
-      "To Channel":f"{context.channel.mention}\nCID: {channel.id}",
+      "To Channel":f"{context.channel.mention}\nCID: {context.channel.id}",
     }
     await self.bot.log_message(context.guild, "MOD_LOG",
       user=context.author, action=f"restored {restored} message(s)",
-      title=title, fields=fields, timestamp=context.message.created_at
+      fields=fields, timestamp=context.message.created_at
     )
     if restored == 0:
       await send_temp_message(context, "Could not restore message(s).", 10)
