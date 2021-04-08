@@ -87,7 +87,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     self.params["messages"] = value
     
   def cog_unload(self):
-    dump_json(self.params, f'{path}/leaderboard.json', 'w')
+    dump_json(self.params, f'{path}/leaderboard.json')
 
   #Default error handler for this cog, can be overwritten with a local error handler.
   async def cog_command_error(self, context, error):
