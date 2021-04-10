@@ -220,7 +220,7 @@ class BaseBot(commands.Bot):
         try:
           await add_cmd_from_row(self, guild, cmd)
         except Exception as e:
-          logger.warning(f"Error when adding command {cmd['cmdname']}: {e}")
+          logger.warning(f"{e.__class__.__name__} occurs when adding command {cmd['cmdname']}: {e}")
           
   def get_guild_prefix(self, guild):
     return self.get_setting(guild, "PREFIX")
@@ -302,7 +302,7 @@ class BaseBot(commands.Bot):
   async def on_task_error(self, task, error, guild):
     if hasattr(error, "original"):
       error = error.original
-    logger.debug(f"Task '{task}' received {error.__class__.__name__}: {error}.")
+    logger.debug(f"Task '{task}' received {error.__class__.__name__}: {error}")
     fields = {
       "Task":task,
       f"{error.__class__.__name__}":f"{error}"
@@ -313,7 +313,10 @@ class BaseBot(commands.Bot):
     )
     
   async def on_error(self, event, *args, **kwargs):
-    logger.exception(f"Ignoring exception in {event}.")
+    error = sys.exc_info()[1]
+    if hasattr(error, "original"):
+      error = error.original
+    logger.debug(f"Ignoring {error.__class__.__name__} in {event}: {error}")
     if len(args) > 0:
       if isinstance(args[0], list):
         first_arg = args[0][0]
@@ -333,9 +336,6 @@ class BaseBot(commands.Bot):
     else:
       guild = None
     if guild is not None:
-      error = sys.exc_info()[1]
-      if hasattr(error, "original"):
-        error = error.original
       fields = {"Event":event,
                f"{error.__class__.__name__}":f"{error}"}
       await self.log_message(guild, "ERROR_LOG",
@@ -802,8 +802,16 @@ class BaseBot(commands.Bot):
       transFun=lambda x: x.upper(), checkFun=lambda x: x in ["ON", "OFF"], checkDescription="either ON or OFF")
     self.default_settings["ACTIVE_TIME"] = DefaultSetting(name="ACTIVE_TIME", default=2, description="interactive message active time", 
       transFun=lambda x: float(x), checkFun=lambda x: x>0, checkDescription="a positive number")
-    self.default_settings["AUTO_SUPPRESS"] = DefaultSetting(name="AUTO_SUPPRESS", default=10, description="delay to suppress embeds (min)", 
+    self.default_settings["SUPPRESS_MODE"] = DefaultSetting(name="SUPPRESS_MODE", default="OFF", description="mode to suppress embeds", 
+      transFun=lambda x: x.upper(), checkFun=lambda x: x in ["OFF", "DELAY", "POSITION"], checkDescription="OFF, DELAY or POSITION")
+    self.default_settings["SUPPRESS_DELAY"] = DefaultSetting(name="SUPPRESS_DELAY", default=10.0, description="delay to suppress embeds (min)", 
       transFun=lambda x: float(x), checkFun=lambda x: x>=0, checkDescription="a non-negative number")
+    self.default_settings["SUPPRESS_POSITION"] = DefaultSetting(name="SUPPRESS_POSITION", default=10, description="position to suppress embeds", 
+      transFun=lambda x: int(x), checkFun=lambda x: x>=0, checkDescription="a non-negative integer")
+    self.default_settings["SUPPRESS_LIMIT"] = DefaultSetting(name="SUPPRESS_LIMIT", default=5, description="limit of link embeds kept", 
+      transFun=lambda x: int(x), checkFun=lambda x: x>=0, checkDescription="a non-negative integer")
+    self.default_settings["SUPPRESS_CHANNEL"] = DefaultSetting(name="SUPPRESS_CHANNEL", default="ALL_BUT_WHITE", description="which channel to suppress", 
+      transFun=lambda x: x.upper(), checkFun=lambda x: x in ["ALL_BUT_WHITE", "NONE_BUT_BLACK"], checkDescription="either ALL_BUT_WHITE or NONE_BUT_BLACK")
   
   def add_default_settings(self, guild):
     #Add default settings for allowed settings

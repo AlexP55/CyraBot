@@ -7,21 +7,110 @@ from base.modules.async_timer import BotTimer as Timer
 import json
 from base.modules.special_bot_methods import special_process_command
 from base.modules.constants import CACHE_PATH as path
+import logging
+
+logger = logging.getLogger(__name__)
 
 def json_to_object(filename, convert_method):
-  object_dict = {}
+    data = {}
+    try:
+      with open(filename) as f:
+        data = convert_method(json.load(f))
+    except Exception as e:
+      logger.error(f"{filename} ignored because of {e.__class__.__name__}: {e}")
+    return data
+
+def dict_json_to_object(filename, convert_method):
+  def full_convert_method(data):
+    assert isinstance(data, dict)
+    object_dict = {}
+    for key in data:
+      try:
+        object_dict[int(key)] = convert_method(data[key])
+      except Exception as e:
+        logger.warning(f"{e.__class__.__name__} ignored while loading {filename}: {e}")
+    return object_dict
+  return json_to_object(filename, full_convert_method)
+  
+def dump_json(data, filename):
   try:
-    with open(filename) as f:
-      data = json.load(f)
-      if isinstance(data, dict):
-        for key in data:
-          try:
-            object_dict[int(key)] = [convert_method(msg) for msg in data[key]]
-          except:
-            pass
-  except:
-    pass
-  return object_dict
+    with open(filename, 'w') as f:
+      json.dump(data, f)
+  except Exception as e:
+    logger.error(f"{e.__class__.__name__} ignored while dumping to {filename}: {e}")
+    
+    
+class JsonEntry:
+
+  @classmethod
+  def from_json(cls, filename):
+    return json_to_object(filename, cls.from_data)
+  
+  @classmethod
+  def from_data(cls, data):
+    return data
+  
+  
+  
+class GuildEntry:
+
+  @classmethod
+  def from_json(cls, filename):
+    return dict_json_to_object(filename, cls.from_data)
+  
+  @classmethod
+  def from_data(cls, data):
+    return data
+    
+
+class SuppressQueueEntry(GuildEntry):
+  
+  @classmethod
+  def from_data(cls, data):
+    assert isinstance(data, dict)
+    result = {}
+    for key in data:
+      assert isinstance(data[key], list)
+      if len(data[key]) == 0:
+        continue
+      new_list = []
+      result[int(key)] = new_list
+      for element in data[key]:
+        assert isinstance(element, list) and len(element) == 2 and isinstance(element[1], int) and element[1] > 0
+        new_list.append(element)
+      new_list.sort(reverse=True, key=lambda element: element[1])
+    return result
+    
+
+class MonitorEntry(GuildEntry):
+  
+  @classmethod
+  def from_data(cls, data):
+    assert isinstance(data, list)
+    return data
+    
+
+class RoleLinksEntry(GuildEntry):
+  
+  @classmethod
+  def from_data(cls, data):
+    assert isinstance(data, list)
+    for link in data:
+      assert "role" in link and "channel" in link and "emoji" in link and ("mod_role" in link or "message" in link)
+    return data
+    
+
+class ChannelWhiteListEntry(GuildEntry):
+  
+  @classmethod
+  def from_data(cls, data):
+    assert isinstance(data, dict)
+    result = {}
+    for key in data:
+      assert isinstance(data[key], int)
+      result[int(key)] = data[key]
+    return result
+  
   
 class SerializableObject(dict):
   def __init__(self):
@@ -29,7 +118,8 @@ class SerializableObject(dict):
     
   @classmethod
   def from_json(cls, filename):
-    return json_to_object(filename, cls.from_dict)
+    convert_method = lambda data: [cls.from_dict(msg) for msg in data]
+    return dict_json_to_object(filename, convert_method)
     
   @classmethod
   def from_dict(cls, dic: dict):
