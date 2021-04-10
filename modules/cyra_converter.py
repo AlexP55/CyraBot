@@ -56,6 +56,12 @@ class hero_emoji_converter(commands.Converter):
     if emoji:
       return emoji
     raise custom_exceptions.HeroNotFound(argument.title())
+    
+def hero_and_secret(arg):
+  if arg == "secret":
+    return "secret"
+  else:
+    return find_hero_from_text(arg)
   
 def find_ability(word):
   word = word.lower()

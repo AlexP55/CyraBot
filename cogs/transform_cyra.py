@@ -1,7 +1,9 @@
 import discord
 from discord.ext import commands, tasks
-from modules.cyra_converter import find_hero_from_text
+from modules.cyra_converter import find_hero_from_text, hero_and_secret
+from modules.cyra_serializable import TransformListEntry
 from base.modules.constants import CACHE_PATH as path
+from base.modules.serializable_object import dump_json
 import logging
 import json
 import random
@@ -9,44 +11,24 @@ import os
 
 logger = logging.getLogger(__name__)
 
-def hero_and_secret(arg):
-  if arg == "secret":
-    return "secret"
-  else:
-    return find_hero_from_text(arg)
-
 class TransformationCog(commands.Cog, name="Transformation Commands"):
   def __init__(self, bot):
     self.bot = bot
     if not os.path.isdir(path):
       os.mkdir(path)
-    try:
-      with open(f'{path}/transform_list.json') as f:
-        data = json.load(f)
-        assert(isinstance(data, dict))
-        self.transform_list = []
-        for hero in data["list"]:
-          try:
-            hero = hero_and_secret(hero)
-            if hero not in self.transform_list:
-              self.transform_list.append(hero)
-          except:
-            pass
-        assert(len(self.transform_list) >= 2)
-        self.transform_interval = data["interval"]
-    except:
+    info = TransformListEntry.from_json(f'{path}/transform_list.json')
+    if not info:
       self.transform_list = ["cyra", "elara"]
       self.transform_interval = 2.0
+    else:
+      self.transform_list = info["list"]
+      self.transform_interval = info["interval"]
     self.auto_transform = self.create_task()
     self.auto_transform.start()
     
   def cog_unload(self):
     self.auto_transform.cancel()
-    try:
-      with open(f'{path}/transform_list.json', 'w') as f:
-        json.dump({"list":self.transform_list, "interval":self.transform_interval}, f)
-    except:
-      pass
+    dump_json({"list":self.transform_list, "interval":self.transform_interval}, f'{path}/transform_list.json')
     
   async def cog_command_error(self, context, error):
     if hasattr(context.command, "on_error"):
@@ -87,10 +69,6 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
           logger.debug(f"Finished Transforming in {guild.name} ({guild.id}).")
         except Exception as error:
           await self.bot.on_task_error("Cyra/Elara auto transformation", error, guild)
-
-    #@auto_transform.error
-    #async def auto_transform_error(error):
-      #TODO: Add logging via logging module
 
     @auto_transform.before_loop
     async def before_auto_transform():

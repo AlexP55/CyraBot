@@ -1,15 +1,18 @@
 import discord
 from discord.ext import commands
 from modules.cyra_converter import hero_emoji_converter, find_hero, TournamentTimeConverter, deEmojify
+from modules.cyra_serializable import LeaderboardEntry
 from base.modules.basic_converter import UnicodeEmoji
 from base.modules.access_checks import has_mod_role, mod_role_check
 from base.modules.constants import CACHE_PATH as path, num_emojis, arrow_emojis, letter_emojis, empty_space
+from base.modules.serializable_object import dump_json
 from base.modules.interactive_message import InteractiveMessage
 from datetime import datetime, timedelta
 import enum
 import json
 import typing
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -42,22 +45,10 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
 
   def __init__(self, bot):
     self.bot = bot
-    self.params = {}
-    try:
-      with open(f"{path}/leaderboard.json") as f:
-        data = json.load(f)
-        self.season = data["season"]
-        self.week = data["week"]
-        self.messages = {}
-        for guildid, messages in data["messages"].items():
-          if not messages:
-            continue
-          self.messages[int(guildid)] ={
-            "all": {"channel": messages["all"]["channel"], "message":messages["all"]["message"]},
-            "season": {"channel": messages["season"]["channel"], "message":messages["season"]["message"]},
-            "week": {"channel": messages["week"]["channel"], "message":messages["week"]["message"]},
-          }
-    except:
+    if not os.path.isdir(path):
+      os.mkdir(path)
+    self.params = LeaderboardEntry.from_json(f"{path}/leaderboard.json")
+    if not self.params:
       self.season = 1
       self.week = 1
       self.messages = {}
@@ -96,11 +87,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
     self.params["messages"] = value
     
   def cog_unload(self):
-    try:
-      with open(f'{path}/leaderboard.json', 'w') as f:
-        json.dump(self.params, f)
-    except:
-      pass
+    dump_json(self.params, f'{path}/leaderboard.json')
 
   #Default error handler for this cog, can be overwritten with a local error handler.
   async def cog_command_error(self, context, error):
