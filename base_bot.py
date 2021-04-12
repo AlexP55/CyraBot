@@ -353,7 +353,7 @@ class BaseBot(commands.Bot):
     if "user_commands" not in self.db[guild.id]:
       self.db[guild.id].create_table("user_commands", "cmdname", cmdname="txt", message="txt", attributes="txt", isgroup="int_not_null", lock="int_not_null", glob="int_not_null", perm="int_not_null")
     if "messages" not in self.db[guild.id]:
-      self.db[guild.id].create_table("messages", "mid", mid="int", time="real", aid="int", author="txt", cid="int", channel="txt", content="txt", embeds="txt", files="txt")
+      self.db[guild.id].create_table("messages", "mid", mid="int", time="real", aid="int", cid="int", content="txt", embeds="txt", files="txt")
 
 
   async def create_logs(self, guild):
@@ -622,8 +622,9 @@ class BaseBot(commands.Bot):
       self.adjust_user_stats(message.guild, message.author, 1, cmd, wrd, 0, 0)         
       #now process commands(only for guild messages)
       if cmd:
-        logger.debug(f"Processing message: {message.content}.")
-        await self.process_commands(message)
+        if not message.author.bot:
+          logger.debug(f"Processing message: {message.content}.")
+          await self.process_commands(message)
       elif message.channel.type == discord.ChannelType.news: # do not publish a command
         if message.channel.permissions_for(message.guild.me).manage_messages:
           try:
