@@ -8,7 +8,7 @@ This is a bot for Realm Defense discord server based on [Discord Base Bot](https
 In addition to the basic features inherited from [Discord Base Bot](https://github.com/Kaldzkur/DiscordBaseBot), the CyraBot has a few specific features for the Realm Defense game.
 
 #### 1. Transformation between Cyra/Elara
-A cool visual transformation in the server every 2 hours which changes the bot's role, name, and profile picture. Bot owners can use `?transform` to force a transformation.
+A cool visual transformation in the server every x hours which changes the bot's role, name, and profile picture. Bot owners can use `?transform` to force a transformation.
 
 #### 2. Various Information Commands
 A large number of information commands showing game general information, including levels, elixirs, tournaments and achievements. Most of them are displayed in a pretty discord embed. Pure-text information commands can be built as custom commands by command masters, which is an inherited function from the base bot.
