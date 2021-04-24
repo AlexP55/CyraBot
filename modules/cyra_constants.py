@@ -13,7 +13,8 @@ emoji_keys = {
   "lancelot":"hero_Lancelot1",
   "smoulder":"hero_Smoulder1",
   "efrigid":"hero_Efrigid1",
-  "hogan":"hero_Hogan1",
+  "normal hogan":"hero_Hogan1",
+  "hogan":"hero_HoganBeastmaster1",
   "bolton":"hero_Bolton1",
   "obsidian":"hero_Obsidian1",
   "masamune":"hero_Masamune1",
@@ -47,14 +48,16 @@ emoji_keys = {
 
 hero_list = [
   "azura","bolton","caldera","connie","efrigid",
-  "fee","helios","hogan","koizuul","lancelot","leif",
+  "fee","helios","hogan", "normal hogan","koizuul","lancelot","leif",
   "mabyn","masamune","narlax","obsidian","raida","sethos",
   "shamiko","smoulder","yan","normal connie","cyra","elara",
 ]
 
 emoji_dict = {
   "ConnieNecro": "connie",
-  "Connie": "normal connie"
+  "Connie": "normal connie",
+  "HoganBeastmaster": "hogan",
+  "Hogan": "normal hogan"
 }
 
 hero_transformable = {
@@ -75,7 +78,7 @@ hero_synonyms.update({ # hero synonyms
   "masa":"masamune",
   "shampoo":"shamiko",
   "necroconnie":"connie",
-  "normalconnie":"normal connie",
+  "beastmasterhogan":"hogan",
   "elana":"elara",
 })
 

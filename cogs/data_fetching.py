@@ -22,14 +22,14 @@ class SheetReader:
     if sheet is None:
       logging.warning("Warning, no hero sheet found")
       return
-    expected = 24
+    expected = 25
     if not sheet.ncols == expected:
       raise Exception(f"Levels sheet columns do not match, expected {expected} but found {sheet.ncols}")
     self.db.delete_table("hero")
     self.db.create_table("hero", "name", name="txt", world="int", baseHP="int", drankHP="int", dlvHP="int", dranklvHP="int",
                     baseND="int", drankND="int", dlvND="int", dranklvND="int", baseSD="int", drankSD="int", dlvSD="int", dranklvSD="int",
-                    baseArmor="real", drankArmor="real", Shield="int", MoveSpeed="real", Dodge="int", ReviveTime="int", minRank="int", maxRank="int", 
-                    introduction="txt", link="txt")
+                    basePhysicalArmor="real", drankPhysicalArmor="real", MagicalArmor="real", Shield="int", MoveSpeed="real", Dodge="int", 
+                    ReviveTime="int", minRank="int", maxRank="int", introduction="txt", link="txt")
     self.insertSheet(sheet, "hero")
 
   def fetchAbility(self):
