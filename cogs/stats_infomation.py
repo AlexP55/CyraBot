@@ -452,7 +452,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     
   @commands.command(
     name="buff",
-    help="Shows information about one buff/debuff.\n\nAvailable buffs/debuffs:\nHaste, slow, cold, decrepit, poison, burn, bleed, shield, armor break, terror, blind, curse, silence, stun, freeze, shock, cocoon, paralysis, bind, cloak, spirit curse, polymorph, charm",
+    help="Shows information about one buff/debuff.\n\nAvailable buffs/debuffs:\nHaste, slow, cold, decrepit, poison, burn, bleed, shield, armor break, terror, blind, curse, silence, stun, freeze, shock, cocoon, paralysis, bind, cloak, spirit curse, polymorph, charm, grounded, slime",
     brief="Shows buff/debuff",
     aliases=["debuff"]
   )
@@ -546,6 +546,16 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       description = "Make the enemy fight for you. Your units can benifit from aura of the enemy. Some charmed enemies don't engage in melee, including W3 Mummy, W4 Magic Book & Cloud Sunfish, W6 Origami Crane & Harpy."
       stack = ""
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/d/de/Charm.jpg/revision/latest?cb=20200901023011"
+    elif name in ["ground", "grounded"]:
+      name = "grounded"
+      description = "Ground the flying enemies making them stoppable by ground troops."
+      stack = ""
+      url = ""
+    elif name in ["slime"]:
+      name = "slime cover"
+      description = "Slime cover buffs your enemies: HP x2, damage x1.5; It debuffs your allies: move speed x0.6, damage x0.8. It can be cleansed by Voltari Perch right branch upgrade."
+      stack = ""
+      url = ""
     else:
       raise custom_exceptions.DataNotFound("Buff", string.capwords(name))
     embed = discord.Embed(title=f"**{string.capwords(name)}**", timestamp=context.message.created_at)
