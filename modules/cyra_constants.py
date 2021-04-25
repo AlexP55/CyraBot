@@ -112,7 +112,7 @@ world_url = {1: "https://static.wikia.nocookie.net/realm-defense-hero-legends-td
   4: "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/d/d5/Worldmap_world4.png/revision/latest?cb=20200906151345",
   5: "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/c/ca/Worldmap_world5.png/revision/latest?cb=20200906151346",
   6: "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/e/ee/Worldmap_world6.png/revision/latest?cb=20200906151346",
-  7: "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/7/7f/Worldmap_comingSoon.png/revision/latest?cb=20200906151342",
+  7: "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/4/4a/Worldmap_world7.png/revision/latest?cb=20210425052258",
   "S": "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/3/3b/SR.png/revision/latest?cb=20191128132619",
   "A": "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/9/91/Arcade.png/revision/latest?cb=20191128132703",
   "E": "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/1/14/Endless2.jpg/revision/latest?cb=20200209220437",
@@ -231,11 +231,15 @@ achievemets_dict = {
 "Small Ghostfire":["w6","spirit"],"Chibi-Mahou":["w6","monk"],"Harpi":["w6","flying"],"Skeleton Samurai":["w6","skeleton"],
 "Oni-baba":["w6","oni"],"Koi-jin":["w6","fishguard"],"Kakutouka":["w6","monk"],"Oni-ken":["w6","oni"],"Kagami-no-Yuurei":["w6","spirit"],
 "Namazu-jin":["w6","fishguard"],"Oni Mask":["w6","spirit"],"Aoi Mask":["w6","spirit"],"Kami-no-Mahoutsukai":["w6"],
-"Kaeru-hei":["w6","fishguard"],"Big Ghostfire":["w6","spirit"],"Shunmin-shi":["w6"],"Oni-kanadzuchi":["w6","oni"]
+"Kaeru-hei":["w6","fishguard"],"Big Ghostfire":["w6","spirit"],"Shunmin-shi":["w6"],"Oni-kanadzuchi":["w6","oni"],
+
+"Quadropus":["corrupted"], "Floating Rambler":["corrupted"],
+"Tin Slime":["w7_slime"], "Flying Slime":["w7_slime"], "Ground Slime":["w7_slime"],
+"Gem Eye":["security_construct"], 
 }
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))
 
-tappables = ["trap", "hidden enemies", "loose change", "chicken dinner", "snowman", "windmill", "cow", "boneheaded", "seeker"]
+tappables = ["trap", "hidden enemies", "loose change", "chicken dinner", "snowman", "windmill", "cow", "boneheaded", "seeker", "llama", "mercenary board"]
 tasks = ["villager", "bandit"]
 
 achievement_synonyms = {achievement:achievement for achievement in achievements}
@@ -247,7 +251,8 @@ achievement_synonyms.update({ # achievement synonyms
 "bird":"flying",
 "air":"flying",
 "flier":"flying",
-"lavacreature":"lava"
+"lavacreature":"lava",
+"construct":"security_construct"
 })
 achievement_synonyms.update({ # tappable synonyms
 "hidden": "hidden enemies",
@@ -255,7 +260,8 @@ achievement_synonyms.update({ # tappable synonyms
 "enemies": "hidden enemies",
 "loose": "loose change",
 "change": "loose change",
-"chicken": "chicken dinner"
+"chicken": "chicken dinner",
+"mercenary": "mercenary board"
 })
 achievement_synonyms.update({ # synonyms for "fast"
 "fast": "fast",
@@ -287,6 +293,7 @@ level_boss = { # additional boss info which is not in assets
 "180_campaign":{-1:{"Raijin Campaign":1}},
 "190_campaign":{-1:{"Koizuul Campaign":1}},
 "200_campaign":{-1:{"Gashadokuro Campaign":1}},
+"210_campaign":{-1:{"Malhog Boss":1}},
 "C1-2":{-4:{"Death Knight Challenge":1}, -1:{"Death Knight Challenge":1}},
 "C1-4":{-4:{"Death Knight Challenge":1}, -1:{"Death Knight Challenge":1}},
 "C1-5":{-4:{"Skeleton Boss":1}, -1:{"Skeleton Boss":2, "Death Knight Challenge":1}},

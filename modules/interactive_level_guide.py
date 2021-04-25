@@ -10,8 +10,8 @@ from modules.level_parser import parse_wave_achievements, sum_dict
 class LevelRootMessage(InteractiveMessage):
   def __init__(self, parent=None, **attributes):
     super().__init__(parent, **attributes)
-    # emojis for 6 worlds
-    self.child_emojis = num_emojis[1:7]
+    # emojis for 7 worlds
+    self.child_emojis = num_emojis[1:8]
     self.connie_emoji = self.context.bot.get_emoji(self.context.guild, "connie")
     # emojis for SR, Arcade, endless, challenges, connie story
     self.child_emojis += [letter_emojis["S"], letter_emojis["A"], letter_emojis["E"], letter_emojis["C"], self.connie_emoji]
@@ -40,6 +40,7 @@ class LevelRootMessage(InteractiveMessage):
     embed.add_field(name=f"World 4:", value="Level 81-120")
     embed.add_field(name=f"World 5:", value="Level 121-160")
     embed.add_field(name=f"World 6:", value="Level 161-200")
+    embed.add_field(name=f"World 7:", value="Level 201-210")
     embed.add_field(name=f"Shattered Realms:", value="Level 1-40")
     embed.add_field(name=f"Arcade:", value="Level 1-5")
     embed.add_field(name=f"Endless:", value="World 1-5")
@@ -50,7 +51,7 @@ class LevelRootMessage(InteractiveMessage):
 
 class LevelWorldMessage(InteractiveMessage):
   def __init__(self, world, parent=None, **attributes):
-    if world not in [1,2,3,4,5,6,"S","A","E","C","Connie"]:
+    if world not in [1,2,3,4,5,6,7,"S","A","E","C","Connie"]:
       raise custom_exceptions.DataNotFound("World", world)
     super().__init__(parent, **attributes)
     self.world = world
@@ -68,6 +69,11 @@ class LevelWorldMessage(InteractiveMessage):
                        f"Level {world*40-59}-{world*40-50}", f"Level {world*40-49}-{world*40-40}"]
       self.lists = [[f"{i}" for i in range(world*40-79,world*40-70+1)], [f"{i}" for i in range(world*40-69,world*40-60+1)],
                     [f"{i}" for i in range(world*40-59,world*40-50+1)], [f"{i}" for i in range(world*40-49,world*40-40+1)]]
+    elif world in [7]:
+      self.world_text = f"World {world}"
+      self.child_emojis = num_emojis[1:2]
+      self.categories = [f"Level {world*40-79}-{world*40-70}"]
+      self.lists = [[f"{i}" for i in range(world*40-79,world*40-70+1)]]
     elif world in ["S"]:
       self.world_text = f"Shattered Realms"
       self.child_emojis = num_emojis[1:9]
@@ -105,7 +111,7 @@ class LevelWorldMessage(InteractiveMessage):
       self.levels = [f"Connie{i}" for i in range(1,8)]
     
   async def transfer_to_child(self, emoji):
-    if self.world in [1,2,3,4,5,6,"S","A","C"]:
+    if self.world in [1,2,3,4,5,6,7,"S","A","C"]:
       return LevelCategoryMessage(self.lists[self.child_emojis.index(emoji)], self.world_text, self)
     else:
       return LevelIndividualMessage(self.levels[self.child_emojis.index(emoji)], self)
@@ -326,7 +332,7 @@ class LevelWaveMessage(InteractiveMessage):
     if enemies:
       max_num_len = max(len(str(num)) for num in enemies.values())
       if self.achieve:
-        kill_msg = [f"`{num:<{max_num_len}} {enemy.title()} Enemies`" for enemy, num in enemies.items()]
+        kill_msg = [f"`{num:<{max_num_len}} {enemy.replace('_', ' ').title()} Enemies`" for enemy, num in enemies.items()]
       else:
         kill_msg = [f"`{num:<{max_num_len}} {enemy.title()}`" for enemy, num in enemies.items()]
     else:
@@ -367,6 +373,7 @@ class LevelAchievementMessage(InteractiveMessage):
     if mode:
       where_clause.append(f'mode="{mode}"')
     # check the achievemnt argument to get the sorting method
+    achievement_parse = achievement.replace('_', ' ').title()
     if achievement == "fast":
       self.goal = "Levels with the shortest completion time"
       self.info = ["TIME"]
@@ -374,7 +381,7 @@ class LevelAchievementMessage(InteractiveMessage):
       select_clause.append(f"MIN(time/2.0+{self.extra_t}) AS criteria")
       sort_method = "criteria ASC"
     elif achievement in tasks:
-      self.goal = f"Shortest levels where **{achievement.title()}s** can be found"
+      self.goal = f"Shortest levels where **{achievement_parse}s** can be found"
       self.info = ["TIME"]
       self.info_fun = lambda row: [f"{row[-1]:.0f}"]
       select_clause.append(f"MIN(time/2.0+{self.extra_t}) AS criteria")
@@ -385,7 +392,7 @@ class LevelAchievementMessage(InteractiveMessage):
       ind = achievements.index(achievement) + len(self.general_columns) # index of achievement in results
       where_clause.append(f"{achievement}>0")
       if num:
-        self.goal = f"Levels that quickly farm **{num} {achievement.title()}** Enemies"
+        self.goal = f"Levels that quickly farm **{num} {achievement_parse}** Enemies"
         self.info = ["KILL","TIME","RUN","SUM_T"]
         self.info_fun = lambda row: [row[ind], f"{row[4]/2.0+self.extra_t:.0f}", 
                         int(-(-num // row[ind])), f"{row[-1]:.0f}"]
@@ -394,7 +401,7 @@ class LevelAchievementMessage(InteractiveMessage):
         select_clause.append(f"MIN({criteria_str}) AS criteria")
         sort_method = "criteria ASC"
       else:
-        self.goal = f"Levels that quickly farm **{achievement.title()}** Enemies"
+        self.goal = f"Levels that quickly farm **{achievement_parse}** Enemies"
         self.info = ["KILL","TIME","KPS"]
         self.info_fun = lambda row: [row[ind], f"{row[4]/2.0+self.extra_t:.0f}", f"{row[-1]:.2f}"]
         criteria_str = f"CAST({achievement} AS FLOAT)/(time/2.0+{self.extra_t})"
@@ -410,7 +417,7 @@ class LevelAchievementMessage(InteractiveMessage):
         condition.append(f"W{world}")
       if mode:
         condition.append(f"{mode.title()} mode")
-      raise custom_exceptions.DataNotFound("Achievement", f"{achievement.title()} in {' '.join(condition)}" if condition else achievement.title())
+      raise custom_exceptions.DataNotFound("Achievement", f"{achievement_parse} in {' '.join(condition)}" if condition else achievement_parse)
     self.update_state(0)
       
   def update_state(self, state):
@@ -486,7 +493,7 @@ class LevelAchievementMessage(InteractiveMessage):
       max_kill_len = max([len(str(kill)) for kill in kills])
       for name, kill in zip(achievements, kills):
         if kill > 0:
-          kill_msg.append(f"`{kill:<{max_kill_len}} {name.title()} Enemies`")
+          kill_msg.append(f"`{kill:<{max_kill_len}} {name.replace('_', ' ').title()} Enemies`")
       if task:
         kill_msg.append(f"`{1:<{max_kill_len}} {task.title()}`")
       embed.add_field(name="Achievement Counts:", value="\n".join(kill_msg) if kill_msg else "None", inline=False)
