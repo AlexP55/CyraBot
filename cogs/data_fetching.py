@@ -4,8 +4,8 @@ from base.modules.access_checks import has_admin_role
 from modules.custom_exceptions import DataNotFound
 import xlrd
 from base.modules.constants import DB_PATH as path
-from modules.cyra_constants import achievements, achievemets_dict, level_boss
-from modules.level_parser import parse_achievements, parse_level
+from modules.cyra_constants import achievements, achievemets_dict
+from modules.level_parser import parse_achievements, is_boss_level
 import os
 import json
 import logging
@@ -325,56 +325,58 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
     db.create_table("wave", ["level", "mode"], level="txt", mode="txt", initial_gold="int", max_life="int", enemy_waves="txt")
     db.delete_table("achievement")
     achievement_columns = {achievement:"int" for achievement in achievements}
-    db.create_table("achievement", ["level", "mode", "strategy"], level="txt", mode="txt", strategy="txt", time="real", gold="int", **achievement_columns)
+    db.create_table("achievement", ["level", "mode", "strategy"], level="txt", mode="txt", strategy="txt", time="real", gold="int", wave="int", **achievement_columns)
     directory = os.path.join(path, 'levels/')
     data = sorted(os.listdir(directory))
     for name in data:
       if not name.endswith(".txt"):
         continue
       try:
-        with open(os.path.join(directory, name), "r+") as f:
-          entry = json.load(f)
-          name = name[:-4]
-          name_split = name.split("_", 1)
+        with open(os.path.join(directory, name), "r") as f:
+          parsed_level = json.load(f)
+            
+          # get level info
+          lvname = name[:-4]
+          name_split = lvname.split("_", 1)
           level = name_split[0]
           if len(name_split) > 1:
             mode = name_split[1]
           else:
             mode = ""
-          parsed_level = parse_level(entry)
-            
-          # get level info
           result = db.select("levels", level)
           remark = result["remark"] if result else ""
-            
-          # add additional boss info to the level
-          if name in level_boss:
-            for wave in level_boss[name]:
-              for enemy in level_boss[name][wave]:
-                parsed_level["enemy_waves"][wave]["enemies"][enemy] = level_boss[name][wave][enemy]
+          wave_num = len(parsed_level["enemy_waves"])
           
           # parse achievements info
-          if (mode != "legendary" and remark == "boss"):
+          if is_boss_level(level, mode, remark):
             # boss level, can skip the last wave by instantly killing the boss
             strategy = "long"
             time, achievement_count, gold = parse_achievements(parsed_level["enemy_waves"])
-            db.insert_or_update("achievement", level, mode, strategy, time, gold+parsed_level["initial_gold"], *achievement_count.values())
-            if len(parsed_level["enemy_waves"]) > 1:
+            db.insert_or_update("achievement", level, mode, strategy, time, gold+parsed_level["initial_gold"], wave_num, *achievement_count.values())
+            if level not in ["180"]: # Raijin boss level is not skippable because of damage immunity
               strategy = "short"
               time, achievement_count, gold = parse_achievements(parsed_level["enemy_waves"][:-1])
-              db.insert_or_update("achievement", level, mode, strategy, time, gold+parsed_level["initial_gold"], *achievement_count.values())
+              db.insert_or_update("achievement", level, mode, strategy, time, gold+parsed_level["initial_gold"], wave_num, *achievement_count.values())
           elif remark == "boss rush": # SR boss levels, you can choose to skip waves
-            wave_num = len(parsed_level["enemy_waves"])
-            for ind in range(1, 2**wave_num):
-               valid_waves = [int(d) for d in bin(ind)[2:].zfill(wave_num)] # a list of 0's and 1's
-               skipped_waves = [str(i+1) for i in range(len(valid_waves)) if valid_waves[i]==0] # a list of skipped waves
+            for ind in range(0, 2**wave_num):
+               valid_waves = [int(d) for d in bin(ind)[2:].zfill(wave_num)] # a list of 0's and 1's, indicating skip wave or not
+               skipped_waves = []
+               waves_info = []
+               gold_valid = 0
+               for i in range(len(valid_waves)):
+                 if valid_waves[i]==0:
+                   skipped_waves.append(str(i+1))
+                 else:
+                   waves_info.append(parsed_level["enemy_waves"][i])
+                   if i > 0:
+                     last_wave = parsed_level["enemy_waves"][i-1]
+                     gold_valid += last_wave["reward"] + last_wave["bonus"]
                if skipped_waves:
                  strategy = "skip wave " + ", ".join(skipped_waves)
                else:
                  strategy = "long"
-               valid_waves = [parsed_level["enemy_waves"][i] for i in range(len(valid_waves)) if valid_waves[i]==1]
-               time, achievement_count, gold = parse_achievements(valid_waves)
-               db.insert_or_update("achievement", level, mode, strategy, time, gold+parsed_level["initial_gold"], *achievement_count.values())
+               time, achievement_count, _ = parse_achievements(waves_info)
+               db.insert_or_update("achievement", level, mode, strategy, time, gold_valid+parsed_level["initial_gold"], wave_num, *achievement_count.values())
           else:
             if level.startswith("A5-"):
               # these levels can be run as long as possible
@@ -382,7 +384,7 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
             else:
               strategy = ""
             time, achievement_count, gold = parse_achievements(parsed_level["enemy_waves"])
-            db.insert_or_update("achievement", level, mode, strategy, time, gold+parsed_level["initial_gold"], *achievement_count.values())
+            db.insert_or_update("achievement", level, mode, strategy, time, gold+parsed_level["initial_gold"], wave_num, *achievement_count.values())
           
           parsed_level["enemy_waves"] = json.dumps(parsed_level["enemy_waves"])
           db.insert_or_update("wave", level, mode, *parsed_level.values())
