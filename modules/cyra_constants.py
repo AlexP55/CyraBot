@@ -234,7 +234,7 @@ achievemets_dict = {
 "Kaeru-hei":["w6","fishguard"],"Big Ghostfire":["w6","spirit"],"Shunmin-shi":["w6"],"Oni-kanadzuchi":["w6","oni"],
 
 "Quadropus":["corrupted"], "Floating Rambler":["corrupted"], "Rock Rambler":["corrupted"],
-"Tin Slime":["w7_slime"], "Flying Slime":["w7_slime", "flying"], "Ground Slime":["w7_slime"],
+"Tin Slime":["w7_slime"], "Flying Slime":["w7_slime"], "Ground Slime":["w7_slime"],
 "Gem Eye":["security_construct"], "Eta Sentry":["security_construct"]
 }
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))
