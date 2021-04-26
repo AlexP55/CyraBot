@@ -1,12 +1,21 @@
 from modules.cyra_constants import achievements, achievemets_dict
 
+def parse_level(entry):
+  parsed_level = {"initial_gold":entry["initial_gold"], "max_life":entry["max_life"], "enemy_waves":[]}
+  waves = entry["enemy_waves"]
+  for wave in waves:
+    parsed_level["enemy_waves"].append(parse_wave(wave))
+  return parsed_level
+
 def parse_achievements(waves):
   time = 0
   achievement_count = {achievement:0 for achievement in achievements}
+  gold = 0
   for wave in waves:
     time += wave["time"]
     sum_dict(achievement_count, parse_wave_achievements(wave["enemies"]))
-  return time, achievement_count
+    gold += wave["reward"] + wave["bonus"]
+  return time, achievement_count, gold
   
 def parse_wave_achievements(enemies):
   achievement_count = {}

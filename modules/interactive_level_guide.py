@@ -3,7 +3,7 @@ from datetime import datetime
 import json
 import modules.custom_exceptions as custom_exceptions
 from base.modules.interactive_message import InteractiveMessage
-from modules.cyra_constants import world_url, tower_menu_url, achievements, tasks
+from modules.cyra_constants import world_url, tower_menu_url, achievements, tasks, tower_achievements
 from base.modules.constants import num_emojis, text_emojis, letter_emojis
 from modules.level_parser import parse_wave_achievements, sum_dict
 
@@ -353,7 +353,7 @@ class LevelWaveMessage(InteractiveMessage):
     return embed
     
 class LevelAchievementMessage(InteractiveMessage):
-  general_columns = ["level","name","mode","strategy","time","link","remark","task"]
+  general_columns = ["level","name","mode","strategy","time", "gold","link","remark","task"]
     
   def __init__(self, achievement, num, parent=None, **attributes):
     super().__init__(parent, **attributes)
@@ -362,6 +362,7 @@ class LevelAchievementMessage(InteractiveMessage):
     self.state = 0
     world = attributes.pop("world", None)
     mode = attributes.pop("mode", None)
+    sort_by_absolute = attributes.pop("sort_by_absolute", False)
     # use the world and mode arguments to limit the search
     where_clause = []
     select_clause = self.general_columns + achievements
@@ -375,24 +376,37 @@ class LevelAchievementMessage(InteractiveMessage):
     # check the achievemnt argument to get the sorting method
     achievement_parse = achievement.replace('_', ' ').title()
     if achievement == "fast":
-      self.goal = "Levels with the shortest completion time"
+      self.goal = "levels with the shortest completion time"
       self.info = ["TIME"]
       self.info_fun = lambda row: [f"{row[-1]:.0f}"]
       select_clause.append(f"MIN(time/2.0+{self.extra_t}) AS criteria")
       sort_method = "criteria ASC"
     elif achievement in tasks:
-      self.goal = f"Shortest levels where **{achievement_parse}s** can be found"
+      self.goal = f"shortest levels where **{achievement_parse}s** can be found"
       self.info = ["TIME"]
       self.info_fun = lambda row: [f"{row[-1]:.0f}"]
       select_clause.append(f"MIN(time/2.0+{self.extra_t}) AS criteria")
       where_clause.append(f"task='{achievement}'")
       where_clause.append(f'mode="campaign"')
       sort_method = "criteria ASC"
+    elif achievement in tower_achievements:
+      self.goal = f"levels with the highest gold rewards to help tower achievements"
+      self.info = ["GOLD", "TIME", "GPS"]
+      time_index = select_clause.index("time")
+      self.info_fun = lambda row: [row[5], f"{row[time_index]/2.0+self.extra_t:.0f}", f"{row[-1]:.2f}"]
+      criteria_str = f"CAST(gold AS FLOAT)/(time/2.0+{self.extra_t})"
+      if not sort_by_absolute:
+        select_clause.append(f"MAX({criteria_str}) AS criteria")
+      else:
+        gold_index = select_clause.index("gold")
+        select_clause[gold_index] = "MAX(gold)"
+        select_clause.append(f"({criteria_str}) AS criteria")
+      sort_method = "criteria DESC" if not sort_by_absolute else "gold DESC"
     else:
       ind = achievements.index(achievement) + len(self.general_columns) # index of achievement in results
       where_clause.append(f"{achievement}>0")
       if num:
-        self.goal = f"Levels that quickly farm **{num} {achievement_parse}** Enemies"
+        self.goal = f"levels that quickly farm **{num} {achievement_parse}** Enemies"
         self.info = ["KILL","TIME","RUN","SUM_T"]
         self.info_fun = lambda row: [row[ind], f"{row[4]/2.0+self.extra_t:.0f}", 
                         int(-(-num // row[ind])), f"{row[-1]:.0f}"]
@@ -401,12 +415,18 @@ class LevelAchievementMessage(InteractiveMessage):
         select_clause.append(f"MIN({criteria_str}) AS criteria")
         sort_method = "criteria ASC"
       else:
-        self.goal = f"Levels that quickly farm **{achievement_parse}** Enemies"
+        self.goal = f"levels that quickly farm **{achievement_parse}** Enemies"
         self.info = ["KILL","TIME","KPS"]
-        self.info_fun = lambda row: [row[ind], f"{row[4]/2.0+self.extra_t:.0f}", f"{row[-1]:.2f}"]
+        time_index = select_clause.index("time")
+        self.info_fun = lambda row: [row[ind], f"{row[time_index]/2.0+self.extra_t:.0f}", f"{row[-1]:.2f}"]
         criteria_str = f"CAST({achievement} AS FLOAT)/(time/2.0+{self.extra_t})"
-        select_clause.append(f"MAX({criteria_str}) AS criteria")
-        sort_method = f"criteria DESC"
+        if not sort_by_absolute:
+          select_clause.append(f"MAX({criteria_str}) AS criteria")
+        else:
+          kill_index = select_clause.index(achievement)
+          select_clause[kill_index] = f"MAX({achievement})"
+          select_clause.append(f"({criteria_str}) AS criteria")
+        sort_method = "criteria DESC" if not sort_by_absolute else f"{achievement} DESC"
     where_clause = " AND ".join(where_clause) if where_clause else "TRUE"
     select_clause = ", ".join(select_clause)
     self.result = self.context.bot.db[self.context.guild.id].query(
@@ -436,7 +456,7 @@ class LevelAchievementMessage(InteractiveMessage):
   async def transfer_to_child(self, emoji):
     if emoji == "👽":
       if self.state > 0:
-        return LevelWaveMessage(self.current_row[0], self.current_row[2], self, link=self.current_row[5], task=self.current_row[7])
+        return LevelWaveMessage(self.current_row[0], self.current_row[2], self, link=self.current_row[6], task=self.current_row[8])
       else:
         return None
     if emoji == text_emojis["info"]:
@@ -469,7 +489,7 @@ class LevelAchievementMessage(InteractiveMessage):
       embed.add_field(name="For Level Details:", value=instruction, inline=False)
     else: # return the level info
       general_columns_num = len(self.general_columns)
-      level, name, mode, strategy, time, link, remark, task = self.current_row[:general_columns_num]
+      level, name, mode, strategy, time, gold, link, remark, task = self.current_row[:general_columns_num]
       kills = self.current_row[general_columns_num:general_columns_num+len(achievements)]
       description = []
       if strategy == "long":
@@ -487,6 +507,10 @@ class LevelAchievementMessage(InteractiveMessage):
       else:
         description.append("⚔️ Strategy: Kill all enemies as fast as you can")
       description.append(f"⏳ Completion Time (x1 speed): {time}s")
+      gold_emoji = self.context.bot.get_emoji(self.context.guild, "coin")
+      if not gold_emoji:
+        gold_emoji = "💰"
+      description.append(f"{gold_emoji} Gold Rewards: {gold}")
       embed = discord.Embed(title=f"{level}. {name} {mode.title()}", colour=discord.Colour.green(), 
                             timestamp=datetime.utcnow(), description="\n".join(description))
       kill_msg = []

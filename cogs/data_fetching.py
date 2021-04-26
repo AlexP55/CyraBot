@@ -5,7 +5,7 @@ from modules.custom_exceptions import DataNotFound
 import xlrd
 from base.modules.constants import DB_PATH as path
 from modules.cyra_constants import achievements, achievemets_dict, level_boss
-from modules.level_parser import parse_achievements, parse_wave
+from modules.level_parser import parse_achievements, parse_level
 import os
 import json
 import logging
@@ -325,7 +325,7 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
     db.create_table("wave", ["level", "mode"], level="txt", mode="txt", initial_gold="int", max_life="int", enemy_waves="txt")
     db.delete_table("achievement")
     achievement_columns = {achievement:"int" for achievement in achievements}
-    db.create_table("achievement", ["level", "mode", "strategy"], level="txt", mode="txt", strategy="txt", time="real", **achievement_columns)
+    db.create_table("achievement", ["level", "mode", "strategy"], level="txt", mode="txt", strategy="txt", time="real", gold="int", **achievement_columns)
     directory = os.path.join(path, 'levels/')
     data = sorted(os.listdir(directory))
     for name in data:
@@ -341,10 +341,7 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
             mode = name_split[1]
           else:
             mode = ""
-          parsed_level = {"initial_gold":entry["initial_gold"], "max_life":entry["max_life"], "enemy_waves":[]}
-          waves = entry["enemy_waves"]
-          for wave in waves:
-            parsed_level["enemy_waves"].append(parse_wave(wave))
+          parsed_level = parse_level(entry)
             
           # get level info
           result = db.select("levels", level)
@@ -360,12 +357,12 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
           if (mode != "legendary" and remark == "boss"):
             # boss level, can skip the last wave by instantly killing the boss
             strategy = "long"
-            time, achievement_count = parse_achievements(parsed_level["enemy_waves"])
-            db.insert_or_update("achievement", level, mode, strategy, time, *achievement_count.values())
+            time, achievement_count, gold = parse_achievements(parsed_level["enemy_waves"])
+            db.insert_or_update("achievement", level, mode, strategy, time, gold+parsed_level["initial_gold"], *achievement_count.values())
             if len(parsed_level["enemy_waves"]) > 1:
               strategy = "short"
-              time, achievement_count = parse_achievements(parsed_level["enemy_waves"][:-1])
-              db.insert_or_update("achievement", level, mode, strategy, time, *achievement_count.values())
+              time, achievement_count, gold = parse_achievements(parsed_level["enemy_waves"][:-1])
+              db.insert_or_update("achievement", level, mode, strategy, time, gold+parsed_level["initial_gold"], *achievement_count.values())
           elif remark == "boss rush": # SR boss levels, you can choose to skip waves
             wave_num = len(parsed_level["enemy_waves"])
             for ind in range(1, 2**wave_num):
@@ -376,16 +373,16 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
                else:
                  strategy = "long"
                valid_waves = [parsed_level["enemy_waves"][i] for i in range(len(valid_waves)) if valid_waves[i]==1]
-               time, achievement_count = parse_achievements(valid_waves)
-               db.insert_or_update("achievement", level, mode, strategy, time, *achievement_count.values())
+               time, achievement_count, gold = parse_achievements(valid_waves)
+               db.insert_or_update("achievement", level, mode, strategy, time, gold+parsed_level["initial_gold"], *achievement_count.values())
           else:
             if level.startswith("A5-"):
               # these levels can be run as long as possible
               strategy = "long"
             else:
               strategy = ""
-            time, achievement_count = parse_achievements(parsed_level["enemy_waves"])
-            db.insert_or_update("achievement", level, mode, strategy, time, *achievement_count.values())
+            time, achievement_count, gold = parse_achievements(parsed_level["enemy_waves"])
+            db.insert_or_update("achievement", level, mode, strategy, time, gold+parsed_level["initial_gold"], *achievement_count.values())
           
           parsed_level["enemy_waves"] = json.dumps(parsed_level["enemy_waves"])
           db.insert_or_update("wave", level, mode, *parsed_level.values())

@@ -129,9 +129,10 @@ class InfoCog(commands.Cog, name="Information Commands"):
     name="achieve",
     brief="Farms achievements",
     aliases=["achievement"],
-    help="Shows which way is the best to farm achievements/daily missions. This command assumes you will spend time on entering and exiting a level, and the results are based on the time efficiency.\nFor example, to show which level is the fastest to farm 200 goblins, use:\n`{prefix}achieve goblin 200`\nTo show which level is the fastest to farm spiders in the sense of counts per second, use:\n`{prefix}achieve spider`\nTo show which w6 legendary level is the fastest to complete, use:\n`{prefix}achieve w6 legendary fast`\nTo show where to find a specific tappable trap, use:\n`{prefix}achieve trap`"
+    help="Shows which way is the best to farm achievements/daily missions. This command assumes you will spend time on entering and exiting a level, and the results are based on the time efficiency. If you want the results to be based on absolute number, input true at the end of argument.\nFor example, to show which level is the fastest to farm 200 goblins, use:\n`{prefix}achieve goblin 200`\nTo show which level is has the highest spider kills per second, use:\n`{prefix}achieve spider`\nTo make the results based on absolute kills, use:\n`{prefix}achieve spider true`\nTo show which w6 legendary level is the fastest to complete, use:\n`{prefix}achieve w6 legendary fast`\nTo show where to find a specific tappable trap, use:\n`{prefix}achieve trap`"
   )
-  async def _achieve(self, context, world:typing.Optional[toWorld], mode:typing.Optional[toMode], achievement:find_achievement="fast", num:int=None):
+  async def _achieve(self, context, world:typing.Optional[toWorld], mode:typing.Optional[toMode], achievement:find_achievement="fast", 
+                     num:typing.Optional[int]=None, sort_by_absolute:typing.Optional[bool]=False):
     # check world argument
     if world is not None and (world <= 0 or world >= 8):
       raise custom_exceptions.DataNotFound("World", world)
@@ -158,7 +159,7 @@ class InfoCog(commands.Cog, name="Information Commands"):
       guide = level_guide.LevelIndividualMessage(valid_row[0], context=context, timeout=timeout, dbrow=valid_row)
       await guide.start(msg)
     else:
-      guide = level_guide.LevelAchievementMessage(achievement, num, context=context, timeout=timeout, world=world, mode=mode)
+      guide = level_guide.LevelAchievementMessage(achievement, num, context=context, timeout=timeout, world=world, mode=mode, sort_by_absolute=sort_by_absolute)
       await guide.start()
 
   @commands.command(
