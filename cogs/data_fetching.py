@@ -350,11 +350,11 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
           # parse achievements info
           if is_boss_level(level, mode, remark):
             # boss level, can skip the last wave by instantly killing the boss
-            strategy = "long"
+            strategy = "Play as long as you can without killing the boss"
             time, achievement_count, gold = parse_achievements(parsed_level["enemy_waves"])
             db.insert_or_update("achievement", level, mode, strategy, time, gold+parsed_level["initial_gold"], wave_num, *achievement_count.values())
             if level not in ["180"]: # Raijin boss level is not skippable because of damage immunity
-              strategy = "short"
+              strategy = "Kill the boss as fast as you can"
               time, achievement_count, gold = parse_achievements(parsed_level["enemy_waves"][:-1])
               db.insert_or_update("achievement", level, mode, strategy, time, gold+parsed_level["initial_gold"], wave_num, *achievement_count.values())
           elif remark == "boss rush": # SR boss levels, you can choose to skip waves
@@ -362,27 +362,26 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
                valid_waves = [int(d) for d in bin(ind)[2:].zfill(wave_num)] # a list of 0's and 1's, indicating skip wave or not
                skipped_waves = []
                waves_info = []
-               gold_valid = 0
+               last_wave = -1
                for i in range(len(valid_waves)):
                  if valid_waves[i]==0:
                    skipped_waves.append(str(i+1))
                  else:
                    waves_info.append(parsed_level["enemy_waves"][i])
-                   if i > 0:
-                     last_wave = parsed_level["enemy_waves"][i-1]
-                     gold_valid += last_wave["reward"] + last_wave["bonus"]
+                   last_wave = i
+               gold_valid = sum([parsed_level["enemy_waves"][i]["reward"] for i in range(last_wave)])
                if skipped_waves:
-                 strategy = "skip wave " + ", ".join(skipped_waves)
+                 strategy = f"Kill boss(es) in wave {', '.join(skipped_waves)} as fast as you can" 
                else:
-                 strategy = "long"
+                 strategy = "Play as long as you can without killing the bosses"
                time, achievement_count, _ = parse_achievements(waves_info)
                db.insert_or_update("achievement", level, mode, strategy, time, gold_valid+parsed_level["initial_gold"], wave_num, *achievement_count.values())
           else:
             if level.startswith("A5-"):
               # these levels can be run as long as possible
-              strategy = "long"
+              strategy = "Play as long as you can"
             else:
-              strategy = ""
+              strategy = "Kill all enemies as fast as you can"
             time, achievement_count, gold = parse_achievements(parsed_level["enemy_waves"])
             db.insert_or_update("achievement", level, mode, strategy, time, gold+parsed_level["initial_gold"], wave_num, *achievement_count.values())
           

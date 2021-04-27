@@ -5,7 +5,7 @@ import modules.custom_exceptions as custom_exceptions
 from base.modules.interactive_message import InteractiveMessage
 from modules.cyra_constants import world_url, tower_menu_url, achievements, tasks, tower_achievements
 from base.modules.constants import num_emojis, text_emojis, letter_emojis
-from modules.level_parser import parse_wave_achievements, sum_dict, is_boss_level
+from modules.level_parser import parse_wave_achievements, sum_dict
 
 class LevelRootMessage(InteractiveMessage):
   def __init__(self, parent=None, **attributes):
@@ -398,12 +398,13 @@ class LevelAchievementMessage(InteractiveMessage):
       self.info = ["GOLD", "TIME", "GPS"]
       self.info_fun = lambda row: [row[5], f"{time_calculation(row):.0f}", f"{row[-1]:.2f}"]
       criteria_str = f"CAST(gold AS FLOAT)/({time_string})"
-      if not sort_by_absolute:
+      if sort_by_absolute == False:
         select_clause.append(f"MAX({criteria_str}) AS criteria")
+        sort_method = "criteria DESC"
       else:
-        select_clause[5] = "MAX(gold)"
+        select_clause.append(f"MAX(gold-time/100.0)")
         select_clause.append(f"({criteria_str}) AS criteria")
-      sort_method = "criteria DESC" if not sort_by_absolute else "gold DESC"
+        sort_method = "gold DESC"
     else:
       ind = select_clause.index(achievement) # index of achievement in results
       where_clause.append(f"{achievement}>0")
@@ -421,12 +422,13 @@ class LevelAchievementMessage(InteractiveMessage):
         self.info = ["KILL","TIME","KPS"]
         self.info_fun = lambda row: [row[ind], f"{time_calculation(row):.0f}", f"{row[-1]:.2f}"]
         criteria_str = f"CAST({achievement} AS FLOAT)/({time_string})"
-        if not sort_by_absolute:
+        if not sort_by_absolute == True:
           select_clause.append(f"MAX({criteria_str}) AS criteria")
+          sort_method = "criteria DESC"
         else:
           select_clause[ind] = f"MAX({achievement})"
           select_clause.append(f"({criteria_str}) AS criteria")
-        sort_method = "criteria DESC" if not sort_by_absolute else f"{achievement} DESC"
+          sort_method =  f"{achievement} DESC"
     where_clause = " AND ".join(where_clause) if where_clause else "TRUE"
     select_clause = ", ".join(select_clause)
     self.result = self.context.bot.db[self.context.guild.id].query(
@@ -492,20 +494,8 @@ class LevelAchievementMessage(InteractiveMessage):
       level, name, mode, strategy, time, gold, wave, link, remark, task = self.current_row[:general_columns_num]
       kills = self.current_row[general_columns_num:general_columns_num+len(achievements)]
       description = []
-      if strategy == "long":
-        if is_boss_level(level, mode, remark):
-          description.append("⚔️ Strategy: Play as long as you can without killing the boss")
-        else:
-          description.append("⚔️ Strategy: Play as long as you can")
-      elif strategy == "short":
-        if is_boss_level(level, mode, remark):
-          description.append("⚔️ Strategy: Kill the boss as fast as you can")
-        else:
-          description.append("⚔️ Strategy: Compelete the mission as fast as you can")
-      elif strategy.startswith("skip"):
-        description.append(f"⚔️ Strategy: {strategy.capitalize()} by killing the boss quickly, but delay as long as you can in other waves")
-      else:
-        description.append("⚔️ Strategy: Kill all enemies as fast as you can")
+      if strategy:
+        description.append(f"⚔️ Strategy: {strategy}")
       description.append(f"⏳ Completion Time (x1 speed): {time}s")
       description.append(f"🌊 Wave Num: {wave}")
       gold_emoji = self.context.bot.get_emoji(self.context.guild, "coin")
