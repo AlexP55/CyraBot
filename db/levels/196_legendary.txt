@@ -1,1 +1,1 @@
-{"initial_gold": 500, "max_life": 1, "enemy_waves": [{"reward": 900, "bonus": 0, "time": 197.5, "enemies": {"Skeleton Samurai": 29, "Small Ghostfire": 26, "Kagami-no-Yuurei": 0, "Aoi Mask": 6, "Oni Mask": 38, "Big Ghostfire": 2}}]}
+{"initial_gold": 500, "max_life": 1, "enemy_waves": [{"reward": 900, "bonus": 0, "time": 197.5, "enemies": {"Skeleton Samurai": 29, "Small Ghostfire": 26, "Kagami-no-Yuurei": 1, "Aoi Mask": 8, "Oni Mask": 38, "Big Ghostfire": 2}}]}
