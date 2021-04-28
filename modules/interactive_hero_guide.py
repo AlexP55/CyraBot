@@ -59,7 +59,7 @@ class HeroIndividualMessage(InteractiveMessage):
   def __init__(self, hero, parent=None, **attributes):
     super().__init__(parent, **attributes)
     db = self.context.bot.db[self.context.guild.id]
-    result = db.query(f'SELECT ability, type, unlock, shortDescription, tag, world, link FROM ability JOIN hero on name=hero WHERE name="{hero}" ORDER BY tag')
+    result = db.query(f'SELECT ability, type, unlock, shortDescription, tag, world, link, introduction FROM ability JOIN hero on name=hero WHERE name="{hero}" ORDER BY tag')
     if len(result) == 0:
       raise custom_exceptions.HeroNotFound(string.capwords(hero))
     world = result[0][5]
@@ -67,11 +67,12 @@ class HeroIndividualMessage(InteractiveMessage):
       self.parent = HeroWorldMessage(world, None, **attributes)
     self.hero = hero
     self.link = result[0][6]
+    self.introduction = result[0][7]
     self.abilities = []
     self.child_emojis = []
     self.ability_emojis = [] # match child_emojis to ability name
     self.extra_info = []
-    for ability, abilityType, unlock, shortDescription, tag, world, link in result:
+    for ability, abilityType, unlock, shortDescription, tag, _, _, _ in result:
       if tag < -2:
         continue
       elif tag == -2: # melee spell
@@ -101,8 +102,8 @@ class HeroIndividualMessage(InteractiveMessage):
     return HeroAbilityMessage(self.hero, ability, self)
     
   async def get_embed(self):
-    embed = discord.Embed(title=f"**{string.capwords(self.hero)}**", url=self.link, 
-      timestamp=datetime.utcnow(), colour=discord.Colour.blue())
+    embed = discord.Embed(title=f"**{string.capwords(self.hero)}**", description=self.introduction,
+                          url=self.link, timestamp=datetime.utcnow(), colour=discord.Colour.blue())
     for title, shortDescription, tag in self.abilities:
       embed.add_field(name=f"{title}", value=shortDescription, inline=False)
     if len(self.extra_info) > 0:
