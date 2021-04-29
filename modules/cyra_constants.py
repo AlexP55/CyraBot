@@ -211,27 +211,37 @@ def token_cost(ranklow, rankhigh):
   return sum(rank_cost[ranklow:rankhigh])
 
 achievemets_dict = {
-"Slime":["slime"],"Skeleton":["skeleton"],"Crow":["flying"],"Skeleton Archer":["skeleton"],"Spider":["spider"],"Poison Spider":["spider"],
-"Skeleton Mage":["skeleton"],"Bucket Slime":["slime"],"Giant Slime":["slime"],"Slime Queen":["slime"],"Slime Blob":["slime"],
+"Slime":["slime"],"Bucket Slime":["slime"],"Giant Slime":["slime"],"Slime Queen":["slime"],"Slime Blob":["slime"],
+"Skeleton":["skeleton"],"Skeleton Archer":["skeleton"],"Skeleton Mage":["skeleton"],
+"Spider":["spider"],"Poison Spider":["spider"],
+"Crow":["flying"],
 
-"Goblin Grunt":["goblin"],"Crow Rider":["flying"],"Goblin Archer":["goblin"],"Goblin Shaman":["goblin"],"Maniac":["goblin"],
-"Goblin Tallman":["goblin"],"Heretic":["goblin"],"Orc":["goblin"],"Goblin Chieftain":["goblin"],"Hordemonger":["goblin"],
+"Goblin Grunt":["goblin"],"Goblin Archer":["goblin"],"Goblin Shaman":["goblin"],"Maniac":["goblin"],"Heretic":["goblin"],
+"Goblin Tallman":["goblin"],"Goblin Chieftain":["goblin"],"Orc":["goblin"],"Hordemonger":["goblin"],
+"Crow Rider":["flying"],
 
-"Flying Scarab":["flying"],"Anubian":["anubian"],"Vulture Rider":["flying"],"Mega Anubian":["anubian"],"Cactus Golem":["golem"],
+"Anubian":["anubian"],"Mega Anubian":["anubian"],
+"Cactus Golem":["golem"],
+"Flying Scarab":["flying"],"Vulture Rider":["flying"],
 
-"Fire Elemental":["elemental"],"Ice Elemental":["elemental"],"Whelp":["flying"],"Time Construct":["golem"],"Wizard Initiate":["wizard"],
-"Void Elemental":["elemental"],"Gravity Wizard":["wizard"],"Earth Elemental":["elemental"],"Ivory Golem":["golem"],
+"Fire Elemental":["elemental"],"Ice Elemental":["elemental"],"Void Elemental":["elemental"],"Earth Elemental":["elemental"],
+"Gravity Wizard":["wizard"],"Wizard Initiate":["wizard"],
+"Time Construct":["golem"],"Ivory Golem":["golem"],
+"Whelp":["flying"],
 
-"Duskvine Sproutling":["duskvine"],"Aqua Slime":["slime"],"Cave Bat":["flying"],"Lava Slime":["slime","lava"],"Lava Bat":["flying","lava"],
-"Lava Snail":["lava"],"Duskvine Sporophyte":["duskvine"],"Giant Cave Bat":["flying"],"Myrk Archer":["myrk"],"Small Ent":["ent"],
-"Duskvine Lasher":["duskvine"],"Myrk Assassin":["myrk"],"Duskvine Crusher":["duskvine"],"Myrk Warlock":["myrk"],"Lava Pango":["lava"],
-"Lava Smasher":["lava"],"Large Ent":["ent"],
+"Duskvine Sproutling":["duskvine"],"Duskvine Sporophyte":["duskvine"],"Duskvine Lasher":["duskvine"],"Duskvine Crusher":["duskvine"],
+"Myrk Archer":["myrk"],"Myrk Assassin":["myrk"],"Myrk Warlock":["myrk"],
+"Aqua Slime":["slime"],"Lava Slime":["slime","lava"],
+"Cave Bat":["flying"],"Lava Bat":["flying","lava"],"Giant Cave Bat":["flying"],
+"Lava Snail":["lava"],"Lava Pango":["lava"],"Lava Smasher":["lava"],
+"Small Ent":["ent"],"Large Ent":["ent"],
 
-"Strange Monk":["w6","monk"],"Origami Crane":["w6","flying"],"Oni-tekidanhei":["w6","oni"],"Daruma":["w6","flying"],
-"Small Ghostfire":["w6","spirit"],"Chibi-Mahou":["w6","monk"],"Harpi":["w6","flying"],"Skeleton Samurai":["w6","skeleton"],
-"Oni-baba":["w6","oni"],"Koi-jin":["w6","fishguard"],"Kakutouka":["w6","monk"],"Oni-ken":["w6","oni"],"Kagami-no-Yuurei":["w6","spirit"],
-"Namazu-jin":["w6","fishguard"],"Oni Mask":["w6","spirit"],"Aoi Mask":["w6","spirit"],"Kami-no-Mahoutsukai":["w6"],
-"Kaeru-hei":["w6","fishguard"],"Big Ghostfire":["w6","spirit"],"Shunmin-shi":["w6"],"Oni-kanadzuchi":["w6","oni"],
+"Strange Monk":["w6","monk"],"Chibi-Mahou":["w6","monk"],"Kakutouka":["w6","monk"],"Kami-no-Mahoutsukai":["w6"],"Shunmin-shi":["w6"],
+"Origami Crane":["w6","flying"],"Daruma":["w6","flying"],"Harpi":["w6","flying"],
+"Oni-tekidanhei":["w6","oni"],"Oni-baba":["w6","oni"],"Oni-ken":["w6","oni"],"Oni-kanadzuchi":["w6","oni"],
+"Small Ghostfire":["w6","spirit"],"Kagami-no-Yuurei":["w6","spirit"],"Oni Mask":["w6","spirit"],"Aoi Mask":["w6","spirit"],"Big Ghostfire":["w6","spirit"],
+"Skeleton Samurai":["w6","skeleton"],
+"Koi-jin":["w6","fishguard"],"Namazu-jin":["w6","fishguard"],"Kaeru-hei":["w6","fishguard"],
 
 "Quadropus":["corrupted"], "Floating Rambler":["corrupted"], "Rock Rambler":["corrupted"],
 "Tin Slime":["w7_slime"], "Flying Slime":["w7_slime"], "Ground Slime":["w7_slime"],
