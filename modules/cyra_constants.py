@@ -244,7 +244,7 @@ achievemets_dict = {
 "Koi-jin":["w6","fishguard"],"Namazu-jin":["w6","fishguard"],"Kaeru-hei":["w6","fishguard"],
 
 "Quadropus":["corrupted"], "Floating Rambler":["corrupted"], "Rock Rambler":["corrupted"],
-"Tin Slime":["w7_slime"], "Flying Slime":["w7_slime"], "Ground Slime":["w7_slime"],
+"Tin Slime":["w7_slime"], "Flying Slime":["w7_slime", "flying_slime"], "Ground Slime":["w7_slime"],
 "Gem Eye":["security_construct"], "Eta Sentry":["security_construct"]
 }
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))
@@ -254,8 +254,6 @@ tappables = ["trap", "hidden enemies", "loose change", "chicken dinner", "snowma
 tower_achievements = ["tower"]
 
 achievement_synonyms = {achievement:achievement for achievement in achievements}
-achievement_synonyms.update({tappable:tappable for tappable in tappables})
-achievement_synonyms.update({achievement:achievement for achievement in tower_achievements})
 achievement_synonyms.update({ # achievement synonyms
 "w6enemy":"w6",
 "world6":"w6",
@@ -265,6 +263,10 @@ achievement_synonyms.update({ # achievement synonyms
 "lavacreature":"lava",
 "construct":"security_construct"
 })
+farmable_achievement_synonyms = achievement_synonyms.copy()
+
+achievement_synonyms.update({tappable:tappable for tappable in tappables})
+achievement_synonyms.update({achievement:achievement for achievement in tower_achievements})
 achievement_synonyms.update({ # tappable synonyms
 "hidden": "hidden enemies",
 "unleash": "hidden enemies",

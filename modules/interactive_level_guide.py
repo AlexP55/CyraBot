@@ -6,6 +6,7 @@ from base.modules.interactive_message import InteractiveMessage
 from modules.cyra_constants import world_url, tower_menu_url, achievements, tower_achievements
 from base.modules.constants import num_emojis, text_emojis, letter_emojis
 from modules.level_parser import parse_wave_achievements, sum_dict
+from modules.optimize import find_minimal_cost
 
 class LevelRootMessage(InteractiveMessage):
   def __init__(self, parent=None, **attributes):
@@ -258,12 +259,13 @@ class LevelWaveMessage(InteractiveMessage):
         raise custom_exceptions.DataNotFound("Level Waves", f"{level} {mode}" if mode else level)
       else:
         dbrow = list(dbrow.values())
-    if self.task is None:
+    if self.task is None or self.link is None:
       level_general = self.context.bot.db[self.context.guild.id].select("levels", level)
       if not level_general:
         raise custom_exceptions.DataNotFound("Level", level)
       else:
         self.task = level_general["task"]
+        self.link = level_general["link"]
     if self.parent is None:
       self.parent = LevelIndividualMessage(level, **attributes)
     # check the level's wave data to decide its child emojis
@@ -353,13 +355,10 @@ class LevelWaveMessage(InteractiveMessage):
     return embed
     
 class LevelAchievementMessage(InteractiveMessage):
-  general_columns = ["level","name","mode","strategy","time","gold","wave","link","remark"]
+  general_columns = ["level","name","mode","strategy","time","gold","wave","link","task"]
     
   def __init__(self, achievement, num, parent=None, **attributes):
     super().__init__(parent, **attributes)
-    self.achievement = achievement
-    self.num = num
-    self.state = 0
     world = attributes.pop("world", None)
     mode = attributes.pop("mode", None)
     sort_by_absolute = attributes.pop("sort_by_absolute", False)
@@ -456,7 +455,7 @@ class LevelAchievementMessage(InteractiveMessage):
   async def transfer_to_child(self, emoji):
     if emoji == "👽":
       if self.state > 0:
-        return LevelWaveMessage(self.current_row[0], self.current_row[2], self, link=self.current_row[7], task=self.current_row[9])
+        return LevelWaveMessage(self.current_row[0], self.current_row[2], self, link=self.current_row[7], task=self.current_row[8])
       else:
         return None
     if emoji == text_emojis["info"]:
@@ -485,11 +484,11 @@ class LevelAchievementMessage(InteractiveMessage):
       summary = ["`" + "  ".join(f"{row[i]:<{max_len[i]}}" for i in range(len(row))) + "`" for row in table]
       embed = discord.Embed(title=f"Search Results", colour=discord.Colour.green(), 
                             timestamp=datetime.utcnow(), description=description+"\n".join(summary))
-      instruction = f"{text_emojis['info']} Summary {num_emojis[1]}-{num_emojis[len(self.result)]} Results"
+      instruction = f"{text_emojis['info']} Summary  {num_emojis[1]}-{num_emojis[len(self.result)]} Results"
       embed.add_field(name="For Level Details:", value=instruction, inline=False)
     else: # return the level info
       general_columns_num = len(self.general_columns)
-      level, name, mode, strategy, time, gold, wave, link, remark = self.current_row[:general_columns_num]
+      level, name, mode, strategy, time, gold, wave, link, _ = self.current_row[:general_columns_num]
       kills = self.current_row[general_columns_num:general_columns_num+len(achievements)]
       description = []
       if strategy:
@@ -509,8 +508,182 @@ class LevelAchievementMessage(InteractiveMessage):
           name = name.title() if name in ["villager", "bandit"] else f"{name.replace('_', ' ').title()} Enemies"
           kill_msg.append(f"`{kill:<{max_kill_len}} {name}`")
       embed.add_field(name="Achievement Counts:", value="\n".join(kill_msg) if kill_msg else "None", inline=False)
-      instruction = (f"{text_emojis['info']} Summary {num_emojis[1]}-{num_emojis[len(self.result)]} Results\n"
+      instruction = (f"{text_emojis['info']} Summary  {num_emojis[1]}-{num_emojis[len(self.result)]} Results\n"
                      f"👽 Details of Enemy Waves")
+      embed.add_field(name="For Other Details:", value=instruction, inline=False)
+      if link and link != "NONE":
+        embed.set_image(url=link)
+    embed.set_footer(text="Achievements")
+    return embed
+    
+    
+class AchievementPlanMessage(InteractiveMessage):
+  general_columns = ["level","name","mode","strategy","time","gold","wave","link","task"]
+
+  def __init__(self, achieves, nums, parent=None, **attributes):
+    super().__init__(parent, **attributes)
+    self.achieves = achieves
+    self.nums = nums
+    self.attributes = attributes.copy()
+    self.achieves_ind = [achievements.index(achievement) for achievement in achieves]
+    world = attributes.pop("world", None)
+    mode = attributes.pop("mode", None)
+    sort_by_absolute = attributes.pop("sort_by_absolute", False)
+    self.candidates = attributes.pop("candidates", None)
+    self.tlevel = self.context.bot.get_setting(self.context.guild, "LEVEL_EXTRA_TIME")
+    self.twave = self.context.bot.get_setting(self.context.guild, "WAVE_EXTRA_TIME")
+    if self.candidates is None:
+      # use the world and mode arguments to limit the search
+      where_clause = [" OR ".join([f"{achievement}>0" for achievement in achieves])]
+      select_clause = self.general_columns + achievements + [f"time/2.0+{self.tlevel}+wave*{self.twave} AS tvalid"] 
+      if world:
+        where_clause.append(f"world={world}")
+      if mode:
+        where_clause.append(f'mode="{mode}"')
+      select_clause = ", ".join(select_clause)
+      where_clause = f"({') AND ('.join(where_clause)})"
+      self.candidates = self.context.bot.db[self.context.guild.id].query(f"SELECT {select_clause} FROM achievement NATURAL JOIN levels WHERE {where_clause}")
+    if not self.candidates:
+      condition = []
+      if world:
+        condition.append(f"W{world}")
+      if mode:
+        condition.append(f"{mode.title()} mode")
+      achieves_parse = ', '.join([achievement.replace('_', ' ').title() for achievement in achieves])
+      raise custom_exceptions.DataNotFound("Achievement", f"{achieves_parse} in {' '.join(condition)}" if condition else achieves_parse)
+      
+    # optimize process
+    constraint_coeffs = []
+    for i in range(len(achieves)):
+      constraint_coeffs.append([])
+    lower_bounds = nums
+    cost_coeffs = []
+    for i, row in enumerate(self.candidates):
+      _, time, row_achieves = self.row_split(row)
+      counts = self.get_target_achieves(row_achieves)
+      for j, count in enumerate(counts):
+        constraint_coeffs[j].append(count)
+      cost_coeffs.append(time if not sort_by_absolute else 10000+time) # give a small weight on time so that level with less time will be more likely to be selected
+    self.minimum_sol = find_minimal_cost(constraint_coeffs, lower_bounds, cost_coeffs)
+    self.minimum_sol.sort(reverse=True, key=lambda sol: sol[1])
+    self.update_state(0)
+      
+  def update_state(self, state):
+    len_viewable = min(10, len(self.minimum_sol))
+    if len_viewable == 0:
+      self.state = 0
+      self.child_emojis = []
+      return
+    if state <= 0:
+      self.state = 0
+      self.child_emojis = [text_emojis["info"]] + num_emojis[1:len_viewable+1]
+    else:
+      self.state = min(state, len(self.minimum_sol))
+      self.child_emojis = [text_emojis["info"]] + num_emojis[1:len_viewable+1] + ["👽", "❌"]
+      
+  @property
+  def current_row(self):
+    if self.state > 0:
+      return self.candidates[self.current_candidate_ind]
+      
+  @property
+  def current_candidate_ind(self):
+    if self.state > 0:
+      return self.minimum_sol[self.state-1][0]
+      
+  def row_split(self, row):
+    general = row[:len(self.general_columns)]
+    time = row[-1]
+    achieves = row[len(self.general_columns):-1]
+    return general, time, achieves
+    
+  def get_target_achieves(self, achieves):
+    return [achieves[ind] for ind in self.achieves_ind]
+    
+  async def transfer_to_child(self, emoji):
+    if emoji == "👽":
+      if self.state > 0:
+        return LevelWaveMessage(self.current_row[0], self.current_row[2], self, link=self.current_row[7], task=self.current_row[8])
+      else:
+        return None
+    if emoji == "❌":
+      if self.state > 0:
+        if len(self.candidates) <= 1:
+          await self.context.send(f"{self.context.author.mention} You are going to remove all candidates levels and no solution can be found!")
+          return None
+        self.candidates.pop(self.current_candidate_ind)
+        self.attributes["candidates"] = self.candidates
+        self.attributes["message"] = self.message
+        return AchievementPlanMessage(self.achieves, self.nums, self.parent, **self.attributes)
+      else:
+        return None
+    if emoji == text_emojis["info"]:
+      state = 0
+    else:
+      state = num_emojis.index(emoji)
+    if state == self.state:
+      return None
+    else:
+      self.update_state(state)
+      return self
+    
+    
+  async def get_embed(self):
+    if self.state <= 0: # return the summary
+      achieve_lists = [f"**{num}** **{achievement.title()}s**" if achievement in ["bandit", "villager"] else
+                       f"**{num}** **{achievement.replace('_', ' ').title()}** enemies"
+                       for achievement, num in zip(self.achieves, self.nums)]
+      goal = f"Find a plan to quickly farm {', '.join(achieve_lists)}"
+      description = (f"🎯 Goal: {goal}\n"
+                     f"📖 Assume: {self.tlevel:<.0f}s to enter and exit, {self.twave:<.0f}s to call a wave, and played under **x2 speed**")
+      embed = discord.Embed(title=f"Plan Results", colour=discord.Colour.green(), timestamp=datetime.utcnow(), description=description)
+      if not self.minimum_sol:
+        embed.add_field(name="Farm Plans:", value="No optimal plan can be found", inline=False)
+      else:
+        table = [["NO","LEVEL","RUN","TIME"] + [f"GOAL{i+1}" for i in range(len(self.achieves))]]
+        max_len = [len(str(item)) for item in table[0]]
+        sum_run = 0
+        sum_t = 0
+        i = 0
+        for ind, runs in self.minimum_sol:
+          i += 1
+          row = self.candidates[ind]
+          achieve_row = row[len(self.general_columns):-1]
+          goal_counts = self.get_target_achieves(achieve_row)
+          sum_run += runs
+          sum_t += row[-1] * runs
+          new_row = [str(i), f"{row[0]} {row[2][:3].title()}", runs, f"{row[-1]:.0f}"]+goal_counts
+          table.append(new_row)
+          max_len = [max(column) for column in zip(max_len, [len(str(item)) for item in new_row])]
+        summary = ["`" + "  ".join(f"{row[i]:<{max_len[i]}}" for i in range(len(row))) + "`" for row in table]
+        embed.add_field(name="Farm Plans:", value="\n".join(summary), inline=False)
+        embed.add_field(name="Summary:", value=f"⏳ Total Time: {sum_t:.0f}s\n🏃 Total Runs: {sum_run}", inline=False)
+        instruction = (f"{text_emojis['info']} Summary  {num_emojis[1]}-{num_emojis[len(self.minimum_sol)]} Results\n"
+                       f"To remove a level, react its number and then ❌") 
+        embed.add_field(name="For Level Details:", value=instruction, inline=False)
+    else: # return the level info
+      general, time, kills = self.row_split(self.current_row)
+      level, name, mode, strategy, time, gold, wave, link, _ = general
+      description = []
+      if strategy:
+        description.append(f"⚔️ Strategy: {strategy}")
+      description.append(f"⏳ Completion Time (x1 speed): {time}s")
+      description.append(f"🌊 Wave Num: {wave}")
+      gold_emoji = self.context.bot.get_emoji(self.context.guild, "coin")
+      if not gold_emoji:
+        gold_emoji = "💰"
+      description.append(f"{gold_emoji} Gold Rewards: {gold}")
+      embed = discord.Embed(title=f"{level}. {name} {mode.title()}", colour=discord.Colour.green(), 
+                            timestamp=datetime.utcnow(), description="\n".join(description))
+      kill_msg = []
+      max_kill_len = max([len(str(kill)) for kill in kills])
+      for name, kill in zip(achievements, kills):
+        if kill > 0:
+          name = name.title() if name in ["villager", "bandit"] else f"{name.replace('_', ' ').title()} Enemies"
+          kill_msg.append(f"`{kill:<{max_kill_len}} {name}`")
+      embed.add_field(name="Achievement Counts:", value="\n".join(kill_msg) if kill_msg else "None", inline=False)
+      instruction = (f"{text_emojis['info']} Summary  {num_emojis[1]}-{num_emojis[len(self.minimum_sol)]} Results\n"
+                     f"👽 Details of Enemy Waves\n❌ Remove this Level from Results")
       embed.add_field(name="For Other Details:", value=instruction, inline=False)
       if link and link != "NONE":
         embed.set_image(url=link)

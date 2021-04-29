@@ -3,9 +3,10 @@ from discord.ext import commands
 import random
 import modules.custom_exceptions as custom_exceptions
 import typing
-from modules.cyra_converter import find_hero, toLevelWorld, toWorld, toMode, find_achievement, numberComparisonConverter
+from modules.cyra_converter import find_hero, toLevelWorld, toWorld, toMode, find_achievement, numberComparisonConverter, find_farmable_achievement
 from modules.cyra_constants import facts, elixir_cost, elixir_cost_hero, max_level, tappables
 from base.modules.message_helper import num_emojis, multiple_choice
+from base.modules.basic_converter import BoolConverter
 import modules.interactive_level_guide as level_guide
 import logging
 
@@ -125,9 +126,11 @@ class InfoCog(commands.Cog, name="Information Commands"):
       guild = level_guide.LevelIndividualMessage(level, context=context, timeout=timeout)
     await guild.start()
     
-  @commands.command(
+  @commands.group(
     name="achieve",
     brief="Farms achievements",
+    case_insensitive = True,
+    invoke_without_command=True,
     aliases=["achievement"],
     help="Shows which way is the best to farm achievements/daily missions. This command assumes you will spend time on entering and exiting a level, and the results are based on the time efficiency. If you want the results to be based on absolute number, input true at the end of argument.\nFor example, to show which level is the fastest to farm 200 goblins, use:\n`{prefix}achieve goblin 200`\nTo show which level is has the highest spider kills per second, use:\n`{prefix}achieve spider`\nTo make the results based on absolute kills, use:\n`{prefix}achieve spider true`\nTo show which w6 legendary level is the fastest to complete, use:\n`{prefix}achieve w6 legendary fast`\nTo show where to find a specific tappable trap, use:\n`{prefix}achieve trap`"
   )
@@ -161,6 +164,36 @@ class InfoCog(commands.Cog, name="Information Commands"):
     else:
       guide = level_guide.LevelAchievementMessage(achievement, num, context=context, timeout=timeout, world=world, mode=mode, sort_by_absolute=sort_by_absolute)
       await guide.start()
+      
+  @_achieve.command(
+    name="plan",
+    brief="Optimizes achievement farming",
+    usage="[world] [mode] <achievements> <num>... [sort_by_absolute]",
+  )
+  async def _achieve_plan(self, context, world:typing.Optional[toWorld], mode:typing.Optional[toMode], *args):
+    if len(args) < 2:
+      raise commands.BadArgument("Invalid input, must input an achievementand a number")
+    achievements = []
+    nums = []
+    sort_by_absolute = False
+    args = list(args)
+    while len(args) > 1:
+      try:
+        achievements.append(find_farmable_achievement(args.pop(0)))
+        nums.append(int(args.pop(0)))
+      except Exception as e:
+        if isinstance(e, commands.BadArgument):
+          raise e
+        else:
+          raise commands.BadArgument("Invalid input, must input a number after each achievement")
+    if args:
+      try:
+        sort_by_absolute = BoolConverter(args.pop(0))
+      except:
+        pass
+    timeout = self.bot.get_setting(context.guild, "ACTIVE_TIME") * 60
+    guide = level_guide.AchievementPlanMessage(achievements, nums, context=context, timeout=timeout, world=world, mode=mode, sort_by_absolute=sort_by_absolute)
+    await guide.start()
 
   @commands.command(
     brief="Displays link to wiki",

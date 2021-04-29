@@ -5,7 +5,8 @@ from datetime import timedelta
 import discord
 from discord.ext import commands
 import modules.custom_exceptions as custom_exceptions
-from modules.cyra_constants import hero_synonyms, ability_synonyms, hero_list, achievements, achievement_synonyms, emoji_dict
+from modules.cyra_constants import hero_synonyms, ability_synonyms, hero_list, achievements, \
+                                   achievement_synonyms, emoji_dict, farmable_achievement_synonyms
 from unidecode import unidecode
 
 def find_closest(word, word_list):
@@ -70,6 +71,13 @@ def find_ability(word):
   if word in ability_synonyms:
     return ability_synonyms[word]
   return word
+  
+def find_farmable_achievement(name):
+  name = name.lower()
+  close_word = find_closest(name, list(farmable_achievement_synonyms))
+  if close_word:
+    return farmable_achievement_synonyms[close_word]
+  raise custom_exceptions.DataNotFound("Achievement", name.title())
   
 def find_achievement(name):
   name = name.lower()
