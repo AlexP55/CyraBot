@@ -3,7 +3,7 @@ from datetime import datetime
 import json
 import modules.custom_exceptions as custom_exceptions
 from base.modules.interactive_message import InteractiveMessage
-from modules.cyra_constants import world_url, tower_menu_url, achievements, tasks, tower_achievements
+from modules.cyra_constants import world_url, tower_menu_url, achievements, tower_achievements
 from base.modules.constants import num_emojis, text_emojis, letter_emojis
 from modules.level_parser import parse_wave_achievements, sum_dict
 
@@ -353,7 +353,7 @@ class LevelWaveMessage(InteractiveMessage):
     return embed
     
 class LevelAchievementMessage(InteractiveMessage):
-  general_columns = ["level","name","mode","strategy","time","gold","wave","link","remark","task"]
+  general_columns = ["level","name","mode","strategy","time","gold","wave","link","remark"]
     
   def __init__(self, achievement, num, parent=None, **attributes):
     super().__init__(parent, **attributes)
@@ -385,14 +385,6 @@ class LevelAchievementMessage(InteractiveMessage):
       self.info_fun = lambda row: [f"{row[-1]:.0f}"]
       select_clause.append(f"MIN({time_string}) AS criteria")
       sort_method = "criteria ASC"
-    elif achievement in tasks:
-      self.goal = f"shortest levels where **{achievement_parse}s** can be found"
-      self.info = ["TIME"]
-      self.info_fun = lambda row: [f"{row[-1]:.0f}"]
-      select_clause.append(f"MIN({time_string}) AS criteria")
-      where_clause.append(f"task='{achievement}'")
-      where_clause.append(f'mode="campaign"')
-      sort_method = "criteria ASC"
     elif achievement in tower_achievements:
       self.goal = f"levels with the highest gold rewards to help tower achievements"
       self.info = ["GOLD", "TIME", "GPS"]
@@ -406,11 +398,17 @@ class LevelAchievementMessage(InteractiveMessage):
         select_clause.append(f"({criteria_str}) AS criteria")
         sort_method = "gold DESC"
     else:
+      if achievement in ["villager", "bandit"]:
+        target = f"**{achievement_parse}s**"
+        farm = "NUM"
+      else:
+        target = f"**{achievement_parse}** Enemies"
+        farm = "KILL"
       ind = select_clause.index(achievement) # index of achievement in results
       where_clause.append(f"{achievement}>0")
       if num:
-        self.goal = f"levels that quickly farm **{num} {achievement_parse}** Enemies"
-        self.info = ["KILL","TIME","RUN","SUM_T"]
+        self.goal = f"levels that quickly farm **{num}** {target}"
+        self.info = [f"{farm}","TIME","RUN","SUM_T"]
         self.info_fun = lambda row: [row[ind], f"{time_calculation(row):.0f}", 
                         int(-(-num // row[ind])), f"{row[-1]:.0f}"]
         num = float(num)
@@ -418,8 +416,8 @@ class LevelAchievementMessage(InteractiveMessage):
         select_clause.append(f"MIN({criteria_str}) AS criteria")
         sort_method = "criteria ASC"
       else:
-        self.goal = f"levels that quickly farm **{achievement_parse}** Enemies"
-        self.info = ["KILL","TIME","KPS"]
+        self.goal = f"levels that quickly farm {target}"
+        self.info = [f"{farm}","TIME","KPS"]
         self.info_fun = lambda row: [row[ind], f"{time_calculation(row):.0f}", f"{row[-1]:.2f}"]
         criteria_str = f"CAST({achievement} AS FLOAT)/({time_string})"
         if not sort_by_absolute == True:
@@ -491,7 +489,7 @@ class LevelAchievementMessage(InteractiveMessage):
       embed.add_field(name="For Level Details:", value=instruction, inline=False)
     else: # return the level info
       general_columns_num = len(self.general_columns)
-      level, name, mode, strategy, time, gold, wave, link, remark, task = self.current_row[:general_columns_num]
+      level, name, mode, strategy, time, gold, wave, link, remark = self.current_row[:general_columns_num]
       kills = self.current_row[general_columns_num:general_columns_num+len(achievements)]
       description = []
       if strategy:
@@ -509,8 +507,6 @@ class LevelAchievementMessage(InteractiveMessage):
       for name, kill in zip(achievements, kills):
         if kill > 0:
           kill_msg.append(f"`{kill:<{max_kill_len}} {name.replace('_', ' ').title()} Enemies`")
-      if task:
-        kill_msg.append(f"`{1:<{max_kill_len}} {task.title()}`")
       embed.add_field(name="Achievement Counts:", value="\n".join(kill_msg) if kill_msg else "None", inline=False)
       instruction = (f"{text_emojis['info']} Summary {num_emojis[1]}-{num_emojis[len(self.result)]} Results\n"
                      f"👽 Details of Enemy Waves")

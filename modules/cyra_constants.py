@@ -248,14 +248,13 @@ achievemets_dict = {
 "Gem Eye":["security_construct"], "Eta Sentry":["security_construct"]
 }
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))
+achievements += ["villager", "bandit"]
 
 tappables = ["trap", "hidden enemies", "loose change", "chicken dinner", "snowman", "windmill", "cow", "boneheaded", "seeker", "llama", "mercenary board"]
-tasks = ["villager", "bandit"]
 tower_achievements = ["tower"]
 
 achievement_synonyms = {achievement:achievement for achievement in achievements}
 achievement_synonyms.update({tappable:tappable for tappable in tappables})
-achievement_synonyms.update({task:task for task in tasks})
 achievement_synonyms.update({achievement:achievement for achievement in tower_achievements})
 achievement_synonyms.update({ # achievement synonyms
 "w6enemy":"w6",
