@@ -200,6 +200,7 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
   @_fetch.command(
     name="hero",
     brief="Fetch hero table",
+    aliases=["heroes"]
   )
   @commands.max_concurrency(1, commands.BucketType.guild)
   @has_admin_role()
@@ -213,6 +214,7 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
   @_fetch.command(
     name="ability",
     brief="Fetch ability table",
+    aliases=["abilities"]
   )
   @commands.max_concurrency(1, commands.BucketType.guild)
   @has_admin_role()
@@ -226,6 +228,7 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
   @_fetch.command(
     name="abilityDetail",
     brief="Fetch abilityDetail table",
+    aliases=["abilityDetails"]
   )
   @commands.max_concurrency(1, commands.BucketType.guild)
   @has_admin_role()
@@ -237,8 +240,9 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
     await self.send_fetch_log(context, "abilityDetail")
 
   @_fetch.command(
-    name="levels",
+    name="level",
     brief="Fetch levels table",
+    aliases=["levels"]
   )
   @commands.max_concurrency(1, commands.BucketType.guild)
   @has_admin_role()
@@ -250,8 +254,9 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
     await self.send_fetch_log(context, "levels")
 
   @_fetch.command(
-    name="quotes",
+    name="quote",
     brief="Fetch quotes table",
+    aliases=["quotes"]
   )
   @commands.max_concurrency(1, commands.BucketType.guild)
   @has_admin_role()
@@ -265,6 +270,7 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
   @_fetch.command(
     name="enemy",
     brief="Fetch enemy table",
+    aliases=["enemies"]
   )
   @commands.max_concurrency(1, commands.BucketType.guild)
   @has_admin_role()
@@ -278,6 +284,7 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
   @_fetch.command(
     name="tower",
     brief="Fetch tower table",
+    aliases=["towers"]
   )
   @commands.max_concurrency(1, commands.BucketType.guild)
   @has_admin_role()
@@ -291,6 +298,7 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
   @_fetch.command(
     name="buff",
     brief="Fetch buff table",
+    aliases=["buffs"]
   )
   @commands.max_concurrency(1, commands.BucketType.guild)
   @has_admin_role()
@@ -304,6 +312,7 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
   @_fetch.command(
     name="wave",
     brief="Fetch wave table",
+    aliases=["waves, achievement, achievements"]
   )
   @commands.max_concurrency(1, commands.BucketType.guild)
   @has_admin_role()
