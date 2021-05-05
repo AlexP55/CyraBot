@@ -78,7 +78,9 @@ hero_synonyms.update({ # hero synonyms
   "masa":"masamune",
   "shampoo":"shamiko",
   "necroconnie":"connie",
+  "old connie":"normal connie",
   "beastmasterhogan":"hogan",
+  "old hogan":"normal hogan",
   "elana":"elara",
 })
 
