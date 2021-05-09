@@ -139,6 +139,8 @@ class InfoCog(commands.Cog, name="Information Commands"):
     # check world argument
     if world is not None and (world <= 0 or world >= 8):
       raise custom_exceptions.DataNotFound("World", world)
+    if world == 7 and achievement == "slime": # extra parsing for w7 slime
+      achievement = "w7_slime"
     timeout = self.bot.get_setting(context.guild, "ACTIVE_TIME") * 60
     if achievement in tappables:
       where_clause = [f'tappable LIKE "%{achievement}%"']
