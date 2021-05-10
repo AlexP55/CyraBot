@@ -156,7 +156,7 @@ class InfoCog(commands.Cog, name="Information Commands"):
         msg = None
       else:
         levels = [f"{num_emojis[i+1]} `W{result[i][1]} lv.{result[i][0]:<5} {result[i][2]}`" for i in range(len(result))]
-        content = f"You can complete the mission in below levels, react to see the details of a level:\n" + '\n'.join(levels)
+        content = f"You can complete the mission **{achievement.title()}** in below levels, react to see the details of a level:\n" + '\n'.join(levels)
         response, msg = await multiple_choice(context, content, num=len(result))
         if response is None:
           return
