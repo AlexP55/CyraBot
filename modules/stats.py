@@ -127,7 +127,7 @@ class CleanStats(Stats):
       elif "Dodge" == key:
         messages.append(f"{key:<13} = {value}%")
       else:
-        if not ("CastSpeed" != key and value == 1):
+        if not ("CastSpeed" == key and value == 1):
           messages.append(f"{key:<13} = {value}")
     return messages
   
