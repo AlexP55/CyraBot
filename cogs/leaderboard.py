@@ -257,7 +257,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       week_message = None
     return all_message, season_message, week_message
     
-  def get_season_leaderboard(self, guild, season=0):
+  def get_season_leaderboard(self, guild, season=0, instruction=None):
     if season is not None:
       if season <= 0:
         season = self.season
@@ -305,11 +305,13 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
                           colour=discord.Colour.gold(), timestamp=datetime.utcnow(), description=description)
     footer_emoji = self.bot.get_emoji(guild, "gm")
     embed.set_footer(text="Seasonal GM" if season is not None else "GM Summary", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
+    if instruction:
+      embed.add_field(name="For Other Info:", value=instruction, inline=False)
     
     self.add_embed_fields(embed, lines)
     return embed
     
-  def get_week_leaderboard(self, guild, season=0, week=0):
+  def get_week_leaderboard(self, guild, season=0, week=0, instruction=None):
     if season <= 0:
       season = self.season
     if week <= 0:
@@ -364,6 +366,8 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
                           timestamp=datetime.utcnow(), description=description)
     footer_emoji = self.bot.get_emoji(guild, "gm")
     embed.set_footer(text="Weekly GM", icon_url=footer_emoji.url if footer_emoji else discord.Embed.Empty)
+    if instruction:
+      embed.add_field(name="For Other Info:", value=instruction, inline=False)
     
     self.add_embed_fields(embed, lines)
     return embed
@@ -371,6 +375,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
   def add_embed_fields(self, embed, lines):
     # add the fields to an embed
     save_size = 0 # the size to be saved to avoid exceeding size limit
+    ind = 0
     if len(embed) + sum([len(line) for line in lines]) + 10 > self.embed_total_limit:
       # contents cannot be all fit in, need to save size for a field
       save_size += len(f"{len(lines)} player(s) not displayed in the table.") + len(empty_space)
@@ -380,12 +385,13 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       field_limit = min(self.embed_field_limit, remaining_size)
       new_field = size_limit_join(lines, field_limit)
       if new_field:
-        embed.add_field(name=empty_space, value=new_field, inline=False)
+        embed.insert_field_at(ind, name=empty_space, value=new_field, inline=False)
+        ind += 1
       if remaining_size <= self.embed_field_limit or not new_field:
         # no more size to add a new field
         break
     if lines:
-      embed.add_field(name=empty_space, value=f"{len(lines)} player(s) not displayed in the table.", inline=False)
+      embed.insert_field_at(ind, name=empty_space, value=f"{len(lines)} player(s) not displayed in the table.", inline=False)
     
   def get_rank_emoji(self, guild, rank):
     if rank <= 1:
@@ -480,16 +486,15 @@ class InteractiveLeaderboard(InteractiveMessage):
     return None
     
   async def get_embed(self):
-    if self.info_type == InteractiveLeaderboard.InfoType.all:
-      embed = self.cog.get_season_leaderboard(self.context.guild, None)
-    elif self.info_type == InteractiveLeaderboard.InfoType.season:
-      embed = self.cog.get_season_leaderboard(self.context.guild, self.season)
-    elif self.info_type == InteractiveLeaderboard.InfoType.week:
-      embed = self.cog.get_week_leaderboard(self.context.guild, self.season, self.week)
     instruction = f"{letter_emojis['A']} All  {letter_emojis['S']} Seasonly  {letter_emojis['W']} Weekly"
     if len(self.season_week_comb) > 1 and self.info_type != InteractiveLeaderboard.InfoType.all:
       instruction = f"{instruction}\n{arrow_emojis['backward']}{arrow_emojis['forward']} Change Season/Week"
-    embed.add_field(name="For Other Info:", value=instruction, inline=False)
+    if self.info_type == InteractiveLeaderboard.InfoType.all:
+      embed = self.cog.get_season_leaderboard(self.context.guild, None, instruction)
+    elif self.info_type == InteractiveLeaderboard.InfoType.season:
+      embed = self.cog.get_season_leaderboard(self.context.guild, self.season, instruction)
+    elif self.info_type == InteractiveLeaderboard.InfoType.week:
+      embed = self.cog.get_week_leaderboard(self.context.guild, self.season, self.week, instruction)
     return embed
     
 def setup(bot):
