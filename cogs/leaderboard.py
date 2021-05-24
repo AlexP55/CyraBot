@@ -277,7 +277,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       rank += 1
       #r_emoji = self.get_rank_emoji(guild, rank)
       member = guild.get_member(playerid)
-      name = deEmojify(gameid if gameid else (member.display_name if member else "???"))
+      name = deEmojify(gameid if gameid else (member.display_name if member else "���"))
       if flag is None:
         flag = "🏁"
       heroes = "".join([hero if hero is not None else "⬛" for hero in [hero1, hero2, hero3]])
@@ -331,17 +331,17 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
       rank += 1
       #r_emoji = self.get_rank_emoji(guild, rank)
       member = guild.get_member(playerid)
-      name = deEmojify(gameid if gameid else (member.display_name if member else "???"))
+      name = deEmojify(gameid if gameid else (member.display_name if member else "���"))
       if flag is None:
         flag = "🏁"
       heroes = "".join([hero if hero is not None else "⬛" for hero in [hero1, hero2, hero3]])
       mention = str(member) if member is not None else ""
       if time is None:
-        time = "???"
+        time = "���"
       else:
         minutes, seconds = divmod(time, 60)
         time = f"{minutes:02.0f}:{seconds:06.3f}"
-      kill = "???" if kill is None else str(kill)
+      kill = "���" if kill is None else str(kill)
       table.append([str(rank) if rank < 100 else "", flag, name[:self.name_limit], heroes, kill, time, mention])
     rank_maxlen = max([len(table[i][0]) for i in range(len(table))])
     name_maxlen = max([len(table[i][2]) for i in range(len(table))])
