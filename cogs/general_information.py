@@ -84,8 +84,11 @@ class InfoCog(commands.Cog, name="Information Commands"):
     hero_str = hero_str if hero_str else hero.title()
     elixir_str = self.bot.get_emoji(context.guild, 'elixir')
     elixir_str = elixir_str if elixir_str else "elixirs"
-    await context.send(f"You are able to upgrade {hero_str} from lv{lvStart} to lv{lv}, "
-                       f"with {numElixir-cost} {elixir_str} remaining.")
+    reply = (f"You are able to upgrade {hero_str} from lv{lvStart} to lv{lv}, "
+             f"with {numElixir-cost} {elixir_str} remaining.")
+    if lv < len(cost_list):
+      reply = f"{reply}\nThe next level needs {cost_list[lv-1]} {elixir_str}."
+    await context.send(reply)
     
   @elixir.command(
     brief="Shows info on elixir mine",
