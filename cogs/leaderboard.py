@@ -271,7 +271,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
                            f"FROM ({leaderboard_query}) AS ldb LEFT JOIN player_info on ldb.playerid=player_info.playerid "
                            f"ORDER BY gm_num DESC, season DESC, week DESC, kill DESC NULLS LAST, time ASC NULLS LAST")
     # return the seasonly leaderboard embed
-    table = [["", "⬛", "Game ID", "⬛⬛⬛", "GMs", "Member"]]
+    table = [[" ", "⬛", "Game ID", "⬛⬛⬛", "GMs", "Member"]]
     rank = 0
     for playerid, gameid, flag, hero1, hero2, hero3, gm_num in result:
       rank += 1
@@ -323,7 +323,7 @@ class LeaderboardCog(commands.Cog, name="Leaderboard Commands"):
                            f"FROM ({leaderboard_query}) AS ldb LEFT JOIN player_info on ldb.playerid=player_info.playerid "
                            f"ORDER BY kill DESC NULLS LAST, time ASC NULLS LAST")
     # return the weekly leaderboard embed
-    table = [["", "⬛", "Game ID", "⬛⬛⬛", "Kill", "Time", "Member"]]
+    table = [[" ", "⬛", "Game ID", "⬛⬛⬛", "Kill", "Time", "Member"]]
     rank = 0
     for playerid, gameid, flag, hero1, hero2, hero3, kill, time, group_rank, gm_rank in result:
       rank += 1
