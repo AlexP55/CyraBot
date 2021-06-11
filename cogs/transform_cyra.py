@@ -48,6 +48,7 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
     async def auto_transform():
       if self.auto_transform.current_loop == 0: # don't transform at the first time
         return
+      before = None
       after = None
       for guild_id, db in self.bot.db.items():
         guild = discord.utils.get(self.bot.guilds, id=guild_id)
@@ -55,8 +56,8 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
           continue
         try:
           logger.debug(f"Transforming in {guild.name} ({guild.id}).")
-          before = self.bot.get_nick(guild).lower()
-          if after is None:
+          if before is None or after is None:
+            before = self.bot.get_nick(guild).lower()
             after = self.get_random_trans_hero(before)
             change_avatar = True
           else:
