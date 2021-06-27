@@ -48,6 +48,7 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
     async def auto_transform():
       if self.auto_transform.current_loop == 0: # don't transform at the first time
         return
+      before = None
       after = None
       for guild_id, db in self.bot.db.items():
         guild = discord.utils.get(self.bot.guilds, id=guild_id)
@@ -55,8 +56,8 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
           continue
         try:
           logger.debug(f"Transforming in {guild.name} ({guild.id}).")
-          before = self.bot.get_nick(guild).lower()
-          if after is None:
+          if before is None or after is None:
+            before = self.bot.get_nick(guild).lower()
             after = self.get_random_trans_hero(before)
             change_avatar = True
           else:
@@ -84,13 +85,14 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
       return False
       
   def get_random_trans_hero(self, old_hero):
-    if not self.transform_list:
-      raise ValueError("Transform list needs to be non-empty.")
-    hero = random.choice(self.transform_list)
-    if len(self.transform_list) > 2:
-      while hero == old_hero:
-        hero = random.choice(self.transform_list)
-    return hero
+    try:
+      list_temp = self.transform_list.copy()
+      list_temp.remove(old_hero)
+    except:
+      pass
+    if not list_temp:
+      raise ValueError("There is no candidate hero to transform to.")
+    return random.choice(list_temp)
     
 
   @commands.group(
