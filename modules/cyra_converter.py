@@ -66,8 +66,13 @@ def hero_and_secret(arg):
   
 def find_ability(word):
   word = word.lower()
-  if word.split(" ", 1)[0] in ["rank1", "rank2", "rank3", "rank4", "rank5", "rank6", "rank7"]:
-    return word.replace("rank", "r", 1)
+  keywords = word.split()
+  if keywords[0] in ["rank", "r"]:
+    keywords.pop(0)
+    keywords[0] = f"r{keywords[0]}"
+  elif keywords[0].startswith("rank") and keywords[0][4:].isnumeric():
+    keywords[0] = keywords[0].replace("rank", "r", 1)
+  word = " ".join(keywords)
   if word in ability_synonyms:
     return ability_synonyms[word]
   return word
