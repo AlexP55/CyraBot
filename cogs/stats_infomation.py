@@ -432,7 +432,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       description = (
         f"Instantly kills all non-boss enemies in AOE range 4, deals `9% hp` damage to bosses, and summons 2 lava golems.\n"
         f"After that, drops 5 more small meteors to random enemies with AOE range 1 and same damage effect.\n"
-        f"Lava golems has 400 hp, and deals `42 TD + 10% hp` damage on a non-boss enemy, or `1% hp` damage on a boss every 1s, last 20s."
+        f"Lava golems has 400 hp, and deals `42 TD + 10% hp` damage on a non-boss enemy, or `1% hp` damage on a boss every 1s."
       )
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/1/18/Inferno_Consumable.png/revision/latest?cb=20200822204547"
     elif name in ["summon potion", "summon"]:
