@@ -83,6 +83,9 @@ hero_synonyms.update({ # hero synonyms
   "old hogan":"normal hogan",
   "elana":"elara",
 })
+transform_extra = ["secret", "sylvan mercenary"]
+transform_synonyms = hero_synonyms.copy()
+transform_synonyms.update({hero:hero for hero in transform_extra})
 
 ability_synonyms = {
   "range":"ranged",

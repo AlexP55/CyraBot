@@ -6,7 +6,8 @@ import discord
 from discord.ext import commands
 import modules.custom_exceptions as custom_exceptions
 from modules.cyra_constants import hero_synonyms, ability_synonyms, hero_list, achievements, \
-                                   achievement_synonyms, emoji_dict, farmable_achievement_synonyms
+                                   achievement_synonyms, emoji_dict, farmable_achievement_synonyms, \
+                                   transform_synonyms
 from unidecode import unidecode
 
 def find_closest(word, word_list):
@@ -58,11 +59,12 @@ class hero_emoji_converter(commands.Converter):
       return emoji
     raise custom_exceptions.HeroNotFound(argument.title())
     
-def hero_and_secret(arg):
-  if arg == "secret":
-    return "secret"
-  else:
-    return find_hero_from_text(arg)
+def hero_and_secret(word):
+  word = word.lower()
+  close_word = find_closest(word, list(transform_synonyms))
+  if close_word:
+    return transform_synonyms[close_word]
+  raise custom_exceptions.HeroNotFound(word.title())
   
 def find_ability(word):
   word = word.lower()
