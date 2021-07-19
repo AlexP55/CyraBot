@@ -150,7 +150,8 @@ facts = [
   "Selling a tower returns 70% gold spent. Before calling the first wave this ratio is 100%, but rebuilding towers during this will not count towards achievements.",
   "Some of the charmed units including Mummy, Magic Book, Cloud Sunfish, Origami Crane and Harpy cannot engage in melee.",
   "Don't use Shamiko's spell too fast. A unit will not receive a new buff/debuff if it already received one in the last 6s even if it's a different buff.",
-  "50 is the maximum number of enemies in screen."
+  "50 is the maximum number of enemies in screen.",
+  "Enemies taken terror from a specific set of spells will recieve resistance that reduces the terror duration from the same set of skills, including Elara's Imposing Aura, Fee's R7 with Mabyn, Mabyn's Jack Toss and Raining Gift, Dragon Tower's terrify. Other terrify skills including Elara's Comic Flux, Shamiko's Shrieking Shred neither increase nor are affected by resistance"
 ]
 facts.append(f"There are {len(facts)+1} random facts stored in this command. Did you find them all?")
 
