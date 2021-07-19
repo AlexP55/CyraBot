@@ -148,8 +148,9 @@ facts = [
   "Dodge can avoid direct damage, but it can never avoid a buff or a percentage damage.",
   "Buffs to troop towers don't have any effect on their troops, not even on the respawn rate.",
   "Selling a tower returns 70% gold spent. Before calling the first wave this ratio is 100%, but rebuilding towers during this will not count towards achievements.",
-  "Some of the charmed units including Mummy, Magic Book, Cloud Sunfish, Origami Crane and Harpy cannot engage in melee",
-  "Don't use Shamiko's spell too fast. A unit will not receive a new buff/debuff if it already received one in the last 6s even if it's a different buff."
+  "Some of the charmed units including Mummy, Magic Book, Cloud Sunfish, Origami Crane and Harpy cannot engage in melee.",
+  "Don't use Shamiko's spell too fast. A unit will not receive a new buff/debuff if it already received one in the last 6s even if it's a different buff.",
+  "50 is the maximum number of enemies in screen."
 ]
 facts.append(f"There are {len(facts)+1} random facts stored in this command. Did you find them all?")
 
