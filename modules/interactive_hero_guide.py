@@ -123,7 +123,7 @@ class HeroAbilityMessage(DetermInteractiveMessage):
       self.parent = HeroIndividualMessage(hero, None, **attributes)
     self.inherited = True # this is the bottom interface, inherit its parent
     db = self.context.bot.db[self.context.guild.id]
-    result = db.query(f'SELECT upgrade, info, type, addition, url FROM abilityDetail AS ad JOIN ability AS ab ON ad.hero=ab.hero AND ad.ability=ab.ability WHERE ab.ability="{ability}" AND ab.hero="{hero}"')
+    result = db.query(f'SELECT upgrade, info, type, addition, url FROM abilityDetail NATURAL JOIN ability WHERE ability="{ability}" AND hero="{hero}" ORDER BY upgrade DESC')
     if len(result) == 0:
       raise custom_exceptions.AbilityNotFound(string.capwords(hero), string.capwords(ability))
     self.hero = hero
