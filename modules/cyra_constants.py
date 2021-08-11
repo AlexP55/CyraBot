@@ -104,7 +104,7 @@ world_hero = {
   4:["yan", "narlax"],
   5:["leif", "caldera"],
   6:["azura", "raida", "koizuul", "shamiko"],
-  7:["cyra", "elara"],
+  7:["cyra", "elara", "osan"],
   None:[], #default 
 }
 
