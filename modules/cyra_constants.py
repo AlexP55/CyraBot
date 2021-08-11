@@ -33,6 +33,7 @@ emoji_keys = {
   "shamiko":"hero_Shamiko1",
   "cyra":"hero_Cyra1",
   "elara":"hero_Elara1",
+  "osan":"hero_Osan1",
   "koizuul dragon":"hero_Koizuul2",
   "gm":"title_4_gm",
   "knight":"title_2_knight",
@@ -50,7 +51,7 @@ hero_list = [
   "azura","bolton","caldera","connie","efrigid",
   "fee","helios","hogan", "normal hogan","koizuul","lancelot","leif",
   "mabyn","masamune","narlax","obsidian","raida","sethos",
-  "shamiko","smoulder","yan","normal connie","cyra","elara",
+  "shamiko","smoulder","yan","normal connie","cyra","elara","osan"
 ]
 
 emoji_dict = {
@@ -202,7 +203,8 @@ elixir_cost_hero = {
   "connie":elixir_cost_1500,
   "shamiko":elixir_cost_7500,
   "cyra":elixir_cost_7500,
-  "elara":elixir_cost_7500
+  "elara":elixir_cost_7500,
+  "osan":elixir_cost_7500
 }
 
 rank_cost = [5, 10, 15, 20, 40, 80, 100]
