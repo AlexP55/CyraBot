@@ -54,7 +54,7 @@ class TowerWorldMessage(InteractiveMessage):
     for emoji, towerInfo in zip(self.child_emojis, self.towers):
       tower, description1, description2 = towerInfo
       embed.add_field(name=f"{emoji} {string.capwords(tower)}:", 
-        value=f"- {description1}\n- {description2}")
+        value=f"- {description1}\n- {description2}", inline=False)
     embed.set_footer(text=f"WORLD {self.world}")
     return embed
 
