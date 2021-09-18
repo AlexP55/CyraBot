@@ -123,14 +123,13 @@ class HeroAbilityMessage(DetermInteractiveMessage):
       self.parent = HeroIndividualMessage(hero, None, **attributes)
     self.inherited = True # this is the bottom interface, inherit its parent
     db = self.context.bot.db[self.context.guild.id]
-    result = db.query(f'SELECT upgrade, info, type, addition, url FROM abilityDetail NATURAL JOIN ability WHERE ability="{ability}" AND hero="{hero}" ORDER BY upgrade')
+    result = db.query(f'SELECT upgrade, info, type, url FROM abilityDetail NATURAL JOIN ability WHERE ability="{ability}" AND hero="{hero}" ORDER BY upgrade')
     if len(result) == 0:
       raise custom_exceptions.AbilityNotFound(string.capwords(hero), string.capwords(ability))
     self.hero = hero
     self.ability = ability
     self.atype = result[0][2]
-    self.addition = result[0][3]
-    self.url = result[0][4]
+    self.url = result[0][3]
     self.upgrades = []
     for row in result:
       upgrade = row[0]
@@ -152,7 +151,7 @@ class HeroAbilityMessage(DetermInteractiveMessage):
   async def get_embed(self):
     embed = discord.Embed(title=f"**{string.capwords(self.ability)}**", 
       timestamp=datetime.utcnow(), colour=discord.Colour.blue(), 
-      description=f"Type: {self.atype}\n{self.addition}")
+      description=f"Type: {self.atype}")
     emoji = self.context.bot.get_emoji(self.context.guild, self.hero)
     if emoji is not None:
       embed.set_thumbnail(url=emoji.url)

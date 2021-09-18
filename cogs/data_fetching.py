@@ -37,12 +37,12 @@ class SheetReader:
     if sheet is None:
       logging.warning("Warning, no ability sheet found")
       return
-    expected = 9
+    expected = 8
     if not sheet.ncols == expected:
       raise Exception(f"Levels sheet columns do not match, expected {expected} but found {sheet.ncols}")
     self.db.delete_table("ability")
     self.db.create_table("ability", ["ability", "hero"], ability="txt_not_null", hero="txt_not_null", type="txt_not_null", unlock="txt_not_null",
-                    shortDescription="txt_not_null", addition="txt_not_null", tag="int_not_null", keyword="txt_not_null", url="txt_not_null")
+                    shortDescription="txt_not_null", tag="int_not_null", keyword="txt_not_null", url="txt_not_null")
     self.insertSheet(sheet, "ability")
 
   def fetchAbilityDetail(self):
