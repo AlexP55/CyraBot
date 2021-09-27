@@ -152,7 +152,8 @@ facts = [
   "Some of the charmed units including Mummy, Magic Book, Cloud Sunfish, Origami Crane and Harpy cannot engage in melee.",
   "Don't use Shamiko's spell too fast. A unit will not receive a new buff/debuff if it already received one in the last 6s even if it's a different buff.",
   "50 is the maximum number of enemies in screen.",
-  "Enemies taken terror from a specific set of spells will receive resistance that reduces the terror duration from the same set of skills, including Elara's Imposing Aura, Fee's R7 with Mabyn, Mabyn's Jack Toss and Raining Gift, Dragon Tower's terrify. Other terrify skills including Elara's Comic Flux, Shamiko's Shrieking Shred neither increase nor are affected by resistance"
+  "Enemies taken terror from a specific set of spells will receive resistance that reduces the terror duration from the same set of skills, including Elara's Imposing Aura, Fee's R7 with Mabyn, Mabyn's Jack Toss and Raining Gift, Dragon Tower's terrify. Other terrify skills including Elara's Comic Flux, Shamiko's Shrieking Shred neither increase nor are affected by resistance",
+  "Poison improved by Osan is a actually a burning effect that can damage shield points and kill enemies."
 ]
 facts.append(f"There are {len(facts)+1} random facts stored in this command. Did you find them all?")
 

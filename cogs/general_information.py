@@ -281,38 +281,38 @@ class InfoCog(commands.Cog, name="Information Commands"):
     elif league.lower() in ["gold"]:
       league = "Gold League"
       description = "Top 3 of 20 get promoted."
-      rewards = {"1st place":f"190 {gem_emoji}, 1200 {elixir_emoji}, 40 {medal_emoji}",
-        "2nd place":f"170 {gem_emoji}, 1000 {elixir_emoji}, 30 {medal_emoji}",
-        "3rd place":f"150 {gem_emoji}, 800 {elixir_emoji}, 20 {medal_emoji}",
-        "4th through 6th place":f"30 {gem_emoji}, 800 {elixir_emoji}, 10 {medal_emoji}",
-        "7th through 10th place":f"20 {gem_emoji}, 400 {elixir_emoji}, 5 {medal_emoji}"}
+      rewards = {"1st place":f"190 {gem_emoji}, 1400 {elixir_emoji}, 40 {medal_emoji}",
+        "2nd place":f"170 {gem_emoji}, 1200 {elixir_emoji}, 30 {medal_emoji}",
+        "3rd place":f"150 {gem_emoji}, 1000 {elixir_emoji}, 20 {medal_emoji}",
+        "4th through 6th place":f"30 {gem_emoji}, 1000 {elixir_emoji}, 10 {medal_emoji}",
+        "7th through 10th place":f"20 {gem_emoji}, 500 {elixir_emoji}, 5 {medal_emoji}"}
       icon = self.bot.get_emoji(guild, "gold")
     elif league.lower() in ["platinum","plat"]:
       league = "Platinum League"
       description = "Top 3 of 25 get promoted."
-      rewards = {"1st place":f"300 {gem_emoji}, 1200 {elixir_emoji}, 50 {medal_emoji}",
-        "2nd place":f"250 {gem_emoji}, 1000 {elixir_emoji}, 40 {medal_emoji}",
-        "3rd place":f"200 {gem_emoji}, 800 {elixir_emoji}, 30 {medal_emoji}",
-        "4th through 6th place":f"30 {gem_emoji}, 800 {elixir_emoji}, 15 {medal_emoji}",
-        "7th through 10th place":f"20 {gem_emoji}, 400 {elixir_emoji}, 10 {medal_emoji}"}
+      rewards = {"1st place":f"300 {gem_emoji}, 1600 {elixir_emoji}, 50 {medal_emoji}",
+        "2nd place":f"250 {gem_emoji}, 1200 {elixir_emoji}, 40 {medal_emoji}",
+        "3rd place":f"200 {gem_emoji}, 1000 {elixir_emoji}, 30 {medal_emoji}",
+        "4th through 6th place":f"30 {gem_emoji}, 1000 {elixir_emoji}, 15 {medal_emoji}",
+        "7th through 10th place":f"20 {gem_emoji}, 800 {elixir_emoji}, 10 {medal_emoji}"}
       icon = self.bot.get_emoji(guild, "platinum")
     elif league.lower() in ["diamond", "dia"]:
       league = "Diamond League"
       description = "Top 5 of 30 get promoted."
-      rewards = {"1st place":f"300 {gem_emoji}, 1500 {elixir_emoji}, 75 {medal_emoji}",
-        "2nd and 3rd place":f"250 {gem_emoji}, 1200 {elixir_emoji}, 60 {medal_emoji}",
-        "4th and 5th place":f"200 {gem_emoji}, 1000 {elixir_emoji}, 50 {medal_emoji}",
-        "6th through 10th place":f"40 {gem_emoji}, 1000 {elixir_emoji}, 25 {medal_emoji}",
-        "11th through 15th place":f"25 {gem_emoji}, 500 {elixir_emoji}, 15 {medal_emoji}"}
+      rewards = {"1st place":f"300 {gem_emoji}, 3000 {elixir_emoji}, 75 {medal_emoji}",
+        "2nd and 3rd place":f"250 {gem_emoji}, 2400 {elixir_emoji}, 60 {medal_emoji}",
+        "4th and 5th place":f"200 {gem_emoji}, 2000 {elixir_emoji}, 50 {medal_emoji}",
+        "6th through 10th place":f"40 {gem_emoji}, 1800 {elixir_emoji}, 25 {medal_emoji}",
+        "11th through 15th place":f"25 {gem_emoji}, 1200 {elixir_emoji}, 15 {medal_emoji}"}
       icon = self.bot.get_emoji(guild, "diamond")
     elif league.lower() in ["master"]:
       league = "Master League"
       description = "Top 5 of 30 get promoted."
-      rewards = {"1st place":f"300 {gem_emoji}, 1500 {elixir_emoji}, 100 {medal_emoji}",
-        "2nd and 3rd place":f"250 {gem_emoji}, 1200 {elixir_emoji}, 90 {medal_emoji}",
-        "4th and 5th place":f"200 {gem_emoji}, 1000 {elixir_emoji}, 80 {medal_emoji}",
-        "6th through 10th place":f"40 {gem_emoji}, 1000 {elixir_emoji}, 40 {medal_emoji}",
-        "11th through 15th place":f"25 {gem_emoji}, 500 {elixir_emoji}, 20 {medal_emoji}"}
+      rewards = {"1st place":f"300 {gem_emoji}, 5000 {elixir_emoji}, 100 {medal_emoji}",
+        "2nd and 3rd place":f"250 {gem_emoji}, 3600 {elixir_emoji}, 90 {medal_emoji}",
+        "4th and 5th place":f"200 {gem_emoji}, 3000 {elixir_emoji}, 80 {medal_emoji}",
+        "6th through 10th place":f"40 {gem_emoji}, 1800 {elixir_emoji}, 40 {medal_emoji}",
+        "11th through 15th place":f"25 {gem_emoji}, 1500 {elixir_emoji}, 20 {medal_emoji}"}
       icon = self.bot.get_emoji(guild, "master")
     elif league.lower() in ["legend", "legendary", "grandmaster", 'gm']:
       league = "Legendary League"
@@ -321,12 +321,12 @@ class InfoCog(commands.Cog, name="Information Commands"):
         description = f"Top 3 of 50 get Grandmaster title {gm_emoji}."
       else:
         description = f"Top 3 of 50 get Grandmaster title."
-      rewards = {"1st place":f"500 {gem_emoji}, 3000 {elixir_emoji}, 500 {medal_emoji}",
-        "2nd place":f"400 {gem_emoji}, 2500 {elixir_emoji}, 400 {medal_emoji}",
-        "3rd place":f"300 {gem_emoji}, 2000 {elixir_emoji}, 300 {medal_emoji}",
-        "4th through 6th place":f"50 {gem_emoji}, 2000 {elixir_emoji}, 80 {medal_emoji}",
-        "7th through 10th place":f"30 {gem_emoji}, 1000 {elixir_emoji}, 40 {medal_emoji}",
-        "11th through 25th place":f"25 {gem_emoji}, 600 {elixir_emoji}, 20 {medal_emoji}"}
+      rewards = {"1st place":f"500 {gem_emoji}, 12000 {elixir_emoji}, 500 {medal_emoji}",
+        "2nd place":f"400 {gem_emoji}, 6000 {elixir_emoji}, 400 {medal_emoji}",
+        "3rd place":f"300 {gem_emoji}, 4500 {elixir_emoji}, 300 {medal_emoji}",
+        "4th through 6th place":f"50 {gem_emoji}, 4000 {elixir_emoji}, 80 {medal_emoji}",
+        "7th through 10th place":f"30 {gem_emoji}, 3000 {elixir_emoji}, 40 {medal_emoji}",
+        "11th through 25th place":f"25 {gem_emoji}, 1800 {elixir_emoji}, 20 {medal_emoji}"}
       icon = self.bot.get_emoji(guild, "legendary")
     else:
       await context.send(f"There is no league called {league}.")
