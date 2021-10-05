@@ -387,7 +387,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     
   @commands.command(
     name="item",
-    help="Shows information about one power item.\n\nAvailable items:\nFire potion, summon potion, healing potion, freeze potion, freeze potion lv2, armageddon, gold boost, meteor",
+    help="Shows information about one power item.\n\nAvailable items:\nFire potion, summon potion, healing potion, freeze potion, freeze potion lv2, armageddon, gold boost, meteor, substitute, swift soda",
     brief="Shows power item",
     aliases=["consumable"]
   )
@@ -440,6 +440,16 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       cooldown = 5
       description = "Summons a lava golem with 200 hp, dealing `42 TD + 10% hp` damage on a non-boss enemy, or `1.25% hp` damage on a boss every 1s."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/3/3d/Summon_Consumable.png/revision/latest?cb=20200822204547"
+    elif name in ["substitute"]:
+      name = "Substitute"
+      cooldown = 5
+      description = "Summons a substitute with 200 hp, 100% physical and magical armor, 100% dodge. It blocks 6 enemies with 3 engage range. \n- Each time it takes a hit, it receives `1 TD` (totally takes 200 hits). But it is vulnerable to TD poison effects. \n- Its HP can be boosted by Hogan's R6 skill."
+      url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/2/27/Substitute_Consumable.png/revision/latest?cb=20211005051014"
+    elif name in ["swift soda", "swift", "soda"]:
+      name = "swift soda"
+      cooldown = 20
+      description = "Resets all heroes' actives cooldown, and haste their speed x2 and boost their damage x1.1 for 20s."
+      url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/7/7c/SwiftSoda_Consumable.png/revision/latest?cb=20211005051012"
     else:
       raise custom_exceptions.DataNotFound("Item", string.capwords(name))
     embed = discord.Embed(title=f"**{string.capwords(name)}**", timestamp=context.message.created_at, description=f"Cooldown: {cooldown}s")
