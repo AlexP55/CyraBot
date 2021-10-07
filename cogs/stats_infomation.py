@@ -538,10 +538,10 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/a/a7/Stun.jpg/revision/latest?cb=20200822214559"
     elif name in ["cloak"]:
       name = "cloak"
-      description = "Make a unit invisible to most of the ranged attacks, but it may be damaged from AOE effect, and will be revealed by melee engagement."
+      description = "Make a unit invisible to most of the ranged attacks, but it may be damaged from AOE effect, and cloaked enemies can be revealed by melee engagement."
       stack = ""
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/5/56/Cloak.jpg/revision/latest?cb=20200822214559"
-    elif name in ["spirit curse"]:
+    elif name in ["spirit", "spirit curse"]:
       name = "spirit curse"
       description = "Reduce the damage by 25% and deals `(5+0.05 ND) TD` every 0.42s."
       stack = "This cursed poison can stack with other poisons."
@@ -560,12 +560,12 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       name = "grounded"
       description = "Ground the flying enemies making them stoppable by ground troops."
       stack = ""
-      url = ""
-    elif name in ["slime"]:
+      url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/d/da/Grounded.jpg/revision/latest?cb=20211007161430"
+    elif name in ["slime", "slime cover"]:
       name = "slime cover"
-      description = "Slime cover buffs your enemies: HP x2, damage x1.5; It debuffs your allies: move speed x0.6, damage x0.8. It can be cleansed by Voltari Perch right branch upgrade."
+      description = "Slime cover buffs ground slime enemies: HP x2, damage x1.5; It debuffs your allies: move speed x0.6, damage x0.8. It can be cleansed by Voltari Perch right branch upgrade."
       stack = ""
-      url = ""
+      url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/4/46/Slime_covered.jpg/revision/latest?cb=20211007161428"
     else:
       raise custom_exceptions.DataNotFound("Buff", string.capwords(name))
     embed = discord.Embed(title=f"**{string.capwords(name)}**", timestamp=context.message.created_at)
