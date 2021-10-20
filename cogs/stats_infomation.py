@@ -129,7 +129,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
       abilities = [f"`{prefix}ability {heroName.replace(' ', '')} {result[i][0]}`" for i in range(len(result))]
       content = f"There are {len(result)} results that match your keyword, please make a choice by reacting:"
-      guide = InteractiveSelectionMessage(selections=abilities, transfer=getInteractiveMessage, description=content, context=context, timeout=timeout)
+      guide = InteractiveSelectionMessage(selections=abilities, transfer=getInteractiveMessage, description=content, colour=discord.Colour.blue(), context=context, timeout=timeout)
       await guide.start()
     else:
       guide = getInteractiveMessage(0)
@@ -322,7 +322,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
       towers = [f"`{prefix}tower w{result[i][1]} {result[i][0]}`" for i in range(len(result))]
       content = f"There are {len(result)} results that match your keyword, please make a choice by reacting:"
-      guide = InteractiveSelectionMessage(selections=towers, transfer=getInteractiveMessage, description=content, context=context, timeout=timeout)
+      guide = InteractiveSelectionMessage(selections=towers, transfer=getInteractiveMessage, description=content, colour=discord.Colour.blue(), context=context, timeout=timeout)
       await guide.start()
     else:
       guide = getInteractiveMessage(0)
