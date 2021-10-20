@@ -7,7 +7,7 @@ import modules.interactive_tower_guide as tower_guide
 import modules.interactive_stats_guide as stats_guide
 from modules.cyra_converter import find_hero, find_ability, toWorld, numberComparisonConverter
 from modules.cyra_constants import max_level
-from base.modules.message_helper import num_emojis, multiple_choice
+from base.modules.interactive_message import InteractiveSelectionMessage, InteractiveEndMessage
 import asyncio
 import string
 import typing
@@ -110,6 +110,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     else: # non-vague search
       where_clause = f'ability LIKE "%{abilityName}%" OR keyword LIKE "%{abilityName}%"'
     result = db.query(f'SELECT ability FROM ability WHERE hero="{heroName}" AND ({where_clause}) ORDER BY tag LIMIT {searchLimit}')
+      
     if len(result) == 0:
       raise custom_exceptions.AbilityNotFound(heroName.title(), string.capwords(abilityName))
     elif len(result) == searchLimit: # too many results
@@ -119,21 +120,20 @@ class StatsCog(commands.Cog, name="Stats Commands"):
         f'please input a more accurate name to narrow down the search: `{prefix}ability {heroName.replace(" ","")} <ability>`'
       )
       return
-    elif len(result) > 1:
-      prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
-      abilities = [f"{num_emojis[i+1]} `{prefix}ability {heroName.replace(' ', '')} {result[i][0]}`" for i in range(len(result))]
-      content = f"There are {len(result)} results that match your keyword, please make a choice by reacting:\n" + '\n'.join(abilities)
-      response, msg = await multiple_choice(context, content, num=len(result))
-      if response is None:
-        return
-      valid_row = result[response]
-    else:
-      valid_row = result[0]
-      msg = None
-    # send an interactive message
+      
     timeout = self.get_active_time(context.guild) * 60
-    guide = hero_guide.HeroAbilityMessage(heroName, valid_row[0], context=context, timeout=timeout)
-    await guide.start(msg)
+    def getInteractiveMessage(ind):
+      return hero_guide.HeroAbilityMessage(heroName, result[ind][0], context=context, timeout=timeout)
+      
+    if len(result) > 1:
+      prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
+      abilities = [f"`{prefix}ability {heroName.replace(' ', '')} {result[i][0]}`" for i in range(len(result))]
+      content = f"There are {len(result)} results that match your keyword, please make a choice by reacting:"
+      guide = InteractiveSelectionMessage(selections=abilities, transfer=getInteractiveMessage, description=content, context=context)
+      await guide.start()
+    else:
+      guide = getInteractiveMessage(0)
+      await guide.start()
       
 
   @commands.command(
