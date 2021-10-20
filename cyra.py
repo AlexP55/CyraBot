@@ -150,8 +150,8 @@ class CyraBot(BaseBot):
     self.default_settings["BOT_ROLE_NAME"].default = f"{bot_name}"
     self.default_settings["ELARA_REFUSE_CHANCE"] = DefaultSetting(name="ELARA_REFUSE_CHANCE", default=10, description="chance to ignore command", 
       transFun=lambda x: float(x), checkFun=lambda x: x>=0, checkDescription="a non-negative number")
-    self.default_settings["SEARCH_LIMIT"] = DefaultSetting(name="SEARCH_LIMIT", default=11, description="max num of entries by a query", 
-      transFun=lambda x: int(x), checkFun=lambda x: 0<x<=11, checkDescription="an integer between 1 and 11")
+    self.default_settings["SEARCH_LIMIT"] = DefaultSetting(name="SEARCH_LIMIT", default=21, description="max num of entries by a query", 
+      transFun=lambda x: int(x), checkFun=lambda x: x>0, checkDescription="a positive integer")
     self.default_settings["LEVEL_EXTRA_TIME"] = DefaultSetting(name="LEVEL_EXTRA_TIME", default=30, description="time to enter/exit a level (s)", 
       transFun=lambda x: float(x), checkFun=lambda x: x>=0, checkDescription="a non-negative number")
     self.default_settings["WAVE_EXTRA_TIME"] = DefaultSetting(name="WAVE_EXTRA_TIME", default=1.0, description="time to call a wave (s)", 

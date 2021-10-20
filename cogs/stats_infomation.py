@@ -129,7 +129,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
       abilities = [f"`{prefix}ability {heroName.replace(' ', '')} {result[i][0]}`" for i in range(len(result))]
       content = f"There are {len(result)} results that match your keyword, please make a choice by reacting:"
-      guide = InteractiveSelectionMessage(selections=abilities, transfer=getInteractiveMessage, description=content, context=context)
+      guide = InteractiveSelectionMessage(selections=abilities, transfer=getInteractiveMessage, description=content, context=context, timeout=timeout)
       await guide.start()
     else:
       guide = getInteractiveMessage(0)
@@ -200,6 +200,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       f"SELECT enemy, enemy.world, type, hp, physicalArmor, magicalArmor, moveSpeed, castSpeed, normalDamage, specialDamage, dodge, abilities, remark, buff, url "
       f"FROM enemy JOIN buff ON buff.unit='enemy' AND enemy.world=buff.world WHERE {where_clause} LIMIT {searchLimit}"
     )
+    
     if len(result) == 0:
       raise custom_exceptions.DataNotFound(f"W{world} Enemy" if world is not None else "Enemy", string.capwords(enemy))
     elif len(result) == searchLimit: # too many results
@@ -209,18 +210,24 @@ class StatsCog(commands.Cog, name="Stats Commands"):
         f"please input a more accurate name to narrow down the search: `{prefix}{context.command.qualified_name} {context.command.signature}`"
       )
       return
-    elif len(result) > 1:
+      
+    timeout = self.get_active_time(context.guild) * 60
+    def getInteractiveMessage(ind):
+      return InteractiveEndMessage(embed=self.get_enemy_embed(context, result[ind]), context=context, timeout=timeout)
+      
+    if len(result) > 1:
       prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
-      enemies = [f"{num_emojis[i+1]} `{prefix}enemy w{result[i][1]} {result[i][0]}`" for i in range(len(result))]
-      content = f"There are {len(result)} results that match your keyword, please make a choice by reacting:\n" + '\n'.join(enemies)
-      response, msg = await multiple_choice(context, content, num=len(result))
-      if response is None:
-        return
-      valid_row = result[response]
+      enemies = [f"`{prefix}enemy w{result[i][1]} {result[i][0]}`" for i in range(len(result))]
+      content = f"There are {len(result)} results that match your keyword, please make a choice by reacting:"
+      guide = InteractiveSelectionMessage(selections=enemies, transfer=getInteractiveMessage, description=content, context=context, timeout=timeout)
+      await guide.start()
     else:
-      valid_row = result[0]
-      msg = None
-    enemy, world, etype, hp, pa, ma, ms, cs, nd, sd, dg, abilities, remark, buff, url = valid_row
+      embed = self.get_enemy_embed(context, result[0])
+      await context.send(embed=embed)
+      
+      
+  def get_enemy_embed(self, context, row):
+    enemy, world, etype, hp, pa, ma, ms, cs, nd, sd, dg, abilities, remark, buff, url = row
     if etype == "G":
       etype = "Ground"
     elif etype == "F":
@@ -263,11 +270,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     if url:
       embed.set_thumbnail(url=url)
     embed.set_footer(text=f"WORLD {world} ENEMY")
-    if msg is not None:
-      await msg.clear_reactions()
-      await msg.edit(content=None, embed=embed)
-    else:
-      await context.send(embed=embed)
+    return embed
         
   @commands.command(
     help="Shows information about one tower.",
@@ -306,23 +309,25 @@ class StatsCog(commands.Cog, name="Stats Commands"):
         f"please input a more accurate name to narrow down the search: `{prefix}{context.command.qualified_name} {context.command.signature}`"
       )
       return
-    elif len(result) > 1:
-      prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
-      towers = [f"{num_emojis[i+1]} `{prefix}tower w{result[i][1]} {result[i][0]}`" for i in range(len(result))]
-      content = f"There are {len(result)} results that match your keyword, please make a choice by reacting:\n" + '\n'.join(towers)
-      response, msg = await multiple_choice(context, content, num=len(result))
-      if response is None:
-        return
-      valid_row = result[response]
-    else: # send an interactive message
-      valid_row = result[0]
-      msg = None
+      
     timeout = self.get_active_time(context.guild) * 60
-    tower = valid_row[0]
-    world = valid_row[1]
-    towerInfo = valid_row[2:]
-    guide = tower_guide.TowerIndividualMessage(world, tower, context=context, timeout=timeout, towerInfo=towerInfo)
-    await guide.start(msg)
+    def getInteractiveMessage(ind):
+      row = result[ind]
+      tower = row[0]
+      world = row[1]
+      towerInfo = row[2:]
+      return tower_guide.TowerIndividualMessage(world, tower, towerInfo=towerInfo, context=context, timeout=timeout)
+      
+    if len(result) > 1:
+      prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
+      towers = [f"`{prefix}tower w{result[i][1]} {result[i][0]}`" for i in range(len(result))]
+      content = f"There are {len(result)} results that match your keyword, please make a choice by reacting:"
+      guide = InteractiveSelectionMessage(selections=towers, transfer=getInteractiveMessage, description=content, context=context, timeout=timeout)
+      await guide.start()
+    else:
+      guide = getInteractiveMessage(0)
+      await guide.start()
+      
       
 
   @commands.group(
