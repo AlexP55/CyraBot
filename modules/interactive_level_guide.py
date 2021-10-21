@@ -369,7 +369,7 @@ class LevelAchievementMessage(InteractiveMessage):
     self.tlevel = self.context.bot.get_setting(self.context.guild, "LEVEL_EXTRA_TIME")
     # the time required for calling a wave
     self.twave = self.context.bot.get_setting(self.context.guild, "WAVE_EXTRA_TIME")
-    limit = self.context.bot.get_setting(self.context.guild, "SEARCH_LIMIT")-1
+    limit = 10
     if world:
       where_clause.append(f"world={world}")
     if mode:

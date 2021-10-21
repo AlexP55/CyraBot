@@ -5,8 +5,8 @@ import modules.custom_exceptions as custom_exceptions
 import typing
 from modules.cyra_converter import find_hero, toLevelWorld, toWorld, toMode, find_achievement, numberComparisonConverter, find_farmable_achievement
 from modules.cyra_constants import facts, elixir_cost, elixir_cost_hero, max_level, tappables
-from base.modules.message_helper import num_emojis, multiple_choice
 from base.modules.basic_converter import BoolConverter
+from base.modules.interactive_message import InteractiveSelectionMessage, InteractiveEndMessage
 import modules.interactive_level_guide as level_guide
 import logging
 
@@ -154,18 +154,20 @@ class InfoCog(commands.Cog, name="Information Commands"):
       result = self.bot.db[context.guild.id].query(f"SELECT * FROM levels WHERE ({where_clause}) LIMIT {limit}")
       if len(result) == 0:
         raise custom_exceptions.DataNotFound("Achievement", f"{achievement} in W{world}" if world else achievement)
-      elif len(result) == 1:
-        valid_row = result[0]
-        msg = None
+        
+      timeout = self.bot.get_setting(context.guild, "ACTIVE_TIME") * 60
+      def getInteractiveMessage(ind):
+        row = result[0]
+        return level_guide.LevelIndividualMessage(row[0], context=context, timeout=timeout, dbrow=row)
+        
+      if len(result) > 1:
+        levels = [f"`W{result[i][1]} lv.{result[i][0]:<5} {result[i][2]}`" for i in range(len(result))]
+        content = f"You can complete the mission **{achievement.title()}** in below levels, react to see the details of a level:"
+        guide = InteractiveSelectionMessage(selections=levels, transfer=getInteractiveMessage, description=content, colour=discord.Colour.green(), context=context, timeout=timeout)
+        await guide.start()
       else:
-        levels = [f"{num_emojis[i+1]} `W{result[i][1]} lv.{result[i][0]:<5} {result[i][2]}`" for i in range(len(result))]
-        content = f"You can complete the mission **{achievement.title()}** in below levels, react to see the details of a level:\n" + '\n'.join(levels)
-        response, msg = await multiple_choice(context, content, num=len(result))
-        if response is None:
-          return
-        valid_row = result[response]
-      guide = level_guide.LevelIndividualMessage(valid_row[0], context=context, timeout=timeout, dbrow=valid_row)
-      await guide.start(msg)
+        guide = getInteractiveMessage(0)
+        await guide.start()
     else:
       guide = level_guide.LevelAchievementMessage(achievement, num, context=context, timeout=timeout, world=world, mode=mode, sort_by_absolute=sort_by_absolute)
       await guide.start()
