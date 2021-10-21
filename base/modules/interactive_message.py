@@ -1,7 +1,8 @@
 import discord
+from datetime import datetime
 from abc import ABC, abstractmethod
 import asyncio
-from base.modules.constants import arrow_emojis
+from base.modules.constants import arrow_emojis, num_emojis
 
 class InteractiveMessage(ABC):
   
@@ -48,6 +49,19 @@ class InteractiveMessage(ABC):
     self.timeout = parent.timeout # how long will the message be active
     self.context = parent.context # the context that starts the message
     self.message = parent.message # the discord message bonded to this object
+    
+  def set_attributes(self, **attributes):
+    # set the attributes of the object, including the attributes of its parent
+    timeout = attributes.pop("timeout", None)
+    context = attributes.pop("context", None)
+    message = attributes.pop("message", None)
+    msg = self
+    while msg is not None:
+      msg.timeout = timeout
+      msg.context = context
+      msg.message = message
+      msg = msg.parent
+    
     
   async def prepare(self):
     # things to setup before sending the message
@@ -151,6 +165,77 @@ class DetermInteractiveMessage(InteractiveMessage, ABC):
     else:
       return None
     return new_msg
+            
+class InteractiveSelectionMessage(InteractiveMessage):
+  # Selections
+  def __init__(self, selections, transfer, parent=None, **attributes):
+    assert callable(transfer), "The input transfer must be a function"
+    assert selections and isinstance(selections, list), "selections must be a non-empty list"
+    super().__init__(parent, **attributes)
+    self.selections = selections
+    self.num = len(selections)
+    self.trans = transfer
+    self.page_length = attributes.pop("page_length", 10)
+    self.title = attributes.pop("title", "Please Make a Selection")
+    self.description = attributes.pop("description", "")
+    self.colour = attributes.pop("colour", discord.Embed.Empty)
+    self.page = 1
+    self.total_page = self.num//self.page_length + 1
+    if self.total_page > 1:
+      self.child_emojis += [arrow_emojis["backward"], arrow_emojis["forward"]]
+    longest_page = min(self.page_length, self.num)
+    self.child_emojis += num_emojis[1:longest_page+1]
+    
+  async def transfer_to_child(self, emoji):
+    if emoji == arrow_emojis["backward"]:
+      self.page = max(self.page - 1, 1)
+      return self
+    elif emoji == arrow_emojis["forward"]:
+      self.page = min(self.page + 1, self.total_page)
+      return self
+    else:
+      ind = num_emojis.index(emoji) - 1
+      selection = ind + (self.page - 1) * self.page_length
+      if selection >= self.num:
+        return None
+      child = self.trans(selection)
+      if child.parent is None:
+        child.set_parent(self)
+      else:
+        child.set_attributes(context=self.context, timeout=self.timeout, message=self.message)
+      return child
+      
+  async def get_embed(self):
+    page_selections = self.selections[(self.page-1)*10:self.page*10]
+    page_selections = [f"{num_emojis[ind+1]} {page_selections[ind]}" for ind in range(0,len(page_selections))]
+    selection_content = "\n".join(page_selections)
+    description = f"{self.description}\n{selection_content}"
+    embed = discord.Embed(title=self.title, timestamp=datetime.utcnow(), description=description, colour=self.colour)
+    embed.set_footer(text=f"Page {self.page}/{self.total_page}")
+    return embed
+      
+            
+class InteractiveEndMessage(InteractiveMessage):
+  # End message, can still be reversed to its parent
+  def __init__(self, parent=None, **attributes):
+    super().__init__(parent, **attributes)
+    self.content = attributes.pop("content", None)
+    self.embed = attributes.pop("embed", None)
+    self.file = attributes.pop("file", None)
+    
+  async def get_content(self): # return some content
+    return self.content
+  
+  async def get_embed(self): # return an embed
+    return self.embed
+  
+  async def get_file(self): # return a file
+    return self.file
+    
+  async def transfer_to_child(self, emoji):
+    pass
+  
+  
     
     
 async def update_reactions(message, old_emojis, new_emojis, reaction, user):
