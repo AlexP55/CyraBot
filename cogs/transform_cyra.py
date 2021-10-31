@@ -106,8 +106,9 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
   @commands.cooldown(1, 600, commands.BucketType.guild)
   async def _transform(self, context, hero:hero_and_secret=None, skin_num:int=None):
     before = self.bot.get_nick(context.guild).lower()
-    if before == hero:
+    if before == hero and skin_num == None:
       await context.send(f"I'm currently {before.title()} so no need to transform.")
+      self._transform.reset_cooldown(context)
       return
     if hero is None:
       hero = self.get_random_trans_hero(before)

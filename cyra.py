@@ -97,6 +97,8 @@ class CyraBot(BaseBot):
         if avatar_file is None: avatar_file = random.choice(avatar_files)
         with open(avatar_file, "rb") as avatar:
           await self.user.edit(avatar=avatar.read())
+    if self.get_nick(guild).lower() == name:
+      return
     state = self.get_state(name)
     nickname = name.title()
     await guild.me.edit(nick=nickname)
