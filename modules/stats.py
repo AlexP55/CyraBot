@@ -72,7 +72,7 @@ class HeroStats(Stats):
     elif self.unit == "yan" and self.rank >= 6:
       self.SpecialDamage *= 2
     elif self.unit == "connie" and self.rank >= 6:
-      self.ReviveTime *= 1/3
+      self.ReviveTime *= 2/3
 
   def transformStats(self):
     if self.unit == "caldera":
