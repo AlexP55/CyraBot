@@ -12,10 +12,14 @@ import glob
 class CyraBot(BaseBot):
 
   def __init__(self, *args, **kwargs):
+    self.emoji_guild = None
     super().__init__(*args, **kwargs)
 
   def get_emoji(self, guild, key):
-    return discord.utils.get(guild.emojis, name=emoji_keys[key])
+    emoji = discord.utils.get(guild.emojis, name=emoji_keys[key])
+    if not emoji and self.emoji_guild:
+      emoji = discord.utils.get(self.emoji_guild, name=emoji_keys[key])
+    return emoji
     
   def get_nick(self, guild):
     nick = guild.me.nick
@@ -123,6 +127,10 @@ class CyraBot(BaseBot):
     await super().init_bot(guild)
     #if self.get_nick(guild).lower() not in hero_list:
     #  await guild.me.edit(nick="Cyra")
+    if self.emoji_guild is None:
+      emojis = [emoji.name for emoji in guild.emojis]
+      if all(emoji in emojis for emoji in list(emoji_keys.values())):
+        self.emoji_guild = guild
 
   async def on_command_error(self, context, error):
     if isinstance(error, commands.CommandNotFound):
