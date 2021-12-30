@@ -19,7 +19,7 @@ class CyraBot(BaseBot):
   def get_emoji(self, guild, key):
     emoji = discord.utils.get(guild.emojis, name=emoji_keys[key])
     if not emoji and self.emoji_guild:
-      emoji = discord.utils.get(self.emoji_guild, name=emoji_keys[key])
+      emoji = discord.utils.get(self.emoji_guild.emojis, name=emoji_keys[key])
     return emoji
     
   def get_nick(self, guild):
