@@ -13,6 +13,7 @@ class CyraBot(BaseBot):
 
   def __init__(self, *args, **kwargs):
     self.emoji_guild = None
+    self.emoji_matches = 0
     super().__init__(*args, **kwargs)
 
   def get_emoji(self, guild, key):
@@ -127,10 +128,13 @@ class CyraBot(BaseBot):
     await super().init_bot(guild)
     #if self.get_nick(guild).lower() not in hero_list:
     #  await guild.me.edit(nick="Cyra")
-    if self.emoji_guild is None:
-      emojis = [emoji.name for emoji in guild.emojis]
-      if all(emoji in emojis for emoji in list(emoji_keys.values())):
-        self.emoji_guild = guild
+    
+    guild_emojis = set([emoji.name for emoji in guild.emojis])
+    target_emojis = set(emoji_keys.values())
+    emoji_matches = len(guild_emojis & target_emojis)
+    if emoji_matches > self.emoji_matches:
+      self.emoji_guild = guild
+      self.emoji_matches = emoji_matches
 
   async def on_command_error(self, context, error):
     if isinstance(error, commands.CommandNotFound):
