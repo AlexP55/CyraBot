@@ -145,7 +145,7 @@ facts = [
   "Terrified enemies usually run back and don't engage in melee, but they will not ignore units like Connie's Bunny Mama, Maybn's bombs, Azura's charmed enemies.",
   "Allies have different ranges to engage in melee. Summons have the highest range, the second highest is from melee heroes and troops, and ranged heroes have the lowest.",
   "A multiplication buff to summons with inherited stats is not as strong as it looks. It only boosts stats except the inherited ones.",
-  "Bosses are immune to most of the time buffs. The buffs that can affect them are Shamiko's Lovely Lullaby, Elara's 40% and 60% slow, Bolton's rank 5 shock.",
+  "Bosses are immune to most of the time buffs. The buffs that can affect them are Shamiko's Lovely Lullaby, Elara's 40% and 60% slow, Bolton's rank 5 shock. Efrigid's rank 5 freeze.",
   "Dodge can avoid direct damage, but it can never avoid a buff or a percentage damage.",
   "Buffs to troop towers don't have any effect on their troops, not even on the respawn rate.",
   "Selling a tower returns 70% gold spent. Before calling the first wave this ratio is 100%, but rebuilding towers during this will not count towards achievements.",
