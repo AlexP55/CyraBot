@@ -448,7 +448,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     elif name in ["substitute"]:
       name = "Substitute"
       cooldown = 5
-      description = "Summons a substitute with 200 hp, 100% physical and magical armor, 100% dodge, immue to debuffs. It blocks 6 enemies (except bosses) with 3 engage range. \n- Each time it takes a hit, it receives `1 TD` (totally takes 200 hits).\n- Its HP can be boosted by Hogan's R6 skill"
+      description = "Summons a substitute with 200 hp, 100% physical and magical armor, 100% dodge, immune to buffs & debuffs. It can block 6 enemies (except bosses) with 3 engage range (not-engaged-strongest). Cannot be healed, cannot be targeted by ranged attack.\n- Each time it takes a hit, it receives `1 TD` (totally takes 200 hits)."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/2/27/Substitute_Consumable.png/revision/latest?cb=20211005051014"
     elif name in ["swift soda", "swift", "soda"]:
       name = "swift soda"
