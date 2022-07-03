@@ -41,7 +41,7 @@ class LevelRootMessage(InteractiveMessage):
     embed.add_field(name=f"World 4:", value="Level 81-120")
     embed.add_field(name=f"World 5:", value="Level 121-160")
     embed.add_field(name=f"World 6:", value="Level 161-200")
-    embed.add_field(name=f"World 7:", value="Level 201-210")
+    embed.add_field(name=f"World 7:", value="Level 201-220")
     embed.add_field(name=f"Shattered Realms:", value="Level 1-40")
     embed.add_field(name=f"Arcade:", value="Level 1-5")
     embed.add_field(name=f"Endless:", value="World 1-5")
@@ -72,9 +72,9 @@ class LevelWorldMessage(InteractiveMessage):
                     [f"{i}" for i in range(world*40-59,world*40-50+1)], [f"{i}" for i in range(world*40-49,world*40-40+1)]]
     elif world in [7]:
       self.world_text = f"World {world}"
-      self.child_emojis = num_emojis[1:2]
-      self.categories = [f"Level {world*40-79}-{world*40-70}"]
-      self.lists = [[f"{i}" for i in range(world*40-79,world*40-70+1)]]
+      self.child_emojis = num_emojis[1:3]
+      self.categories = [f"Level {world*40-79}-{world*40-70}", f"Level {world*40-69}-{world*40-60}"]
+      self.lists = [[f"{i}" for i in range(world*40-79,world*40-70+1)], [f"{i}" for i in range(world*40-69,world*40-60+1)]]
     elif world in ["S"]:
       self.world_text = f"Shattered Realms"
       self.child_emojis = num_emojis[1:9]
