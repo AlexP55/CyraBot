@@ -1,0 +1,1 @@
+{"initial_gold": 1200, "max_life": 1, "enemy_waves": [{"reward": 1259, "bonus": 0, "time": 282.0, "enemies": {"Rock Rambler": 30, "Flying Slime": 67, "Tin Slime": 54, "Gem Eye": 25, "Slime Shooter": 20}}]}

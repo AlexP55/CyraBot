@@ -253,9 +253,10 @@ achievemets_dict = {
 "Skeleton Samurai":["w6","skeleton"],
 "Koi-jin":["w6","fishguard"],"Namazu-jin":["w6","fishguard"],"Kaeru-hei":["w6","fishguard"],
 
-"Quadropus":["corrupted"], "Floating Rambler":["corrupted"], "Rock Rambler":["corrupted"],
+"Quadropus":["corrupted"], "Floating Rambler":["corrupted"], "Rock Rambler":["corrupted","sentient_rock"],
 "Tin Slime":["w7_slime"], "Flying Slime":["w7_slime", "flying_slime"], "Ground Slime":["w7_slime"],
-"Gem Eye":["security_construct"], "Eta Sentry":["security_construct"]
+"Gem Eye":["security_construct"], "Eta Sentry":["security_construct"],
+"Elysium Rock":["sentient_rock"], "Rock Flinger":["sentient_rock"]
 }
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))
 achievements += ["villager", "bandit"]
@@ -271,7 +272,8 @@ achievement_synonyms.update({ # achievement synonyms
 "air":"flying",
 "flier":"flying",
 "lavacreature":"lava",
-"construct":"security_construct"
+"construct":"security_construct",
+"rock":"sentient_rock"
 })
 farmable_achievement_synonyms = achievement_synonyms.copy()
 

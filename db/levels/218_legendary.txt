@@ -1,0 +1,1 @@
+{"initial_gold": 900, "max_life": 1, "enemy_waves": [{"reward": 1484, "bonus": 0, "time": 335.0, "enemies": {"Elysium Rock": 58, "Rock Flinger": 68, "Satyr Sentinel": 78, "Slime Shooter": 26}}]}

@@ -1,0 +1,1 @@
+{"initial_gold": 800, "max_life": 1, "enemy_waves": [{"reward": 1214, "bonus": 0, "time": 252.0, "enemies": {"Rock Flinger": 9, "Elysium Pebble": 32, "Tin Slime": 37, "Gem Eye": 29, "Eta Sentry": 16}}]}

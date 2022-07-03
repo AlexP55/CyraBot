@@ -1,0 +1,1 @@
+{"initial_gold": 1100, "max_life": 1, "enemy_waves": [{"reward": 1304, "bonus": 0, "time": 222.0, "enemies": {"Eta Sentry": 50, "Satyr Sentinel": 38, "Omega Spider": 70, "Slime Shooter": 61}}]}

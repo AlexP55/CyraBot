@@ -1,0 +1,1 @@
+{"initial_gold": 1100, "max_life": 1, "enemy_waves": [{"reward": 1912, "bonus": 0, "time": 371, "enemies": {"Flying Slime": 35, "Omega Spider": 86, "Elysium Rock": 16, "Tin Slime": 15, "Rock Rambler": 14, "Satyr Sentinel": 37, "Slime Shooter": 24}}]}
