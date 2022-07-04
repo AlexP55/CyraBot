@@ -256,7 +256,7 @@ achievemets_dict = {
 
 "Quadropus":["corrupted"], "Floating Rambler":["corrupted"], "Rock Rambler":["corrupted","sentient_rock"],
 "Tin Slime":["w7_slime"], "Flying Slime":["w7_slime", "flying_slime"], "Ground Slime":["w7_slime"],
-"Gem Eye":["security_construct"], "Eta Sentry":["security_construct"], "Chameleon Sentry":["security_construct"],
+"Gem Eye":["security_construct"], "Eta Sentry":["security_construct"], "Chameleon Sentry":["security_construct"], "Elysium Pebble":["sentient_rock"],
 "Elysium Rock":["sentient_rock"], "Rock Flinger":["sentient_rock"], "Slime Shooter":["w7_slime"], "Omega Spider":["security_construct"]
 }
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))
