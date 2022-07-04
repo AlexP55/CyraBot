@@ -123,6 +123,7 @@ world_url = {1: "https://static.wikia.nocookie.net/realm-defense-hero-legends-td
   "A": "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/9/91/Arcade.png/revision/latest?cb=20191128132703",
   "E": "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/1/14/Endless2.jpg/revision/latest?cb=20200209220437",
   "C": "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/c/cd/Challenges.png/revision/latest?cb=20191128135100&format=original",
+  "T": "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/d/d3/Tournament1.png/revision/latest?cb=20191128132552",
   "Connie": "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/3/3e/Connie_Event_Chapter7.png/revision/latest?cb=20200228183358&format=original"}
   
 facts = [
