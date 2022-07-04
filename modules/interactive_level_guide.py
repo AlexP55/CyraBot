@@ -14,8 +14,11 @@ class LevelRootMessage(InteractiveMessage):
     # emojis for 7 worlds
     self.child_emojis = num_emojis[1:8]
     self.connie_emoji = self.context.bot.get_emoji(self.context.guild, "connie")
+    if not self.connie_emoji: self.connie_emoji = "🐿️"
+    self.tournament_emoji = self.context.bot.get_emoji(self.context.guild, "medal")
+    if not self.tournament_emoji: self.tournament_emoji = "🏆"
     # emojis for SR, Arcade, endless, challenges, connie story
-    self.child_emojis += [letter_emojis["S"], letter_emojis["A"], letter_emojis["E"], letter_emojis["C"], self.connie_emoji]
+    self.child_emojis += [letter_emojis["S"], letter_emojis["A"], letter_emojis["E"], letter_emojis["C"], self.connie_emoji, self.tournament_emoji]
 
   async def transfer_to_child(self, emoji):
     if emoji == letter_emojis["S"]:
@@ -28,6 +31,8 @@ class LevelRootMessage(InteractiveMessage):
       world = "C"
     elif emoji == self.connie_emoji:
       world = "Connie"
+    elif emoji == self.tournament_emoji:
+      world = "T"
     else:
       world = num_emojis.index(emoji)
     return LevelWorldMessage(world, self)
@@ -43,16 +48,17 @@ class LevelRootMessage(InteractiveMessage):
     embed.add_field(name=f"World 6:", value="Level 161-200")
     embed.add_field(name=f"World 7:", value="Level 201-220")
     embed.add_field(name=f"Shattered Realms:", value="Level 1-40")
-    embed.add_field(name=f"Arcade:", value="Level 1-5")
+    embed.add_field(name=f"Arcades:", value="Level 1-5")
     embed.add_field(name=f"Endless:", value="World 1-5")
     embed.add_field(name=f"Challenges:", value="World 1,2,3,6")
     embed.add_field(name=f"{self.connie_emoji} Connie Story:", value="Chapter 1-7")
+    embed.add_field(name=f"Tournaments:", value="World 1-6")
     embed.set_footer(text="MAIN MENU")
     return embed
 
 class LevelWorldMessage(InteractiveMessage):
   def __init__(self, world, parent=None, **attributes):
-    if world not in [1,2,3,4,5,6,7,"S","A","E","C","Connie"]:
+    if world not in [1,2,3,4,5,6,7,"S","A","E","C","Connie","T"]:
       raise custom_exceptions.DataNotFound("World", world)
     super().__init__(parent, **attributes)
     self.world = world
@@ -110,9 +116,21 @@ class LevelWorldMessage(InteractiveMessage):
       self.child_emojis = num_emojis[1:8]
       self.categories = [f"Chapter {i}" for i in range(1,8)]
       self.levels = [f"Connie{i}" for i in range(1,8)]
+	elif world in ["T"]:
+      self.world_text = f"Tournament"
+      levelgroups = self.context.bot.db[self.context.guild.id].query(f'SELECT level, world FROM levels WHERE level LIKE "T%"')
+      values = sorted(set(map(lambda x:x[1], levels)))
+      levelgroups = [[y[0] for y in levels if y[1]==x] for x in values]
+      self.lists = [];
+      for levelgroup in levelgroups:
+        self.lists.extend([levelgroup[i:i+10] for i in range(0, len(levelgroup), 10)])
+      groups = len(self.lists)
+	  self.child_emojis = num_emojis[1:groups+1]
+      self.categories = [f"{self.lists[i][0]}-{self.lists[i][-1]}" for i in range(0,groups+1)]
+	  
     
   async def transfer_to_child(self, emoji):
-    if self.world in [1,2,3,4,5,6,7,"S","A","C"]:
+    if self.world in [1,2,3,4,5,6,7,"S","A","C","T"]:
       return LevelCategoryMessage(self.lists[self.child_emojis.index(emoji)], self.world_text, self)
     else:
       return LevelIndividualMessage(self.levels[self.child_emojis.index(emoji)], self)

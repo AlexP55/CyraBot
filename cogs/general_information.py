@@ -169,15 +169,15 @@ class InfoCog(commands.Cog, name="Information Commands"):
         )
         return
         
-      def getInteractiveMessage(ind):
+      def getInteractiveMessage(ind, parent):
         row = result[0]
-        return level_guide.LevelIndividualMessage(row[0], context=context, timeout=timeout, dbrow=row)
+        return level_guide.LevelIndividualMessage(row[0], parent=parent, dbrow=row)
         
       if len(result) > 1:
         levels = [f"`W{result[i][1]} lv.{result[i][0]:<5} {result[i][2]}`" for i in range(len(result))]
         content = f"You can complete the mission **{achievement.title()}** in below levels, react to see the details of a level:"
         guide = InteractiveSelectionMessage(selections=levels, transfer=getInteractiveMessage, description=content, 
-          colour=discord.Colour.green(), keep_parent=True, context=context, timeout=timeout)
+          colour=discord.Colour.green(), context=context, timeout=timeout)
         await guide.start()
       else:
         guide = getInteractiveMessage(0)
