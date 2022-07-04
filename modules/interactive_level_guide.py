@@ -249,9 +249,11 @@ class LevelIndividualMessage(InteractiveMessage):
     if self.wave_info or self.legendary_info:
       instructions = []
       if self.wave_info:
-        instructions.append("👽 Enemy waves")
-      if self.legendary_info:
-        instructions.append("🏆 Legendary waves")
+        if self.legendary_info:
+          instructions.append("👽 Campaign waves")
+          instructions.append("🏆 Legendary waves")
+        else:
+          instructions.append("👽 Enemy waves")
       embed.add_field(name="To check enemy waves:", value=" ".join(instructions), inline=False)
     if link and link != "NONE":
       embed.set_image(url=link)
