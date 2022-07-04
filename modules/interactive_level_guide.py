@@ -239,7 +239,7 @@ class LevelIndividualMessage(InteractiveMessage):
     elif task == "villager":
       descriptions.append(f"📝 Campaign Task: Protect the villager")
     if handicap and handicap != "NONE": descriptions.append(f"🏅 Legendary Handicap: {handicap}")
-    description = "\n".join(descriptions) if descriptions else None
+    description = "\n".join(descriptions) if descriptions else ""
     embed = discord.Embed(title=f"{level}. {name}", colour=discord.Colour.green(), timestamp=datetime.utcnow(), description=description)
     if tappable:
       coin_emoji = self.context.bot.get_emoji(self.context.guild, "coin")
