@@ -226,9 +226,9 @@ class LevelIndividualMessage(InteractiveMessage):
     
   async def transfer_to_child(self, emoji):
     if emoji == "👽":
-      return LevelWaveMessage(self.level, self.wave_info[1], self, dbrow=self.wave_info, link=self.dbrow[6], task=self.dbrow[4])
+      return LevelWaveMessage(self.level, self.wave_info[1], self, dbrow=self.wave_info, link=self.dbrow[7], task=self.dbrow[4])
     elif emoji == "🏆":
-      return LevelWaveMessage(self.level, self.legendary_info[1], self, dbrow=self.legendary_info, link=self.dbrow[6], task=self.dbrow[4])
+      return LevelWaveMessage(self.level, self.legendary_info[1], self, dbrow=self.legendary_info, link=self.dbrow[7], task=self.dbrow[4])
     
   async def get_embed(self):
     level, world, name, handicap, task, tappable, extra, link, remark = self.dbrow
