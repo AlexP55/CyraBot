@@ -15,10 +15,8 @@ class LevelRootMessage(InteractiveMessage):
     self.child_emojis = num_emojis[1:8]
     self.connie_emoji = self.context.bot.get_emoji(self.context.guild, "connie")
     if not self.connie_emoji: self.connie_emoji = "🐿️"
-    self.tournament_emoji = self.context.bot.get_emoji(self.context.guild, "medal")
-    if not self.tournament_emoji: self.tournament_emoji = "🏆"
     # emojis for SR, Arcade, endless, challenges, connie story
-    self.child_emojis += [letter_emojis["S"], letter_emojis["A"], letter_emojis["E"], letter_emojis["C"], self.connie_emoji, self.tournament_emoji]
+    self.child_emojis += [letter_emojis["S"], letter_emojis["A"], letter_emojis["E"], letter_emojis["C"], letter_emojis["T"], self.connie_emoji]
 
   async def transfer_to_child(self, emoji):
     if emoji == letter_emojis["S"]:
@@ -29,10 +27,10 @@ class LevelRootMessage(InteractiveMessage):
       world = "E"
     elif emoji == letter_emojis["C"]:
       world = "C"
+    elif emoji == letter_emojis["T"]:
+      world = "T"
     elif emoji == self.connie_emoji:
       world = "Connie"
-    elif emoji == self.tournament_emoji:
-      world = "T"
     else:
       world = num_emojis.index(emoji)
     return LevelWorldMessage(world, self)
@@ -40,25 +38,25 @@ class LevelRootMessage(InteractiveMessage):
   async def get_embed(self):
     embed = discord.Embed(title=f"Level Main Menu", timestamp=datetime.utcnow(), colour=discord.Colour.green(), description="Choose a world (by reacting):")
     embed.set_thumbnail(url=tower_menu_url)
-    embed.add_field(name=f"World 1:", value="Level 1-20")
-    embed.add_field(name=f"World 2:", value="Level 21-40")
-    embed.add_field(name=f"World 3:", value="Level 41-80")
-    embed.add_field(name=f"World 4:", value="Level 81-120")
-    embed.add_field(name=f"World 5:", value="Level 121-160")
-    embed.add_field(name=f"World 6:", value="Level 161-200")
-    embed.add_field(name=f"World 7:", value="Level 201-220")
-    embed.add_field(name=f"Shattered Realms:", value="Level 1-40")
-    embed.add_field(name=f"Arcades:", value="Level 1-5")
-    embed.add_field(name=f"Endless:", value="World 1-5")
-    embed.add_field(name=f"Challenges:", value="World 1,2,3,6")
+    embed.add_field(name=f"World {num_emojis[1]}:", value="Level 1-20")
+    embed.add_field(name=f"World {num_emojis[2]}:", value="Level 21-40")
+    embed.add_field(name=f"World {num_emojis[3]}:", value="Level 41-80")
+    embed.add_field(name=f"World {num_emojis[4]}:", value="Level 81-120")
+    embed.add_field(name=f"World {num_emojis[5]}:", value="Level 121-160")
+    embed.add_field(name=f"World {num_emojis[6]}:", value="Level 161-200")
+    embed.add_field(name=f"World {num_emojis[7]}:", value="Level 201-220")
+    embed.add_field(name=f"{letter_emojis['S']}hattered Realms:", value="Level 1-40")
+    embed.add_field(name=f"{letter_emojis['A']}rcades:", value="Level 1-5")
+    embed.add_field(name=f"{letter_emojis['E']}ndless:", value="World 1-5")
+    embed.add_field(name=f"{letter_emojis['C']}hallenges:", value="World 1,2,3,6")
+    embed.add_field(name=f"{letter_emojis['T']}ournaments:", value="Tournament maps")
     embed.add_field(name=f"{self.connie_emoji} Connie Story:", value="Chapter 1-7")
-    embed.add_field(name=f"Tournaments:", value="World 1-6")
     embed.set_footer(text="MAIN MENU")
     return embed
 
 class LevelWorldMessage(InteractiveMessage):
   def __init__(self, world, parent=None, **attributes):
-    if world not in [1,2,3,4,5,6,7,"S","A","E","C","Connie","T"]:
+    if world not in [1,2,3,4,5,6,7,"S","A","E","C","T","Connie"]:
       raise custom_exceptions.DataNotFound("World", world)
     super().__init__(parent, **attributes)
     self.world = world
@@ -111,35 +109,35 @@ class LevelWorldMessage(InteractiveMessage):
       self.categories = [f"World {i} Challenge" for i in [1,2,3,6]]
       self.lists = [[f"C1-{i}" for i in range(1,6)], [f"C2-{i}" for i in range(1,11)],
                     [f"C3-{i}" for i in range(1,11)], [f"C6-{i}" for i in range(1,11)]]
+    elif world in ["T"]:
+      self.world_text = f"Tournament"
+      levelgroups = self.context.bot.db[self.context.guild.id].query(f'SELECT level, world FROM levels WHERE level LIKE "T%"')
+      values = sorted(set(map(lambda x:x[1], levelgroups)))
+      levelgroups = [[y[0] for y in levelgroups if y[1]==x] for x in values]
+      self.lists = [];
+      for levelgroup in levelgroups:
+        self.lists.extend([levelgroup[i:i+10] for i in range(0, len(levelgroup), 10)])
+      groups = len(self.lists)
+      self.child_emojis = num_emojis[1:groups+1]
+      self.categories = [f"{self.lists[i][0]}-{self.lists[i][-1]}" for i in range(0,groups)]
     elif world in ["Connie"]:
       self.world_text = f"Connie Story"
       self.child_emojis = num_emojis[1:8]
       self.categories = [f"Chapter {i}" for i in range(1,8)]
       self.levels = [f"Connie{i}" for i in range(1,8)]
-	elif world in ["T"]:
-      self.world_text = f"Tournament"
-      levelgroups = self.context.bot.db[self.context.guild.id].query(f'SELECT level, world FROM levels WHERE level LIKE "T%"')
-      values = sorted(set(map(lambda x:x[1], levels)))
-      levelgroups = [[y[0] for y in levels if y[1]==x] for x in values]
-      self.lists = [];
-      for levelgroup in levelgroups:
-        self.lists.extend([levelgroup[i:i+10] for i in range(0, len(levelgroup), 10)])
-      groups = len(self.lists)
-	  self.child_emojis = num_emojis[1:groups+1]
-      self.categories = [f"{self.lists[i][0]}-{self.lists[i][-1]}" for i in range(0,groups+1)]
 	  
     
   async def transfer_to_child(self, emoji):
     if self.world in [1,2,3,4,5,6,7,"S","A","C","T"]:
       return LevelCategoryMessage(self.lists[self.child_emojis.index(emoji)], self.world_text, self)
-    else:
+    else: # endless and connie levels don't need categories
       return LevelIndividualMessage(self.levels[self.child_emojis.index(emoji)], self)
     
   async def get_embed(self):
     instructions = "\n".join([f"{emoji} `{category}`" for emoji, category in zip(self.child_emojis, self.categories)])
     embed = discord.Embed(title=f"{self.world_text} Level Menu", timestamp=datetime.utcnow(), colour=discord.Colour.green(),
       description=f"Choose a category (by reacting):\n{instructions}")
-    embed.set_thumbnail(url=world_url[self.world])
+    if self.world in world_url: embed.set_thumbnail(url=world_url[self.world])
     embed.set_footer(text=f"{self.world_text}")
     return embed
 
