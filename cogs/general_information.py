@@ -23,6 +23,9 @@ class InfoCog(commands.Cog, name="Information Commands"):
   #Default error handler for this cog, can be overwritten with a local error handler.
   async def cog_command_error(self, context, error):
     await self.bot.respond_to_error(context, error)
+    
+  def get_search_limit(self, guild):
+    return self.bot.get_setting(guild, "SEARCH_LIMIT")
 
   @commands.group(
     brief="Shows info on elixir",
@@ -146,16 +149,26 @@ class InfoCog(commands.Cog, name="Information Commands"):
       achievement = "w7_slime"
     timeout = self.bot.get_setting(context.guild, "ACTIVE_TIME") * 60
     if achievement in tappables:
-      where_clause = [f'tappable LIKE "%{achievement}%"']
+      if achievement == "tappable":
+        where_clause = [f'LENGTH(tappable)>0']
+      elif achievement == "mercenary board":
+        where_clause = [f'extra LIKE "%{achievement}%"']
+      else:
+        where_clause = [f'tappable LIKE "%{achievement}%"']
       if world:
         where_clause.append(f"world={world}")
       where_clause = " AND ".join(where_clause) if where_clause else "TRUE"
-      limit = self.bot.get_setting(context.guild, "SEARCH_LIMIT")-1
-      result = self.bot.db[context.guild.id].query(f"SELECT * FROM levels WHERE ({where_clause}) LIMIT {limit}")
+      searchLimit = self.bot.get_setting(context.guild, "SEARCH_LIMIT")
+      result = self.bot.db[context.guild.id].query(f"SELECT * FROM levels WHERE ({where_clause}) LIMIT {searchLimit}")
       if len(result) == 0:
         raise custom_exceptions.DataNotFound("Achievement", f"{achievement} in W{world}" if world else achievement)
+      elif len(result) == searchLimit: # too many results
+        await context.send(
+          f'There are more than {searchLimit-1} levels that match your input condition, '
+          f'please input a more accurate condition to narrow down the search'
+        )
+        return
         
-      timeout = self.bot.get_setting(context.guild, "ACTIVE_TIME") * 60
       def getInteractiveMessage(ind):
         row = result[0]
         return level_guide.LevelIndividualMessage(row[0], context=context, timeout=timeout, dbrow=row)
@@ -163,7 +176,8 @@ class InfoCog(commands.Cog, name="Information Commands"):
       if len(result) > 1:
         levels = [f"`W{result[i][1]} lv.{result[i][0]:<5} {result[i][2]}`" for i in range(len(result))]
         content = f"You can complete the mission **{achievement.title()}** in below levels, react to see the details of a level:"
-        guide = InteractiveSelectionMessage(selections=levels, transfer=getInteractiveMessage, description=content, colour=discord.Colour.green(), context=context, timeout=timeout)
+        guide = InteractiveSelectionMessage(selections=levels, transfer=getInteractiveMessage, description=content, 
+          colour=discord.Colour.green(), keep_parent=True, context=context, timeout=timeout)
         await guide.start()
       else:
         guide = getInteractiveMessage(0)

@@ -215,7 +215,7 @@ class LevelIndividualMessage(InteractiveMessage):
       return LevelWaveMessage(self.level, self.legendary_info[1], self, dbrow=self.legendary_info, link=self.dbrow[6], task=self.dbrow[4])
     
   async def get_embed(self):
-    level, world, name, handicap, task, tappable, link, remark = self.dbrow
+    level, world, name, handicap, task, tappable, extra, link, remark = self.dbrow
     descriptions = []
     if remark: descriptions.append(f"🕹️ Level Type: {remark.title()}")
     if task == "bandit":
@@ -225,7 +225,7 @@ class LevelIndividualMessage(InteractiveMessage):
     if handicap and handicap != "NONE": descriptions.append(f"🏅 Legendary Handicap: {handicap}")
     description = "\n".join(descriptions) if descriptions else None
     embed = discord.Embed(title=f"{level}. {name}", colour=discord.Colour.green(), timestamp=datetime.utcnow(), description=description)
-    if tappable and tappable != "NONE":
+    if tappable:
       coin_emoji = self.context.bot.get_emoji(self.context.guild, "coin")
       if coin_emoji is not None:
         tappable = tappable.replace("💰", f"{coin_emoji}")
