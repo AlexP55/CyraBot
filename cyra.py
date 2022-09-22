@@ -75,7 +75,7 @@ class CyraBot(BaseBot):
       elif isinstance(error, custom_exceptions.HeroNotFound):
         msg = state["nohero_msg"]
       elif isinstance(error, custom_exceptions.AbilityNotFound):
-        if error.hero) == self.get_nick(context.guild):
+        if error.hero == self.get_nick(context.guild):
           msg = state["noability_msg_self"]
         else:
           msg = state["noability_msg_other"]
