@@ -189,34 +189,28 @@ elixir_cost_hero = {
   "lancelot":elixir_cost_lance,
   "smoulder":elixir_cost_3000,
   "efrigid":elixir_cost_3000,
+  "normal hogan":elixir_cost_1500,
   "hogan":elixir_cost_1500,
   "bolton":elixir_cost_1500,
   "obsidian":elixir_cost_3000,
   "masamune":elixir_cost_1500,
   "mabyn":elixir_cost_3000,
-  "narlax":elixir_cost_7500,
   "sethos":elixir_cost_6000,
   "helios":elixir_cost_6000,
-  "yan":elixir_cost_7500,
-  "raida":elixir_cost_7500,
-  "caldera":elixir_cost_7500,
-  "leif":elixir_cost_7500,
-  "koizuul":elixir_cost_7500,
-  "azura":elixir_cost_7500,
   "normal connie":elixir_cost_1500,
   "connie":elixir_cost_1500,
-  "shamiko":elixir_cost_7500,
-  "cyra":elixir_cost_7500,
-  "elara":elixir_cost_7500,
-  "osan":elixir_cost_7500
 }
 
 rank_cost = [5, 10, 15, 20, 40, 80, 100]
 
+def elixir_cost_list(hero):
+  if hero in elixir_cost_hero: return elixir_cost_hero[hero]
+  else: return elixir_cost_7500
+
 def elixir_cost(hero, lvlow, lvhigh):
   if lvlow > lvhigh:
     lvlow, lvhigh = lvhigh, lvlow
-  return sum(elixir_cost_hero[hero][lvlow-1:lvhigh-1])
+  return sum(elixir_cost_list(hero)[lvlow-1:lvhigh-1])
   
 def token_cost(ranklow, rankhigh):
   if ranklow > rankhigh:
