@@ -233,10 +233,10 @@ class LevelIndividualMessage(InteractiveMessage):
   async def get_embed(self):
     level, world, name, handicap, task, tappable, extra, link, remark = self.dbrow
     descriptions = []
-    if remark: descriptions.append(f"🕹️ Level Type: {remark.title()}")
-    if task == "bandit":
+    if remark: descriptions.append(f"🕹️ Level Type: {remark}")
+    if task == "Bandit":
       descriptions.append(f"📝 Campaign Task: Kill the bandit")
-    elif task == "villager":
+    elif task == "Villager":
       descriptions.append(f"📝 Campaign Task: Protect the villager")
     if handicap and handicap != "NONE": descriptions.append(f"🏅 Legendary Handicap: {handicap}")
     description = "\n".join(descriptions) if descriptions else ""
@@ -352,13 +352,13 @@ class LevelWaveMessage(InteractiveMessage):
     if enemies:
       max_num_len = max(len(str(num)) for num in enemies.values())
       if self.achieve:
-        kill_msg = [f"`{num:<{max_num_len}} {enemy.replace('_', ' ').title()} Enemies`" for enemy, num in enemies.items()]
+        kill_msg = [f"`{num:<{max_num_len}} {enemy.replace('_', ' ')} Enemies`" for enemy, num in enemies.items()]
       else:
-        kill_msg = [f"`{num:<{max_num_len}} {enemy.title()}`" for enemy, num in enemies.items()]
+        kill_msg = [f"`{num:<{max_num_len}} {enemy}`" for enemy, num in enemies.items()]
     else:
       kill_msg = []
-    if self.state == 0 and self.mode != "legendary" and (self.task == "bandit" or (self.task == "villager" and self.achieve)):
-      kill_msg.append(f"`{1:<{max_num_len}} {self.task.title()}`")
+    if self.state == 0 and self.mode != "legendary" and (self.task == "Bandit" or (self.task == "Villager" and self.achieve)):
+      kill_msg.append(f"`{1:<{max_num_len}} {self.task}`")
     embed.add_field(name="Enemies:" if not self.achieve else "Achievements:", value="\n".join(kill_msg) if kill_msg else "None", inline=False)
     if len(self.level_info["enemy_waves"]) > 1:
       wave_emojis = " ".join(num_emojis[1:len(self.level_info["enemy_waves"])+1])
@@ -393,10 +393,10 @@ class LevelAchievementMessage(InteractiveMessage):
     if mode:
       where_clause.append(f'mode="{mode}"')
     # check the achievemnt argument to get the sorting method
-    achievement_parse = achievement.replace('_', ' ').title()
+    achievement_parse = achievement.replace('_', ' ')
     time_string = f"time/2.0+{self.tlevel}+wave*{self.twave}"
     time_calculation = lambda row: row[4]/2.0+self.tlevel+row[6]*self.twave
-    if achievement == "fast":
+    if achievement == "Fast":
       self.goal = "levels with the shortest completion time"
       self.info = ["TIME"]
       self.info_fun = lambda row: [f"{row[-1]:.0f}"]
@@ -415,7 +415,7 @@ class LevelAchievementMessage(InteractiveMessage):
         select_clause.append(f"({criteria_str}) AS criteria")
         sort_method = "gold DESC"
     else:
-      if achievement in ["villager", "bandit"]:
+      if achievement in ["Villager", "Bandit"]:
         target = f"**{achievement_parse}s**"
         farm = "NUM"
       else:
@@ -523,7 +523,7 @@ class LevelAchievementMessage(InteractiveMessage):
       max_kill_len = max([len(str(kill)) for kill in kills])
       for name, kill in zip(achievements, kills):
         if kill > 0:
-          name = name.title() if name in ["villager", "bandit"] else f"{name.replace('_', ' ').title()} Enemies"
+          name = name if name in ["Villager", "Bandit"] else f"{name.replace('_', ' ')} Enemies"
           kill_msg.append(f"`{kill:<{max_kill_len}} {name}`")
       embed.add_field(name="Achievement Counts:", value="\n".join(kill_msg) if kill_msg else "None", inline=False)
       instruction = (f"{text_emojis['info']} Summary  {num_emojis[1]}-{num_emojis[len(self.result)]} Results\n"
@@ -648,8 +648,8 @@ class AchievementPlanMessage(InteractiveMessage):
     
   async def get_embed(self):
     if self.state <= 0: # return the summary
-      achieve_lists = [f"**{num}** **{achievement.title()}s**" if achievement in ["bandit", "villager"] else
-                       f"**{num}** **{achievement.replace('_', ' ').title()}** enemies"
+      achieve_lists = [f"**{num}** **{achievement}s**" if achievement in ["Bandit", "Villager"] else
+                       f"**{num}** **{achievement.replace('_', ' ')}** enemies"
                        for achievement, num in zip(self.achieves, self.nums)]
       goal = f"Find a plan to quickly farm {', '.join(achieve_lists)}"
       description = (f"🎯 Goal: {goal}\n"
@@ -697,7 +697,7 @@ class AchievementPlanMessage(InteractiveMessage):
       max_kill_len = max([len(str(kill)) for kill in kills])
       for name, kill in zip(achievements, kills):
         if kill > 0:
-          name = name.title() if name in ["villager", "bandit"] else f"{name.replace('_', ' ').title()} Enemies"
+          name = name if name in ["Villager", "Bandit"] else f"{name.replace('_', ' ')} Enemies"
           kill_msg.append(f"`{kill:<{max_kill_len}} {name}`")
       embed.add_field(name="Achievement Counts:", value="\n".join(kill_msg) if kill_msg else "None", inline=False)
       instruction = (f"{text_emojis['info']} Summary  {num_emojis[1]}-{num_emojis[len(self.minimum_sol)]} Results\n"

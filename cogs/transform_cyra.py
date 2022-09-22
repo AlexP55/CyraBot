@@ -57,7 +57,7 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
         try:
           logger.debug(f"Transforming in {guild.name} ({guild.id}).")
           if before is None or after is None:
-            before = self.bot.get_nick(guild).lower()
+            before = self.bot.get_nick(guild)
             after = self.get_random_trans_hero(before)
             change_avatar = True
           else:
@@ -65,7 +65,7 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
           await self.bot.transform(guild, after, change_avatar=change_avatar)
           await self.bot.log_message(guild, "ADMIN_LOG",
             user=self.bot.user, action="auto transformed",
-            description=f"Direction: {before.title()} -> {after.title()}"
+            description=f"Direction: {before} -> {after}"
           )
           logger.debug(f"Finished Transforming in {guild.name} ({guild.id}).")
         except Exception as error:
@@ -105,9 +105,9 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
   @commands.is_owner()
   @commands.cooldown(1, 600, commands.BucketType.guild)
   async def _transform(self, context, hero:hero_and_secret=None, skin_num:int=None):
-    before = self.bot.get_nick(context.guild).lower()
+    before = self.bot.get_nick(context.guild)
     if before == hero and skin_num == None:
-      await context.send(f"I'm currently {before.title()} so no need to transform.")
+      await context.send(f"I'm currently {before} so no need to transform.")
       self._transform.reset_cooldown(context)
       return
     if hero is None:
@@ -115,14 +115,14 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
     after = hero
     await self.bot.transform(context.guild, after, skin=skin_num)
     if after == "cyra":
-      await context.send(f"*{after.title()} has taken control back.*")
+      await context.send(f"*{after} has taken control back.*")
     elif after == "elara":
-      await context.send(f"*{after.title()} is here to reap chaos.*")
+      await context.send(f"*{after} is here to reap chaos.*")
     else:
-      await context.send(f"*{after.title()} just landed on RD server.*")
+      await context.send(f"*{after} just landed on RD server.*")
     await self.bot.log_message(context.guild, "ADMIN_LOG",
       user=context.author, action="was transformed", target=self.bot.user,
-      description=f"Direction: {before.title()} -> {after.title()}",
+      description=f"Direction: {before} -> {after}",
       timestamp=context.message.created_at
     )
       
@@ -133,7 +133,7 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
   @commands.is_owner()
   async def _list_transform(self, context):
     await context.send(f"Below is the list of heroes that can be auto-transformed to:```\n" + 
-                        "\n".join([hero.title() for hero in self.transform_list]) + "```")
+                        "\n".join([hero for hero in self.transform_list]) + "```")
         
   @_transform.command(
     name="add",
@@ -148,7 +148,7 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
         added_heroes.append(hero)
     if added_heroes:
       await context.send(f"Heroes added to the auto transformation:```\n" + 
-                          "\n".join([hero.title() for hero in added_heroes]) + "```")
+                          "\n".join([hero for hero in added_heroes]) + "```")
     else:
       await context.send(f"No heroes added to the auto transformation.")
         
@@ -164,12 +164,12 @@ class TransformationCog(commands.Cog, name="Transformation Commands"):
     for hero in heroes:
       if hero in self.transform_list:
         if len(self.transform_list) <= 2:
-          msg += f"Warning: Cannot remove {hero.title()} because the number of transformable heroes should be at least 2.\n"
+          msg += f"Warning: Cannot remove {hero} because the number of transformable heroes should be at least 2.\n"
           continue
         self.transform_list.remove(hero)
         removed_heroes.append(hero)
     if removed_heroes:
-      msg += f"Heroes removed from the auto transformation:```\n" +  "\n".join([hero.title() for hero in removed_heroes]) + "```"
+      msg += f"Heroes removed from the auto transformation:```\n" +  "\n".join([hero for hero in removed_heroes]) + "```"
     else:
       msg += f"No heroes removed from the auto transformation."
     await context.send(msg)

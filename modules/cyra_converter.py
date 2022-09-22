@@ -23,20 +23,20 @@ def find_hero_from_emoji(ctx, argument):
     hero_name = match.group(2)
     hero_name = emoji_dict[hero_name] if hero_name in emoji_dict else hero_name.lower()
     if hero_name not in hero_list:
-      raise custom_exceptions.HeroNotFound(hero_name.title())
+      raise custom_exceptions.HeroNotFound(hero_name)
     emoji_id = int(match.group(4))
     emoji = discord.utils.get(ctx.guild.emojis, id=emoji_id)
     if not emoji:
       emoji = ctx.bot.get_emoji(ctx.guild, hero_name)
     return hero_name, emoji
-  raise custom_exceptions.HeroNotFound(argument.title())
+  raise custom_exceptions.HeroNotFound(argument)
   
 def find_hero_from_text(word):
   word = word.lower()
   close_word = find_closest(word, list(hero_synonyms))
   if close_word:
     return hero_synonyms[close_word]
-  raise custom_exceptions.HeroNotFound(word.title())
+  raise custom_exceptions.HeroNotFound(word)
 
 class find_hero(commands.Converter):
   # convert a hero input to a string
@@ -57,14 +57,14 @@ class hero_emoji_converter(commands.Converter):
       emoji = ctx.bot.get_emoji(ctx.guild, hero)
     if emoji:
       return emoji
-    raise custom_exceptions.HeroNotFound(argument.title())
+    raise custom_exceptions.HeroNotFound(argument)
     
 def hero_and_secret(word):
   word = word.lower()
   close_word = find_closest(word, list(transform_synonyms))
   if close_word:
     return transform_synonyms[close_word]
-  raise custom_exceptions.HeroNotFound(word.title())
+  raise custom_exceptions.HeroNotFound(word)
   
 def find_ability(word):
   word = word.lower()
@@ -84,14 +84,14 @@ def find_farmable_achievement(name):
   close_word = find_closest(name, list(farmable_achievement_synonyms))
   if close_word:
     return farmable_achievement_synonyms[close_word]
-  raise custom_exceptions.DataNotFound("Achievement", name.title())
+  raise custom_exceptions.DataNotFound("Achievement", name)
   
 def find_achievement(name):
   name = name.lower()
   close_word = find_closest(name, list(achievement_synonyms))
   if close_word:
     return achievement_synonyms[close_word]
-  raise custom_exceptions.DataNotFound("Achievement", name.title())
+  raise custom_exceptions.DataNotFound("Achievement", name)
   
 def toMode(argument):
   argument = argument.lower()
@@ -99,7 +99,7 @@ def toMode(argument):
     return "legendary"
   elif argument in ["camp", "campaign"]:
     return "campaign"
-  raise custom_exceptions.DataNotFound("Mode", argument.title())
+  raise custom_exceptions.DataNotFound("Mode", argument)
 
 def toWorld(argument):
   world = argument.lower()
@@ -126,7 +126,7 @@ def toLevelWorld(argument):
     return "C"
   elif world in ["connie", "connie story", "conniestrory"]:
     return "Connie"
-  raise custom_exceptions.DataNotFound("World", argument.title())
+  raise custom_exceptions.DataNotFound("World", argument)
   
 def numberComparisonConverter(argument):
   if "->" in argument:

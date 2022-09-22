@@ -112,7 +112,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     result = db.query(f'SELECT ability FROM ability WHERE hero="{heroName}" AND ({where_clause}) ORDER BY tag LIMIT {searchLimit}')
       
     if len(result) == 0:
-      raise custom_exceptions.AbilityNotFound(heroName.title(), string.capwords(abilityName))
+      raise custom_exceptions.AbilityNotFound(heroName, abilityName)
     elif len(result) == searchLimit: # too many results
       prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
       await context.send(
@@ -144,7 +144,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
   async def stats(self, context, unit:find_hero, rank:numberComparisonConverter=None, level:numberComparisonConverter=None):
     result = self.bot.db[context.guild.id].select("hero", unit)
     if result is None:
-      raise custom_exceptions.HeroNotFound(unit.title())
+      raise custom_exceptions.HeroNotFound(unit)
     minRank, maxRank = result["minRank"], result["maxRank"]
     if rank is None:
       rank = maxRank
@@ -160,10 +160,10 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     else:
       level1, level2 = level, level
     if (not 0 < level1 <= max_level) or (not 0 < level2 <= max_level):
-      await context.send(f"Level of {unit.title()} must be between 1 and {max_level}.")
+      await context.send(f"Level of {unit} must be between 1 and {max_level}.")
       return
     if (not minRank <= rank1 <= maxRank) or (not minRank <= rank2 <= maxRank):
-      await context.send(f"Rank of {unit.title()} must be between rank {minRank} and rank {maxRank}.")
+      await context.send(f"Rank of {unit} must be between rank {minRank} and rank {maxRank}.")
       return
     timeout = self.get_active_time(context.guild) * 60
     if rank1 == rank2 and level1 == level2:
@@ -202,7 +202,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     )
     
     if len(result) == 0:
-      raise custom_exceptions.DataNotFound(f"W{world} Enemy" if world is not None else "Enemy", string.capwords(enemy))
+      raise custom_exceptions.DataNotFound(f"W{world} Enemy" if world is not None else "Enemy", enemy)
     elif len(result) == searchLimit: # too many results
       prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
       await context.send(
@@ -266,7 +266,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
     embed.add_field(name="__Stats__:", value=statsMsg, inline=False)
     embed.add_field(name="__Abilities__:", value=abilities, inline=False)
     if (not remark == "boss") and buff:
-      embed.add_field(name="__Extra Buffs__:", value=f"{string.capwords(enemy)} receives {buff}", inline=False)
+      embed.add_field(name="__Extra Buffs__:", value=f"{enemy} receives {buff}", inline=False)
     if url:
       embed.set_thumbnail(url=url)
     embed.set_footer(text=f"WORLD {world} ENEMY")
@@ -301,7 +301,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       f"FROM tower JOIN buff ON tower.type=buff.unit AND tower.world=buff.world WHERE {where_clause} LIMIT {searchLimit}"
     )
     if len(result) == 0:
-      raise custom_exceptions.DataNotFound(f"W{world} Tower" if world is not None else "Tower", string.capwords(tower))
+      raise custom_exceptions.DataNotFound(f"W{world} Tower" if world is not None else "Tower", tower)
     elif len(result) == searchLimit: # too many results
       prefix = self.bot.get_guild_prefix(context.guild) if context.guild else context.prefix
       await context.send(
@@ -402,37 +402,37 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       return
     name = name.lower()
     if name in ["armageddon"]:
-      name = "armageddon"
+      name = "Armageddon"
       cooldown = 20
       description = "Deals `600 TD + 50% hp` damage to 20 non-boss enemies, and `10% hp` damage to all bosses."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/b/b5/Armageddon_Consumable.png/revision/latest?cb=20200822204546"
     elif name in ["fire potion", "fire", "bomb"]:
-      name = "fire potion"
+      name = "Fire Potion"
       cooldown = 10
       description = "Deals `400 TD` to enemies in AOE range 2."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/9/92/Bomb_Consumable.png/revision/latest?cb=20200822204547"
     elif name in ["freeze potion", "freeze"]:
-      name = "freeze potion"
+      name = "Freeze Potion"
       cooldown = 60
       description = "Freeze all enemies for 5s."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/4/40/Freeze_Consumable.png/revision/latest?cb=20200822204547"
     elif name in ["freeze potion lv2", "freeze lv2", "freeze2"]:
-      name = "freeze potion lv2"
+      name = "Freeze Potion Lv2"
       cooldown = 60
       description = "Freeze all enemies for 7.5s."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/4/40/Freeze_Consumable.png/revision/latest?cb=20200822204547"
     elif name in ["gold boost", "gold"]:
-      name = "gold boost"
+      name = "Gold Boost"
       cooldown = 30
       description = "Instantly grants 500 coins."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/0/0c/Coin_Consumable.png/revision/latest?cb=20200822204547"
     elif name in ["healing potion", "heal potion", "healing", "heal"]:
-      name = "healing potion"
+      name = "Healing Potion"
       cooldown = 5
       description = "Revives dead heroes, and in 15s heals allies in AOE range 3 `150 HP`."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/2/2a/Revive_Consumable.png/revision/latest?cb=20200822204547"
     elif name in ["meteor"]:
-      name = "meteor"
+      name = "Meteor"
       cooldown = 30
       description = (
         f"Instantly kills all non-boss enemies in AOE range 4, deals `9% hp` damage to bosses, and summons 2 lava golems.\n"
@@ -441,7 +441,7 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       )
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/1/18/Inferno_Consumable.png/revision/latest?cb=20200822204547"
     elif name in ["summon potion", "summon"]:
-      name = "summon potion"
+      name = "Summon Potion"
       cooldown = 5
       description = "Summons a lava golem with 200 hp, dealing `42 TD + 10% hp` damage on a non-boss enemy, or `1.25% hp` damage on a boss every 1s."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/3/3d/Summon_Consumable.png/revision/latest?cb=20200822204547"
@@ -451,13 +451,13 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       description = "Summons a substitute with 200 hp, 100% physical and magical armor, 100% dodge, immune to buffs & debuffs. It can block 6 enemies (except bosses) with 3 engage range (not-engaged-strongest). Cannot be healed, cannot be targeted by ranged attack.\n- Each time it takes a hit, it receives `1 TD` (totally takes 200 hits)."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/2/27/Substitute_Consumable.png/revision/latest?cb=20211005051014"
     elif name in ["swift soda", "swift", "soda"]:
-      name = "swift soda"
+      name = "Swift Soda"
       cooldown = 20
       description = "Resets all heroes' actives cooldown, and haste their speed x2 and boost their damage x1.1 for 30s."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/7/7c/SwiftSoda_Consumable.png/revision/latest?cb=20211005051012"
     else:
-      raise custom_exceptions.DataNotFound("Item", string.capwords(name))
-    embed = discord.Embed(title=f"**{string.capwords(name)}**", timestamp=context.message.created_at, description=f"Cooldown: {cooldown}s")
+      raise custom_exceptions.DataNotFound("Item", name)
+    embed = discord.Embed(title=f"**{name}**", timestamp=context.message.created_at, description=f"Cooldown: {cooldown}s")
     embed.add_field(name="Effects:", value=description, inline=False)
     if url:
       embed.set_footer(text="ITEM", icon_url=url)
@@ -477,103 +477,103 @@ class StatsCog(commands.Cog, name="Stats Commands"):
       return
     name = name.lower()
     if name in ["haste"]:
-      name = "haste"
+      name = "Haste"
       description = "Increase the speed of a unit by some percentage value."
       stack = "Most of the hastes from different sources stack with each other, except:\n1) Haste x1.5 from towers, but theoretically we cannot use towers from different worlds at the same time so not a problem\n2) Haste x1.5 from enemies, this usually is not a problem either\nAnd it's also worth mentioning that the haste x1.5 from enemies' aura stacks with haste x1.5 from tower's aura."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/2/27/Haste.jpg/revision/latest?cb=20200822214559"
     elif name in ["slow"]:
-      name = "slow"
+      name = "Slow"
       description = "Decrease the speed of a unit by some percentage value."
       stack = "There are 5 kinds of slows and they stack with each other.\n1) The most common slow by 50% with a clock on top\n2) Slow by 25% from Sethos' R6 sandstorm\n3) Move speed x0.4 from Smoulder's r4 aura\n4) Slow from Shamiko\n4) Slow by 60% from Elara's rifts' explosion (explosion only, slow from her active and aura of rifts is 50%)"
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/5/54/Slow.jpg/revision/latest?cb=20200822214559"
     elif name in ["cold"]:
-      name = "cold"
+      name = "Cold"
       description = "Decrease the move speed by 50% and the animation speed by 25%. The slow on animation speed may stop some heroes from casting special spells."
       stack = "The speed reduction stacks with slow buffs."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/7/70/Cold.jpg/revision/latest?cb=20200822214558"
     elif name in ["decrepit", "decrepify"]:
-      name = "decrepit"
+      name = "Decrepit"
       description = "Decrease the speed and reduce the armor of a unit. This includes a decrepit from Yan (speed x0.35, armor -0.25) and a stronger version from W4 Small Golem (speed x0.25, armor -0.5)."
       stack = "The speed reduction stacks with slow buff and the armor reduction stacks with armor buff."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/e/e6/Decrepify.jpg/revision/latest?cb=20200822214559"
     elif name in ["poison", "venom"]:
-      name = "poison"
+      name = "Poison"
       description = "Ignores the shield points and deals damage (usually magical or true damage) over time. This includes a normal poison which deals `(3+0.05 ND) TD` every 0.42s and others from heroes."
       stack = "There are several different poison buffs with different damage multipliers, and they stack with each other. For example venom from Sethos stacks with posion from Mabyn."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/8/87/Poison.jpg/revision/latest?cb=20200822214559"
     elif name in ["burn", "burning"]:
-      name = "burn"
+      name = "Burn"
       description = "Deals `(2+0.05 ND) PD` every 0.4s."
       stack = "There is only one kind of burn buff so they cannot stack even they are from different sources."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/8/8c/Burn.jpg/revision/latest?cb=20200822214559"
     elif name in ["bleed", "bleeding"]:
-      name = "bleed"
+      name = "Bleed"
       description = "Deals `(2+0.05 ND) PD` every 0.33s while moving."
       stack = "There is only one kind of bleed buff so they cannot stack even they are from different sources."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/7/72/Bleed.jpg/revision/latest?cb=20200822215031"
     elif name in ["shield", "armor"]:
-      name = "shield"
+      name = "Shield"
       description = "Gives some max shield points and increase the armor of a unit."
       stack = "Shield buffs from different sources stack with each other, but because they only gives max shield points, the shield points won't be restored if the unit loses some shield in battle."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/4/43/Shield.jpg/revision/latest?cb=20200822214557"
     elif name in ["armor break", "break armor"]:
-      name = "armor break"
+      name = "Armor Break"
       description = "Reduce the armor of a unit. Could be a percentage reduce (e.g. x0.5) or a value reduce (e.g. -0.2)."
       stack = "The armor breaks with different values can stack with each other. For example, a unit can receive x0.5 and x0.7 armor break and totally the armor will be x0.35."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/0/02/Armor_break.jpg/revision/latest?cb=20200822214559"
     elif name in ["terror", "terrify"]:
-      name = "terror"
+      name = "Terror"
       description = "Makes a unit to move backward, but the unit is still able to attack."
       stack = "Terror from Shamiko/Elara/Mabyn are literally different, but they may interfere each other due to some bug."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/4/48/Terror.jpg/revision/latest?cb=20200822214558"
     elif name in ["blind"]:
-      name = "blind"
+      name = "Blind"
       description = "Increase the miss chance of a unit by 50%."
       stack = "All blinds buffs are the same and cannot stack."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/7/7b/Blind.jpg/revision/latest?cb=20200822214559"
     elif name in ["curse", "silence"]:
-      name = "curse/silence"
+      name = "Curse/Silence"
       description = "Stops a unit from attacking or casting, also stops the cooldowns. This buff is either from W2 Heretic or W4 Pyromancer Tower."
       stack = ""
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/9/97/Curse.jpg/revision/latest?cb=20200822214558"
     elif name in ["stun", "freeze", "shock", "cocoon", "paralysis", "bind"]:
-      name = "stun/freeze/shock/..."
+      name = "Stun/Freeze/Shock/..."
       description = "Stuns a unit so it cannot do anything."
       stack = "Buffs with different names can stack with each other, but with the same name a buff will only replace an older one."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/a/a7/Stun.jpg/revision/latest?cb=20200822214559"
     elif name in ["cloak"]:
-      name = "cloak"
+      name = "Cloak"
       description = "Make a unit invisible to most of the ranged attacks, but it may be damaged from AOE effect, and cloaked enemies can be revealed by melee engagement."
       stack = ""
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/5/56/Cloak.jpg/revision/latest?cb=20200822214559"
     elif name in ["spirit", "spirit curse"]:
-      name = "spirit curse"
+      name = "Spirit Curse"
       description = "Reduce the damage by 25% and deals `(5+0.05 ND) TD` every 0.42s."
       stack = "This cursed poison can stack with other poisons."
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/8/85/Spirit_curse.jpg/revision/latest?cb=20200822214559"
     elif name in ["polymorph", "poly", "polymorphism"]:
-      name = "polymorph"
+      name = "Polymorph"
       description = "Reduce the HP to 1/4, move speed to 1/2, remove all armor, and silence the unit."
       stack = ""
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/e/e0/Polymorph.jpg/revision/latest?cb=20200901022035"
     elif name in ["charm"]:
-      name = "charm"
+      name = "Charm"
       description = "Make the enemy fight for you. Your units can benifit from aura of the enemy. Some charmed enemies don't engage in melee, including W3 Mummy, W4 Magic Book & Cloud Sunfish, W6 Origami Crane & Harpy."
       stack = ""
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/d/de/Charm.jpg/revision/latest?cb=20200901023011"
     elif name in ["ground", "grounded"]:
-      name = "grounded"
+      name = "Grounded"
       description = "Ground the flying enemies making them stoppable by ground troops."
       stack = ""
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/d/da/Grounded.jpg/revision/latest?cb=20211007161430"
     elif name in ["slime", "slime cover"]:
-      name = "slime cover"
+      name = "Slime Cover"
       description = "Slime cover buffs ground slime enemies: HP x2, damage x1.5; It debuffs your allies: move speed x0.6, damage x0.8. It can be cleansed by Voltari Perch right branch upgrade."
       stack = ""
       url = "https://static.wikia.nocookie.net/realm-defense-hero-legends-td/images/4/46/Slime_covered.jpg/revision/latest?cb=20211007161428"
     else:
-      raise custom_exceptions.DataNotFound("Buff", string.capwords(name))
-    embed = discord.Embed(title=f"**{string.capwords(name)}**", timestamp=context.message.created_at)
+      raise custom_exceptions.DataNotFound("Buff", name)
+    embed = discord.Embed(title=f"**{name}**", timestamp=context.message.created_at)
     if description:
       embed.add_field(name="Effects:", value=description, inline=False)
     if stack:

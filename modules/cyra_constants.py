@@ -9,33 +9,33 @@ emoji_keys = {
   "star":"item_star",
   "coin":"item_coin",
   "meteor":"item_Meteor",
-  "fee":"hero_Fee1",
-  "lancelot":"hero_Lancelot1",
-  "smoulder":"hero_Smoulder1",
-  "efrigid":"hero_Efrigid1",
-  "normal hogan":"hero_Hogan1",
-  "hogan":"hero_HoganBeastmaster1",
-  "bolton":"hero_Bolton1",
-  "obsidian":"hero_Obsidian1",
-  "masamune":"hero_Masamune1",
-  "mabyn":"hero_Mabyn1",
-  "narlax":"hero_Narlax1",
-  "sethos":"hero_Sethos1",
-  "helios":"hero_Helios1",
-  "yan":"hero_Yan1",
-  "raida":"hero_Raida1",
-  "caldera":"hero_Caldera1",
-  "leif":"hero_Leif1",
-  "koizuul":"hero_Koizuul1",
-  "azura":"hero_Azura1",
-  "normal connie":"hero_Connie1",
-  "connie":"hero_ConnieNecro1",
-  "shamiko":"hero_Shamiko1",
-  "cyra":"hero_Cyra1",
-  "elara":"hero_Elara1",
-  "osan":"hero_Osan1",
-  "jett":"hero_Jett1",
-  "koizuul dragon":"hero_Koizuul2",
+  "Fee":"hero_Fee1",
+  "Lancelot":"hero_Lancelot1",
+  "Smoulder":"hero_Smoulder1",
+  "Efrigid":"hero_Efrigid1",
+  "Normal Hogan":"hero_Hogan1",
+  "Hogan":"hero_HoganBeastmaster1",
+  "Bolton":"hero_Bolton1",
+  "Obsidian":"hero_Obsidian1",
+  "Masamune":"hero_Masamune1",
+  "Mabyn":"hero_Mabyn1",
+  "Narlax":"hero_Narlax1",
+  "Sethos":"hero_Sethos1",
+  "Helios":"hero_Helios1",
+  "Yan":"hero_Yan1",
+  "Raida":"hero_Raida1",
+  "Caldera":"hero_Caldera1",
+  "Leif":"hero_Leif1",
+  "Koizuul":"hero_Koizuul1",
+  "Azura":"hero_Azura1",
+  "Normal Connie":"hero_Connie1",
+  "Connie":"hero_ConnieNecro1",
+  "Shamiko":"hero_Shamiko1",
+  "Cyra":"hero_Cyra1",
+  "Elara":"hero_Elara1",
+  "Osan":"hero_Osan1",
+  "Jett":"hero_Jett1",
+  "Koizuul Dragon":"hero_Koizuul2",
   "gm":"title_4_gm",
   "knight":"title_2_knight",
   "ruler":"title_3_ruler",
@@ -49,44 +49,44 @@ emoji_keys = {
 }
 
 hero_list = [
-  "azura","bolton","caldera","connie","efrigid",
-  "fee","helios","hogan", "normal hogan","koizuul","lancelot","leif",
-  "mabyn","masamune","narlax","obsidian","raida","sethos",
-  "shamiko","smoulder","yan","normal connie","cyra","elara","osan","jett"
+  "Azura","Bolton","Caldera","Connie","Efrigid",
+  "Fee","Helios","Hogan", "Normal Hogan","Koizuul","Lancelot","Leif",
+  "Mabyn","Masamune","Narlax","Obsidian","Raida","Sethos",
+  "Shamiko","Smoulder","Yan","Normal Connie","Cyra","Elara","Osan","Jett"
 ]
 
 emoji_dict = {
-  "ConnieNecro": "connie",
-  "Connie": "normal connie",
-  "HoganBeastmaster": "hogan",
-  "Hogan": "normal hogan"
+  "ConnieNecro": "Connie",
+  "Connie": "Normal Connie",
+  "HoganBeastmaster": "Hogan",
+  "Hogan": "Normal Hogan"
 }
 
 hero_transformable = {
-  "leif": ("Weapon lv1", "Weapon lv6"),
-  "caldera": ("True Form", "Giant Form"),
-  "koizuul": ("Fish Form", "Dragon Form"),
-  "cyra": ("Normal Form", "Goddess Form"),
-  "elara": ("Normal Form", "Goddess Form"),
-  "jett": ("Normal Form", "Overheat Mode"),
+  "Leif": ("Weapon lv1", "Weapon lv6"),
+  "Caldera": ("True Form", "Giant Form"),
+  "Koizuul": ("Fish Form", "Dragon Form"),
+  "Cyra": ("Normal Form", "Goddess Form"),
+  "Elara": ("Normal Form", "Goddess Form"),
+  "Jett": ("Normal Form", "Overheat Mode"),
 }
 
 hero_synonyms = {hero:hero for hero in hero_list}
 hero_synonyms.update({ # hero synonyms
-  "koi":"koizuul",
-  "elsa":"efrigid",
-  "efridge":"efrigid",
-  "lance":"lancelot",
-  "maybe":"mabyn",
-  "masa":"masamune",
-  "shampoo":"shamiko",
-  "necroconnie":"connie",
-  "old connie":"normal connie",
-  "beastmasterhogan":"hogan",
-  "old hogan":"normal hogan",
-  "elana":"elara",
+  "Koi":"Koizuul",
+  "Elsa":"Efrigid",
+  "Efridge":"Efrigid",
+  "Lance":"Lancelot",
+  "Maybe":"Mabyn",
+  "Masa":"Masamune",
+  "Shampoo":"Shamiko",
+  "Necroconnie":"Connie",
+  "Old Connie":"Normal Connie",
+  "Beastmasterhogan":"Hogan",
+  "Old Hogan":"Normal Hogan",
+  "Elana":"Elara",
 })
-transform_extra = ["secret", "sylvan mercenary","l.a.g."]
+transform_extra = ["Secret", "Sylvan Mercenary","L.A.G."]
 transform_synonyms = hero_synonyms.copy()
 transform_synonyms.update({hero:hero for hero in transform_extra})
 
@@ -99,14 +99,14 @@ ability_synonyms = {
 
 # which world are heroes in
 world_hero = {
-  1:["fee", "lancelot", "hogan", "masamune", "bolton", "normal connie",
-     "connie", "smoulder", "efrigid",],#"obsidian","mabyn"
-  2:["obsidian", "mabyn"],
-  3:["sethos", "helios"],
-  4:["yan", "narlax"],
-  5:["leif", "caldera"],
-  6:["azura", "raida", "koizuul", "shamiko"],
-  7:["cyra", "elara", "osan", "jett"],
+  1:["Fee", "Lancelot", "Hogan", "Masamune", "Bolton", "Normal Connie",
+     "Connie", "Smoulder", "Efrigid",],#"Obsidian","Mabyn"
+  2:["Obsidian", "Mabyn"],
+  3:["Sethos", "Helios"],
+  4:["Yan", "Narlax"],
+  5:["Leif", "Caldera"],
+  6:["Azura", "Raida", "Koizuul", "Shamiko"],
+  7:["Cyra", "Elara", "Osan", "Jett"],
   None:[], #default 
 }
 
@@ -185,20 +185,20 @@ elixir_cost_7500 =  [        60,     108,    194,    350,    630,    1134,   113
                      2531,   3416,   4612,   6226,   8406,   11348,  15319,  20681,  27920,  37691,
                      50883,  68693,  92735,  125192, 169010, 174925, 181047, 187384, 193942, 200730]
 elixir_cost_hero = {
-  "fee":elixir_cost_fee,
-  "lancelot":elixir_cost_lance,
-  "smoulder":elixir_cost_3000,
-  "efrigid":elixir_cost_3000,
-  "normal hogan":elixir_cost_1500,
-  "hogan":elixir_cost_1500,
-  "bolton":elixir_cost_1500,
-  "obsidian":elixir_cost_3000,
-  "masamune":elixir_cost_1500,
-  "mabyn":elixir_cost_3000,
-  "sethos":elixir_cost_6000,
-  "helios":elixir_cost_6000,
-  "normal connie":elixir_cost_1500,
-  "connie":elixir_cost_1500,
+  "Fee":elixir_cost_fee,
+  "Lancelot":elixir_cost_lance,
+  "Smoulder":elixir_cost_3000,
+  "Efrigid":elixir_cost_3000,
+  "Normal Hogan":elixir_cost_1500,
+  "Hogan":elixir_cost_1500,
+  "Bolton":elixir_cost_1500,
+  "Obsidian":elixir_cost_3000,
+  "Masamune":elixir_cost_1500,
+  "Mabyn":elixir_cost_3000,
+  "Sethos":elixir_cost_6000,
+  "Helios":elixir_cost_6000,
+  "Normal Connie":elixir_cost_1500,
+  "Connie":elixir_cost_1500,
 }
 
 rank_cost = [5, 10, 15, 20, 40, 80, 100]
@@ -218,77 +218,77 @@ def token_cost(ranklow, rankhigh):
   return sum(rank_cost[ranklow:rankhigh])
 
 achievemets_dict = {
-"Slime":["slime"],"Bucket Slime":["slime"],"Giant Slime":["slime"],"Slime Queen":["slime"],"Slime Blob":["slime"],
-"Skeleton":["skeleton"],"Skeleton Archer":["skeleton"],"Skeleton Mage":["skeleton"],
-"Spider":["spider"],"Poison Spider":["spider"],
-"Crow":["flying"],
+"Slime":["Slime"],"Bucket Slime":["Slime"],"Giant Slime":["Slime"],"Slime Queen":["Slime"],"Slime Blob":["Slime"],
+"Skeleton":["Skeleton"],"Skeleton Archer":["Skeleton"],"Skeleton Mage":["Skeleton"],
+"Spider":["Spider"],"Poison Spider":["Spider"],
+"Crow":["Flying"],
 
-"Goblin Grunt":["goblin"],"Goblin Archer":["goblin"],"Goblin Shaman":["goblin"],"Maniac":["goblin"],"Heretic":["goblin"],
-"Goblin Tallman":["goblin"],"Goblin Chieftain":["goblin"],"Orc":["goblin"],"Hordemonger":["goblin"],
-"Crow Rider":["flying"],
+"Goblin Grunt":["Goblin"],"Goblin Archer":["Goblin"],"Goblin Shaman":["Goblin"],"Maniac":["Goblin"],"Heretic":["Goblin"],
+"Goblin Tallman":["Goblin"],"Goblin Chieftain":["Goblin"],"Orc":["Goblin"],"Hordemonger":["Goblin"],
+"Crow Rider":["Flying"],
 
-"Anubian":["anubian"],"Mega Anubian":["anubian"],
-"Cactus Golem":["golem"],
-"Flying Scarab":["flying"],"Vulture Rider":["flying"],
+"Anubian":["Anubian"],"Mega Anubian":["Anubian"],
+"Cactus Golem":["Golem"],
+"Flying Scarab":["Flying"],"Vulture Rider":["Flying"],
 
-"Fire Elemental":["elemental"],"Ice Elemental":["elemental"],"Void Elemental":["elemental"],"Earth Elemental":["elemental"],
-"Gravity Wizard":["wizard"],"Wizard Initiate":["wizard"],
-"Time Construct":["golem"],"Ivory Golem":["golem"],
-"Whelp":["flying"],
+"Fire Elemental":["Elemental"],"Ice Elemental":["Elemental"],"Void Elemental":["Elemental"],"Earth Elemental":["Elemental"],
+"Gravity Wizard":["Wizard"],"Wizard Initiate":["Wizard"],
+"Time Construct":["Golem"],"Ivory Golem":["Golem"],
+"Whelp":["Flying"],
 
-"Duskvine Sproutling":["duskvine"],"Duskvine Sporophyte":["duskvine"],"Duskvine Lasher":["duskvine"],"Duskvine Crusher":["duskvine"],
-"Myrk Archer":["myrk"],"Myrk Assassin":["myrk"],"Myrk Warlock":["myrk"],
-"Aqua Slime":["slime"],"Lava Slime":["slime","lava"],
-"Cave Bat":["flying"],"Lava Bat":["flying","lava"],"Giant Cave Bat":["flying"],
-"Lava Snail":["lava"],"Lava Pango":["lava"],"Lava Smasher":["lava"],
-"Small Ent":["ent"],"Large Ent":["ent"],
+"Duskvine Sproutling":["Duskvine"],"Duskvine Sporophyte":["Duskvine"],"Duskvine Lasher":["Duskvine"],"Duskvine Crusher":["Duskvine"],
+"Myrk Archer":["Myrk"],"Myrk Assassin":["Myrk"],"Myrk Warlock":["Myrk"],
+"Aqua Slime":["Slime"],"Lava Slime":["Slime","Lava"],
+"Cave Bat":["Flying"],"Lava Bat":["Flying","Lava"],"Giant Cave Bat":["Flying"],
+"Lava Snail":["Lava"],"Lava Pango":["Lava"],"Lava Smasher":["Lava"],
+"Small Ent":["Ent"],"Large Ent":["Ent"],
 
-"Strange Monk":["w6","monk"],"Chibi-Mahou":["w6","monk"],"Kakutouka":["w6","monk"],"Kami-no-Mahoutsukai":["w6"],"Shunmin-shi":["w6"],
-"Origami Crane":["w6","flying"],"Daruma":["w6","flying"],"Harpi":["w6","flying"],
-"Oni-tekidanhei":["w6","oni"],"Oni-baba":["w6","oni"],"Oni-ken":["w6","oni"],"Oni-kanadzuchi":["w6","oni"],
-"Small Ghostfire":["w6","spirit"],"Kagami-no-Yuurei":["w6","spirit"],"Oni Mask":["w6","spirit"],"Aoi Mask":["w6","spirit"],"Big Ghostfire":["w6","spirit"],
-"Skeleton Samurai":["w6","skeleton"],
-"Koi-jin":["w6","fishguard"],"Namazu-jin":["w6","fishguard"],"Kaeru-hei":["w6","fishguard"],
+"Strange Monk":["W6","Monk"],"Chibi-Mahou":["W6","Monk"],"Kakutouka":["W6","Monk"],"Kami-no-Mahoutsukai":["W6"],"Shunmin-shi":["W6"],
+"Origami Crane":["W6","Flying"],"Daruma":["W6","Flying"],"Harpi":["W6","Flying"],
+"Oni-tekidanhei":["W6","Oni"],"Oni-baba":["W6","Oni"],"Oni-ken":["W6","Oni"],"Oni-kanadzuchi":["W6","Oni"],
+"Small Ghostfire":["W6","Spirit"],"Kagami-no-Yuurei":["W6","Spirit"],"Oni Mask":["W6","Spirit"],"Aoi Mask":["W6","Spirit"],"Big Ghostfire":["W6","Spirit"],
+"Skeleton Samurai":["W6","Skeleton"],
+"Koi-jin":["W6","Fishguard"],"Namazu-jin":["W6","Fishguard"],"Kaeru-hei":["W6","Fishguard"],
 
-"Quadropus":["corrupted"], "Floating Rambler":["corrupted"], "Rock Rambler":["corrupted","sentient_rock"],
-"Tin Slime":["w7_slime"], "Flying Slime":["w7_slime", "flying_slime"], "Ground Slime":["w7_slime"],
-"Gem Eye":["security_construct"], "Eta Sentry":["security_construct"], "Chameleon Sentry":["security_construct"], "Elysium Pebble":["sentient_rock"],
-"Elysium Rock":["sentient_rock"], "Rock Flinger":["sentient_rock"], "Slime Shooter":["w7_slime"], "Omega Spider":["security_construct"]
+"Quadropus":["Corrupted"], "Floating Rambler":["Corrupted"], "Rock Rambler":["Corrupted","Sentient_Rock"],
+"Tin Slime":["W7_Slime"], "Flying Slime":["W7_Slime", "Flying_Slime"], "Ground Slime":["W7_Slime"],
+"Gem Eye":["Security_Construct"], "Eta Sentry":["Security_Construct"], "Chameleon Sentry":["Security_Construct"], "Elysium Pebble":["Sentient_Rock"],
+"Elysium Rock":["Sentient_Rock"], "Rock Flinger":["Sentient_Rock"], "Slime Shooter":["W7_Slime"], "Omega Spider":["Security_Construct"]
 }
 achievements = sorted(set([j for i in achievemets_dict.values() for j in i]))
-achievements += ["villager", "bandit"]
+achievements += ["Villager", "Bandit"]
 
-tappables = ["tappable", "trap", "hidden enemies", "loose change", "chicken dinner", "snowman", "windmill", "cow", "boneheaded", "seeker", "llama", "mercenary board"]
-tower_achievements = ["tower"]
+tappables = ["Tappable", "Trap", "Hidden Enemies", "Loose Change", "Chicken Dinner", "Snowman", "Windmill", "Cow", "Boneheaded", "Seeker", "Llama", "Mercenary Board"]
+tower_achievements = ["Tower"]
 
 achievement_synonyms = {achievement:achievement for achievement in achievements}
 achievement_synonyms.update({ # achievement synonyms
-"w6enemy":"w6",
-"world6":"w6",
-"bird":"flying",
-"air":"flying",
-"flier":"flying",
-"lavacreature":"lava",
-"construct":"security_construct",
-"rock":"sentient_rock"
+"W6enemy":"W6",
+"World6":"W6",
+"Bird":"Flying",
+"Air":"Flying",
+"Flier":"Flying",
+"Lavacreature":"Lava",
+"Construct":"Security_Construct",
+"Rock":"Sentient_Rock"
 })
 farmable_achievement_synonyms = achievement_synonyms.copy()
 
 achievement_synonyms.update({tappable:tappable for tappable in tappables})
 achievement_synonyms.update({achievement:achievement for achievement in tower_achievements})
 achievement_synonyms.update({ # tappable synonyms
-"hidden": "hidden enemies",
-"unleash": "hidden enemies",
-"enemies": "hidden enemies",
-"loose": "loose change",
-"change": "loose change",
-"chicken": "chicken dinner",
-"mercenary": "mercenary board"
+"Hidden": "Hidden Enemies",
+"Unleash": "Hidden Enemies",
+"Enemies": "Hidden Enemies",
+"Loose": "Loose Change",
+"Change": "Loose Change",
+"Chicken": "Chicken Dinner",
+"Mercenary": "Mercenary Board"
 })
 achievement_synonyms.update({ # synonyms for "fast"
-"fast": "fast",
-"quick": "fast",
-"short": "fast"
+"Fast": "Fast",
+"Quick": "Fast",
+"Short": "Fast"
 })
 
 bot_state = {
@@ -306,7 +306,7 @@ bot_state = {
     "noaccess_msg":"I'm sorry, you do not have permission to use {context.command.qualified_name}. Please ask my masters.",
     "unexpected_msg":"Something unexpected happened in my command. Maybe try something else?\nPlease refer to `{context.prefix}help {context.command.qualified_name}` for information on my commands."
   },
-  "cyra": {
+  "Cyra": {
     "mod_role":"Enforcer",
     "admin_role":"Master",
     "color":discord.Colour.red(),
@@ -320,7 +320,7 @@ bot_state = {
     "noaccess_msg":"I'm sorry, you do not have permission to use `{context.command.qualified_name}`. Please ask my masters.",
     "unexpected_msg":"Elara stopped me from executing that command. Maybe try something else?\nPlease refer to `{context.prefix}help {context.command.qualified_name}` for information on my commands."
   },
-  "elara": {
+  "Elara": {
     "mod_role":"Ravager",
     "admin_role":"Master",
     "color":discord.Colour.dark_purple(),

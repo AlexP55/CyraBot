@@ -30,13 +30,13 @@ class CyraBot(BaseBot):
     
   def get_state(self, name):
     if isinstance(name, discord.Guild):
-      name = self.get_nick(name).lower()
+      name = self.get_nick(name)
     if name in bot_state:
       return bot_state[name]
     return bot_state["_default"]
   
   def is_willing_to_answer(self, context):
-    if self.get_nick(context.guild).lower() == "elara":
+    if self.get_nick(context.guild) == "Elara":
       #If the nick is Elara, there is a chance she will refuse to answer.
       if context.command.qualified_name == "help":
         return True
@@ -75,7 +75,7 @@ class CyraBot(BaseBot):
       elif isinstance(error, custom_exceptions.HeroNotFound):
         msg = state["nohero_msg"]
       elif isinstance(error, custom_exceptions.AbilityNotFound):
-        if error.hero.lower() == self.get_nick(context.guild).lower():
+        if error.hero) == self.get_nick(context.guild):
           msg = state["noability_msg_self"]
         else:
           msg = state["noability_msg_other"]
@@ -102,10 +102,10 @@ class CyraBot(BaseBot):
         if avatar_file is None: avatar_file = random.choice(avatar_files)
         with open(avatar_file, "rb") as avatar:
           await self.user.edit(avatar=avatar.read())
-    if self.get_nick(guild).lower() == name:
+    if self.get_nick(guild) == name:
       return
     state = self.get_state(name)
-    nickname = name.title()
+    nickname = name
     await guild.me.edit(nick=nickname)
     admin_role = self.get_admin_role(guild)
     mod_role = self.get_mod_role(guild)
@@ -126,7 +126,7 @@ class CyraBot(BaseBot):
   async def init_bot(self, guild):
     # overrides the method: check nick name, add Cyra-specific variables
     await super().init_bot(guild)
-    #if self.get_nick(guild).lower() not in hero_list:
+    #if self.get_nick(guild) not in hero_list:
     #  await guild.me.edit(nick="Cyra")
     
     guild_emojis = set([emoji.name for emoji in guild.emojis])
@@ -159,8 +159,8 @@ class CyraBot(BaseBot):
   def initialize_default_settings(self):
     super().initialize_default_settings()
     bot_name = "Cyra"
-    self.default_settings["MOD_ROLE_NAME"].default = f"{bot_name}'s {bot_state[bot_name.lower()]['mod_role']}"
-    self.default_settings["ADMIN_ROLE_NAME"].default = f"{bot_name}'s {bot_state[bot_name.lower()]['admin_role']}"
+    self.default_settings["MOD_ROLE_NAME"].default = f"{bot_name}'s {bot_state[bot_name]['mod_role']}"
+    self.default_settings["ADMIN_ROLE_NAME"].default = f"{bot_name}'s {bot_state[bot_name]['admin_role']}"
     self.default_settings["BOT_ROLE_NAME"].default = f"{bot_name}"
     self.default_settings["ELARA_REFUSE_CHANCE"] = DefaultSetting(name="ELARA_REFUSE_CHANCE", default=10, description="chance to ignore command", 
       transFun=lambda x: float(x), checkFun=lambda x: x>=0, checkDescription="a non-negative number")

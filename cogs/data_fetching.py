@@ -398,10 +398,10 @@ class FetchCog(commands.Cog, name="Data Fetching Commands"):
             
           for strategy, time, gold, achievement_count in achieve_info:
             if mode == "campaign":
-              if task == "bandit":
-                achievement_count["bandit"] = 1
-              elif task == "villager":
-                achievement_count["villager"] = 1
+              if task == "Bandit":
+                achievement_count["Bandit"] = 1
+              elif task == "Villager":
+                achievement_count["Villager"] = 1
             db.insert_or_update("achievement", level, mode, strategy, time, gold, wave_num, *achievement_count.values())
           
           parsed_level["enemy_waves"] = json.dumps(parsed_level["enemy_waves"])

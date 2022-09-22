@@ -50,7 +50,7 @@ class HeroWorldMessage(InteractiveMessage):
     embed.set_thumbnail(url=world_url[self.world])
     embed.add_field(
       name="Choose a hero (by reacting):",
-      value="\n".join([f"{emoji}: {string.capwords(hero)}" for emoji,hero in zip(self.child_emojis, world_hero[self.world])])
+      value="\n".join([f"{emoji}: {hero}" for emoji,hero in zip(self.child_emojis, world_hero[self.world])])
     )
     embed.set_footer(text=f"WORLD {self.world}")
     return embed
@@ -61,7 +61,7 @@ class HeroIndividualMessage(InteractiveMessage):
     db = self.context.bot.db[self.context.guild.id]
     result = db.query(f'SELECT ability, type, unlock, shortDescription, tag, world, link, introduction FROM ability JOIN hero on name=hero WHERE name="{hero}" ORDER BY tag')
     if len(result) == 0:
-      raise custom_exceptions.HeroNotFound(string.capwords(hero))
+      raise custom_exceptions.HeroNotFound(hero)
     world = result[0][5]
     if self.parent is None:
       self.parent = HeroWorldMessage(world, None, **attributes)
@@ -91,10 +91,10 @@ class HeroIndividualMessage(InteractiveMessage):
         else:
           activeTag = ""
         if unlock:
-          unlockTag = f" ({unlock.title()})"
+          unlockTag = f" ({unlock})"
         else:
           unlockTag = ""
-        title = f"{num_emojis[tag+1]} {string.capwords(ability)}{activeTag}{unlockTag}"
+        title = f"{num_emojis[tag+1]} {ability}{activeTag}{unlockTag}"
         self.abilities.append((title, shortDescription, tag))
     
   async def transfer_to_child(self, emoji):
@@ -102,7 +102,7 @@ class HeroIndividualMessage(InteractiveMessage):
     return HeroAbilityMessage(self.hero, ability, self)
     
   async def get_embed(self):
-    embed = discord.Embed(title=f"**{string.capwords(self.hero)}**", description=self.introduction,
+    embed = discord.Embed(title=f"**{self.hero}**", description=self.introduction,
                           url=self.link, timestamp=datetime.utcnow(), colour=discord.Colour.blue())
     for title, shortDescription, tag in self.abilities:
       embed.add_field(name=f"{title}", value=shortDescription, inline=False)
@@ -125,7 +125,7 @@ class HeroAbilityMessage(DetermInteractiveMessage):
     db = self.context.bot.db[self.context.guild.id]
     result = db.query(f'SELECT upgrade, info, type, url FROM abilityDetail NATURAL JOIN ability WHERE ability="{ability}" AND hero="{hero}" ORDER BY upgrade')
     if len(result) == 0:
-      raise custom_exceptions.AbilityNotFound(string.capwords(hero), string.capwords(ability))
+      raise custom_exceptions.AbilityNotFound(hero, ability)
     self.hero = hero
     self.ability = ability
     self.atype = result[0][2]
@@ -143,13 +143,13 @@ class HeroAbilityMessage(DetermInteractiveMessage):
       if upgrade == "basic" and len(result) == 1:
         self.upgrades.append(("\u200B", upgradeInfo))
       else:
-        self.upgrades.append((f"__{upgrade.title()}__:", upgradeInfo))
+        self.upgrades.append((f"__{upgrade}__:", upgradeInfo))
     
   async def transfer_to_child(self, emoji):
     pass    
     
   async def get_embed(self):
-    embed = discord.Embed(title=f"**{string.capwords(self.ability)}**", 
+    embed = discord.Embed(title=f"**{self.ability}**", 
       timestamp=datetime.utcnow(), colour=discord.Colour.blue(), 
       description=f"Type: {self.atype}")
     emoji = self.context.bot.get_emoji(self.context.guild, self.hero)

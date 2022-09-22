@@ -1,7 +1,7 @@
 from modules.cyra_constants import achievements, achievemets_dict
 
 def is_boss_level(level, mode, remark):
-  return (remark == "boss" and (mode != "legendary" or level in ["10", "20", "30", "40"]))
+  return (remark == "Boss" and (mode != "legendary" or level in ["10", "20", "30", "40"]))
 
 def parse_achievements(waves):
   time = 0
