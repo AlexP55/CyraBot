@@ -13,7 +13,7 @@ class LevelRootMessage(InteractiveMessage):
     super().__init__(parent, **attributes)
     # emojis for 7 worlds
     self.child_emojis = num_emojis[1:8]
-    self.connie_emoji = self.context.bot.get_emoji(self.context.guild, "connie")
+    self.connie_emoji = self.context.bot.get_emoji(self.context.guild, "Connie")
     if not self.connie_emoji: self.connie_emoji = "🐿️"
     # emojis for SR, Arcade, endless, challenges, connie story
     self.child_emojis += [letter_emojis["S"], letter_emojis["A"], letter_emojis["E"], letter_emojis["C"], letter_emojis["T"], self.connie_emoji]

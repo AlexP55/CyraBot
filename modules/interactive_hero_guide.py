@@ -86,7 +86,7 @@ class HeroIndividualMessage(InteractiveMessage):
       else: # other spells
         self.child_emojis.append(num_emojis[tag+1]) 
         self.ability_emojis.append(ability)
-        if abilityType == "active":
+        if abilityType == "Active":
           activeTag = " (Active)"
         else:
           activeTag = ""
@@ -134,13 +134,13 @@ class HeroAbilityMessage(DetermInteractiveMessage):
     for row in result:
       upgrade = row[0]
       if not upgrade:
-        upgrade = "basic"
-      if upgrade.startswith("r"):
-        upgrade = upgrade.replace("r","rank ", 1)
-      elif upgrade.startswith("lv"):
-        upgrade = upgrade.replace("lv","level ", 1)
+        upgrade = "Basic"
+      if upgrade.startswith("R"):
+        upgrade = upgrade.replace("R","rank ", 1)
+      elif upgrade.startswith("Lv"):
+        upgrade = upgrade.replace("Lv","Level ", 1)
       upgradeInfo = row[1]
-      if upgrade == "basic" and len(result) == 1:
+      if upgrade == "Basic" and len(result) == 1:
         self.upgrades.append(("\u200B", upgradeInfo))
       else:
         self.upgrades.append((f"__{upgrade}__:", upgradeInfo))
