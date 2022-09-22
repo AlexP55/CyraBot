@@ -136,7 +136,7 @@ class HeroAbilityMessage(DetermInteractiveMessage):
       if not upgrade:
         upgrade = "Basic"
       if upgrade.startswith("R"):
-        upgrade = upgrade.replace("R","rank ", 1)
+        upgrade = upgrade.replace("R","Rank ", 1)
       elif upgrade.startswith("Lv"):
         upgrade = upgrade.replace("Lv","Level ", 1)
       upgradeInfo = row[1]
