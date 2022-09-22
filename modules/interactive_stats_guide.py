@@ -109,7 +109,7 @@ class StatsMessage(InteractiveMessage):
         level_msg = f"{level_msg} ({self.level-last_level:+})"
         reqMsg.append(lvlup_cost_msg(self.context, self.hero, self.level, last_level))
       if self.transform != last_transform:
-        form_text = f"{form_text}{arrow_emojis['trans'] }"
+        form_text = f"{form_text}{arrow_emojis['trans']} "
       introMsg = f"{form_text}at {rank_msg} and {level_msg}"
     max_len = max(len(ele) for ele in statsMsg)
       
