@@ -121,7 +121,7 @@ class StatsMessage(InteractiveMessage):
     embed.add_field(name=f"To adjust stats:", value=instruction, inline=False)
     emoji = None
     if self.hero == "koizuul" and self.transform:
-      emoji = self.context.bot.get_emoji(self.context.guild, "koizuul dragon")
+      emoji = self.context.bot.get_emoji(self.context.guild, "Koizuul Dragon")
     if emoji is None:
       emoji = self.context.bot.get_emoji(self.context.guild, self.hero)
     if emoji is not None:

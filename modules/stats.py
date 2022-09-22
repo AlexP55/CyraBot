@@ -58,39 +58,39 @@ class HeroStats(Stats):
     self.NormalDamage = self.baseND + self.rank*self.drankND + (self.level-1)*self.dlvND + self.rank*(self.level-1)*self.dranklvND
     self.SpecialDamage = self.baseSD + self.rank*self.drankSD + (self.level-1)*self.dlvSD + self.rank*(self.level-1)*self.dranklvSD
     self.PhysicalArmor = self.basePhysicalArmor + self.rank*self.drankPhysicalArmor
-    if self.unit in ["leif", "caldera"]:
+    if self.unit in ["Leif", "Caldera"]:
       self.CastSpeed = 1
-    if self.unit == "leif":
+    if self.unit == "Leif":
       if self.rank < 6:
         self.NormalDamage = round(self.NormalDamage/1.5)
         self.SpecialDamage = round(self.SpecialDamage/1.5)
       else:
         self.HealthPoints *= 2
-    elif self.unit == "koizuul" and self.rank >= 6:
+    elif self.unit == "Koizuul" and self.rank >= 6:
       self.NormalDamage *= 2
       self.SpecialDamage *= 2
-    elif self.unit == "yan" and self.rank >= 6:
+    elif self.unit == "Yan" and self.rank >= 6:
       self.SpecialDamage *= 2
-    elif self.unit == "connie" and self.rank >= 6:
+    elif self.unit == "Connie" and self.rank >= 6:
       self.ReviveTime = round(2/3*self.ReviveTime)
-    elif self.unit == "jett":
+    elif self.unit == "Jett":
       self.CastSpeed = 1.25
       if self.rank >= 4: self.Shield = round(0.275*self.HealthPoints)
 
   def transformStats(self):
-    if self.unit == "caldera":
+    if self.unit == "Caldera":
       self.transformHealthPoints = 8 * self.HealthPoints
       self.transformNormalDamage = 8 * self.NormalDamage
       self.transformPhysicalArmor = self.PhysicalArmor + 1
       self.transformMoveSpeed = self.MoveSpeed - 2
       self.transformCastSpeed = 2 * self.CastSpeed
-    elif self.unit == "leif":
+    elif self.unit == "Leif":
       self.transformNormalDamage = round(1.5**5 * self.NormalDamage)
       self.transformSpecialDamage = round(1.5**5 * self.SpecialDamage)
       self.transformPhysicalArmor = 5*0.05 + self.PhysicalArmor
       self.transformMoveSpeed = round(1.1**5 * self.MoveSpeed, 2)
       self.transformCastSpeed = round(1.1**5 * self.CastSpeed, 2)
-    elif self.unit == "koizuul":
+    elif self.unit == "Koizuul":
       if self.rank >= 5:
         x = 160
       else:
@@ -98,11 +98,11 @@ class HeroStats(Stats):
       self.transformNormalDamage = x * self.NormalDamage
       self.transformSpecialDamage = x * self.SpecialDamage
       self.transformMoveSpeed = 2.2
-    elif self.unit in ["cyra", "elara"]:
+    elif self.unit in ["Cyra", "Elara"]:
       self.transformPhysicalArmor = self.PhysicalArmor + 0.15
       self.transformMagicalArmor = self.MagicalArmor + (0.1 if self.unit == "cyra" else 0.15)
       self.transformMoveSpeed = self.MoveSpeed + 1
-    elif self.unit == "jett":
+    elif self.unit == "Jett":
       self.transformNormalDamage = round(1.33 * self.NormalDamage)
       self.transformSpecialDamage = round(1.33 * self.SpecialDamage)
       self.transformCastSpeed = 1.5 * self.CastSpeed

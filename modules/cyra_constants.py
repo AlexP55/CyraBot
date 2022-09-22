@@ -68,7 +68,7 @@ hero_transformable = {
   "Koizuul": ("Fish Form", "Dragon Form"),
   "Cyra": ("Normal Form", "Goddess Form"),
   "Elara": ("Normal Form", "Goddess Form"),
-  "Jett": ("Normal Form", "Overheat Mode"),
+  "Jett": ("Normal Mode", "Overheat Mode"),
 }
 
 hero_synonyms = {hero:hero for hero in hero_list}
