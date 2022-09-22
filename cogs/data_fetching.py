@@ -127,7 +127,7 @@ class SheetReader:
       self.db.insert_or_update(table, *tup)
 
   def tupleFromRow(self, sheet, rowx):
-    if sheet.cell_type(rowx, 0) == xlrd.XL_CELL_EMPTY:
+    if sheet.cell_type(rowx, 0) == xlrd.XL_CELL_EMPTY or sheet.cell_value(rowx, 0) == "":
       return None
     cellList = []
     for colx in range(sheet.ncols):
