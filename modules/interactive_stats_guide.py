@@ -39,47 +39,47 @@ class StatsMessage(InteractiveMessage):
     
   async def transfer_to_child(self, emoji):
     if emoji == arrow_emojis["trans"]:
-      self.last_status = (self.current_stats, self.rank, self.level)
+      self.last_status = (self.current_stats, self.rank, self.level, self.transform)
       self.transform = not self.transform
       return self
     elif emoji == arrow_emojis["backward"]:
       if self.rank > self.dbrow["minRank"]:
-        self.last_status = (self.current_stats, self.rank, self.level)
+        self.last_status = (self.current_stats, self.rank, self.level, self.transform)
         self.rank -= 1
         return self
       else:
         return None
     elif emoji == arrow_emojis["forward"]:
       if self.rank < self.dbrow["maxRank"]:
-        self.last_status = (self.current_stats, self.rank, self.level)
+        self.last_status = (self.current_stats, self.rank, self.level, self.transform)
         self.rank += 1
         return self
       else:
         return None
     elif emoji == arrow_emojis["down"]:
       if self.level > 1:
-        self.last_status = (self.current_stats, self.rank, self.level)
+        self.last_status = (self.current_stats, self.rank, self.level, self.transform)
         self.level -= 1
         return self
       else:
         return None
     elif emoji == arrow_emojis["fast_down"]:
       if self.level > 1:
-        self.last_status = (self.current_stats, self.rank, self.level)
+        self.last_status = (self.current_stats, self.rank, self.level, self.transform)
         self.level = max(self.level-5, 1)
         return self
       else:
         return None
     elif emoji == arrow_emojis["up"]:
       if self.level < max_level:
-        self.last_status = (self.current_stats, self.rank, self.level)
+        self.last_status = (self.current_stats, self.rank, self.level, self.transform)
         self.level += 1
         return self
       else:
         return None
     elif emoji == arrow_emojis["fast_up"]:
       if self.level < max_level:
-        self.last_status = (self.current_stats, self.rank, self.level)
+        self.last_status = (self.current_stats, self.rank, self.level, self.transform)
         self.level = min(self.level+5, max_level)
         return self
       else:
@@ -98,7 +98,7 @@ class StatsMessage(InteractiveMessage):
       statsMsg = self.current_stats.clean_stats_msg()
       introMsg = f"{form_text}at __R{self.rank}__ and __Lv{self.level}__"
     else:
-      (last_stats, last_rank, last_level) = self.last_status
+      (last_stats, last_rank, last_level, last_transform) = self.last_status
       statsMsg = self.current_stats.stats_change_msg(last_stats)
       rank_msg = f"__R{self.rank}__"
       if self.rank != last_rank:
@@ -108,10 +108,12 @@ class StatsMessage(InteractiveMessage):
       if self.level != last_level:
         level_msg = f"{level_msg} ({self.level-last_level:+})"
         reqMsg.append(lvlup_cost_msg(self.context, self.hero, self.level, last_level))
+      if self.transform != last_transform:
+        form_text = f"{form_text}{arrow_emojis['trans'] }"
       introMsg = f"{form_text}at {rank_msg} and {level_msg}"
     max_len = max(len(ele) for ele in statsMsg)
       
-    embed = discord.Embed(title=f"Stats: {string.capwords(self.hero)}",
+    embed = discord.Embed(title=f"Stats: {self.hero}",
       timestamp=datetime.utcnow(), colour=discord.Colour.blue())
     embed.add_field(name=f"{introMsg}:", value="\n".join(f"`{stat:<{max_len}}`" for stat in statsMsg), inline=False)
     if reqMsg:
@@ -218,7 +220,7 @@ class StatsCmpMessage(InteractiveMessage):
     if self.level[0] != self.level[1]:
       reqMsg.append(lvlup_cost_msg(self.context, self.hero, self.level[0], self.level[1]))
       
-    embed = discord.Embed(title=f"Stats: {string.capwords(self.hero)}",
+    embed = discord.Embed(title=f"Stats: {self.hero}",
       timestamp=datetime.utcnow(), colour=discord.Colour.blue())
     embed.add_field(name=f"{introMsg}:", value="\n".join(f"`{stat:<{max_len}}`" for stat in statsMsg), inline=False)
     if reqMsg:
