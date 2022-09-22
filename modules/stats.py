@@ -73,6 +73,9 @@ class HeroStats(Stats):
       self.SpecialDamage *= 2
     elif self.unit == "connie" and self.rank >= 6:
       self.ReviveTime = round(2/3*self.ReviveTime)
+    elif self.unit == "jett":
+      self.CastSpeed = 1.25
+      if self.rank >= 4: self.Shield = round(0.275*self.HealthPoints)
 
   def transformStats(self):
     if self.unit == "caldera":
@@ -99,6 +102,10 @@ class HeroStats(Stats):
       self.transformPhysicalArmor = self.PhysicalArmor + 0.15
       self.transformMagicalArmor = self.MagicalArmor + (0.1 if self.unit == "cyra" else 0.15)
       self.transformMoveSpeed = self.MoveSpeed + 1
+    elif self.unit == "jett":
+      self.transformNormalDamage = round(1.33 * self.NormalDamage)
+      self.transformSpecialDamage = round(1.33 * self.SpecialDamage)
+      self.transformCastSpeed = 1.5 * self.CastSpeed
     
   def get_clean_stats(self, transform:bool=False):
     # return a dictionary with clean stats

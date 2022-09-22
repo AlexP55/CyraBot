@@ -34,6 +34,7 @@ emoji_keys = {
   "cyra":"hero_Cyra1",
   "elara":"hero_Elara1",
   "osan":"hero_Osan1",
+  "jett":"hero_Jett1",
   "koizuul dragon":"hero_Koizuul2",
   "gm":"title_4_gm",
   "knight":"title_2_knight",
@@ -51,7 +52,7 @@ hero_list = [
   "azura","bolton","caldera","connie","efrigid",
   "fee","helios","hogan", "normal hogan","koizuul","lancelot","leif",
   "mabyn","masamune","narlax","obsidian","raida","sethos",
-  "shamiko","smoulder","yan","normal connie","cyra","elara","osan"
+  "shamiko","smoulder","yan","normal connie","cyra","elara","osan","jett"
 ]
 
 emoji_dict = {
@@ -66,7 +67,8 @@ hero_transformable = {
   "caldera": ("True Form", "Giant Form"),
   "koizuul": ("Fish Form", "Dragon Form"),
   "cyra": ("Normal Form", "Goddess Form"),
-  "elara": ("Normal Form", "Goddess Form")
+  "elara": ("Normal Form", "Goddess Form"),
+  "jett": ("Normal Form", "Overheat Mode"),
 }
 
 hero_synonyms = {hero:hero for hero in hero_list}
@@ -84,7 +86,7 @@ hero_synonyms.update({ # hero synonyms
   "old hogan":"normal hogan",
   "elana":"elara",
 })
-transform_extra = ["secret", "sylvan mercenary"]
+transform_extra = ["secret", "sylvan mercenary","l.a.g."]
 transform_synonyms = hero_synonyms.copy()
 transform_synonyms.update({hero:hero for hero in transform_extra})
 
@@ -104,7 +106,7 @@ world_hero = {
   4:["yan", "narlax"],
   5:["leif", "caldera"],
   6:["azura", "raida", "koizuul", "shamiko"],
-  7:["cyra", "elara", "osan"],
+  7:["cyra", "elara", "osan", "jett"],
   None:[], #default 
 }
 
