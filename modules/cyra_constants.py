@@ -91,10 +91,10 @@ transform_synonyms = hero_synonyms.copy()
 transform_synonyms.update({hero:hero for hero in transform_extra})
 
 ability_synonyms = {
-  "range":"ranged",
-  "melee attack":"melee",
-  "ranged attack":"ranged",
-  "range attack":"ranged"
+  "range":"Ranged",
+  "melee attack":"Melee",
+  "ranged attack":"Ranged",
+  "range attack":"Ranged"
 }
 
 # which world are heroes in

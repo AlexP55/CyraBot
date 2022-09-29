@@ -53,11 +53,11 @@ class InfoCog(commands.Cog, name="Information Commands"):
     if lvEnd <= lvStart:
       lvEnd = lvStart + 1
     if lvStart <= 0 or lvEnd > max_level:
-      await context.send(f"Level of {hero.title()} must be between 1 and {max_level}.")
+      await context.send(f"Level of {hero} must be between 1 and {max_level}.")
       return
     cost = elixir_cost(hero, lvStart, lvEnd)
     hero_str = self.bot.get_emoji(context.guild, hero)
-    hero_str = hero_str if hero_str else hero.title()
+    hero_str = hero_str if hero_str else hero
     elixir_str = self.bot.get_emoji(context.guild, 'elixir')
     elixir_str = elixir_str if elixir_str else "elixirs"
     await context.send(
@@ -73,7 +73,7 @@ class InfoCog(commands.Cog, name="Information Commands"):
   )
   async def _elixir_up(self, context, hero:find_hero, numElixir:int, lvStart:int=1):
     if lvStart <= 0 or lvStart >= max_level:
-      await context.send(f"Starting level of {hero.title()} must be between 1 and {max_level-1}.")
+      await context.send(f"Starting level of {hero} must be between 1 and {max_level-1}.")
       return
     cost_list = elixir_cost_hero[hero]
     cost = 0
@@ -84,7 +84,7 @@ class InfoCog(commands.Cog, name="Information Commands"):
     else:
       lv += 1
     hero_str = self.bot.get_emoji(context.guild, hero)
-    hero_str = hero_str if hero_str else hero.title()
+    hero_str = hero_str if hero_str else hero
     elixir_str = self.bot.get_emoji(context.guild, 'elixir')
     elixir_str = elixir_str if elixir_str else "elixirs"
     reply = (f"You are able to upgrade {hero_str} from lv{lvStart} to lv{lv}, "
@@ -169,13 +169,13 @@ class InfoCog(commands.Cog, name="Information Commands"):
         )
         return
         
-      def getInteractiveMessage(ind, parent):
+      def getInteractiveMessage(ind, parent=None):
         row = result[0]
         return level_guide.LevelIndividualMessage(row[0], parent=parent, dbrow=row)
         
       if len(result) > 1:
         levels = [f"`W{result[i][1]} lv.{result[i][0]:<5} {result[i][2]}`" for i in range(len(result))]
-        content = f"You can complete the mission **{achievement.title()}** in below levels, react to see the details of a level:"
+        content = f"You can complete the mission **{achievement}** in below levels, react to see the details of a level:"
         guide = InteractiveSelectionMessage(selections=levels, transfer=getInteractiveMessage, description=content, 
           colour=discord.Colour.green(), context=context, timeout=timeout)
         await guide.start()

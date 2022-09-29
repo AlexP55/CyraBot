@@ -21,7 +21,7 @@ def find_hero_from_emoji(ctx, argument):
   match = re.match(r'<(a?):hero_([a-zA-Z]+)([0-9]+)?:([0-9]+)>$', argument)
   if match:
     hero_name = match.group(2)
-    hero_name = emoji_dict[hero_name] if hero_name in emoji_dict else hero_name.lower()
+    hero_name = emoji_dict[hero_name] if hero_name in emoji_dict else hero_name
     if hero_name not in hero_list:
       raise custom_exceptions.HeroNotFound(hero_name)
     emoji_id = int(match.group(4))
@@ -32,7 +32,6 @@ def find_hero_from_emoji(ctx, argument):
   raise custom_exceptions.HeroNotFound(argument)
   
 def find_hero_from_text(word):
-  word = word.lower()
   close_word = find_closest(word, list(hero_synonyms))
   if close_word:
     return hero_synonyms[close_word]
@@ -60,15 +59,13 @@ class hero_emoji_converter(commands.Converter):
     raise custom_exceptions.HeroNotFound(argument)
     
 def hero_and_secret(word):
-  word = word.lower()
   close_word = find_closest(word, list(transform_synonyms))
   if close_word:
     return transform_synonyms[close_word]
   raise custom_exceptions.HeroNotFound(word)
   
 def find_ability(word):
-  word = word.lower()
-  keywords = word.split()
+  keywords = word.lower().split()
   if keywords[0] in ["rank", "r"]:
     keywords.pop(0)
     keywords[0] = f"r{keywords[0]}"
@@ -80,14 +77,12 @@ def find_ability(word):
   return word
   
 def find_farmable_achievement(name):
-  name = name.lower()
   close_word = find_closest(name, list(farmable_achievement_synonyms))
   if close_word:
     return farmable_achievement_synonyms[close_word]
   raise custom_exceptions.DataNotFound("Achievement", name)
   
 def find_achievement(name):
-  name = name.lower()
   close_word = find_closest(name, list(achievement_synonyms))
   if close_word:
     return achievement_synonyms[close_word]
