@@ -203,7 +203,10 @@ class InfoCog(commands.Cog, name="Information Commands"):
     args = list(args)
     while len(args) > 1:
       try:
-        achievements.append(find_farmable_achievement(args.pop(0)))
+        achievement = find_farmable_achievement(args.pop(0))
+        if world == 7 and achievement == "Slime": # extra parsing for w7 slime
+          achievement = "W7_Slime"
+        achievements.append(achievement)
         nums.append(int(args.pop(0)))
       except Exception as e:
         if isinstance(e, commands.BadArgument):
