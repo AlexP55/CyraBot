@@ -145,13 +145,13 @@ class InfoCog(commands.Cog, name="Information Commands"):
     # check world argument
     if world is not None and (world <= 0 or world >= 8):
       raise custom_exceptions.DataNotFound("World", world)
-    if world == 7 and achievement == "slime": # extra parsing for w7 slime
-      achievement = "w7_slime"
+    if world == 7 and achievement == "Slime": # extra parsing for w7 slime
+      achievement = "W7_slime"
     timeout = self.bot.get_setting(context.guild, "ACTIVE_TIME") * 60
     if achievement in tappables:
-      if achievement == "tappable":
+      if achievement == "Tappable":
         where_clause = [f'LENGTH(tappable)>0']
-      elif achievement == "mercenary board":
+      elif achievement == "Mercenary Board":
         where_clause = [f'extra LIKE "%{achievement}%"']
       else:
         where_clause = [f'tappable LIKE "%{achievement}%"']
@@ -171,7 +171,10 @@ class InfoCog(commands.Cog, name="Information Commands"):
         
       def getInteractiveMessage(ind, parent=None):
         row = result[0]
-        return level_guide.LevelIndividualMessage(row[0], parent=parent, dbrow=row)
+        if parent is None:
+          return level_guide.LevelIndividualMessage(row[0], context=context, timeout=timeout, dbrow=row)
+        else:
+          return level_guide.LevelIndividualMessage(row[0], parent=parent, dbrow=row)
         
       if len(result) > 1:
         levels = [f"`W{result[i][1]} lv.{result[i][0]:<5} {result[i][2]}`" for i in range(len(result))]
