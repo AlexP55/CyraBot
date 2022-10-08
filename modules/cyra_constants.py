@@ -268,7 +268,6 @@ achievement_synonyms.update({ # achievement synonyms
 "Bird":"Flying",
 "Air":"Flying",
 "Flier":"Flying",
-"Flyer":"Flying",
 "Fly":"Flying",
 "Lavacreature":"Lava",
 "Construct":"Security_Construct",
