@@ -11,7 +11,7 @@ from modules.cyra_constants import hero_synonyms, ability_synonyms, hero_list, a
 from unidecode import unidecode
 
 def find_closest(word, word_list):
-  close_word = difflib.get_close_matches(word, word_list, n=1, cutoff=1)
+  close_word = difflib.get_close_matches(word, word_list, n=1, cutoff=0.4)
   if close_word:
     return close_word[0]
   return None
