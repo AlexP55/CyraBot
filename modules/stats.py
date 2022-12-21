@@ -77,7 +77,7 @@ class HeroStats(Stats):
       self.CastSpeed = 1.25
       if self.rank >= 4: self.Shield = round(0.275*self.HealthPoints)
     elif self.unit == "Obsidian" and self.rank >= 7:
-      self.PhysicalArmor += 0 # unknown
+      self.PhysicalArmor += 0.25
 
   def transformStats(self):
     if self.unit == "Caldera":
