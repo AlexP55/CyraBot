@@ -108,6 +108,8 @@ class HeroStats(Stats):
       self.transformNormalDamage = round(1.33 * self.NormalDamage)
       self.transformSpecialDamage = round(1.33 * self.SpecialDamage)
       self.transformCastSpeed = 1.5 * self.CastSpeed
+      self.transformPhysicalArmor = 1.25 * self.PhysicalArmor
+      self.transformMagicalArmor = 1.25 * self.MagicalArmor
     
   def get_clean_stats(self, transform:bool=False):
     # return a dictionary with clean stats
