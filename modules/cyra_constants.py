@@ -1,6 +1,6 @@
 import discord
 
-max_level = 40
+max_level = 50
 
 emoji_keys = {
   "elixir":"item_Elixir",
